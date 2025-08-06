@@ -93,7 +93,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CardTitle className="text-lg">API Connection Status</CardTitle>
+            <CardTitle className="text-lg">Server Connection Status</CardTitle>
             {status === 'connected' && (
               <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 border-green-200">
                 <CheckCircle className="h-3 w-3 mr-1" />

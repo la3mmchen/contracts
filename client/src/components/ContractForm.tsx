@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Contract } from '@/types/contract';
 import { getCategories, getCategoryDisplayName } from '@/config/categories';
 import { Button } from '@/components/ui/button';
@@ -28,17 +28,12 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
     frequency: contract?.frequency || 'monthly' as Contract['frequency'],
     status: contract?.status || 'active' as Contract['status'],
     category: contract?.category || 'other' as Contract['category'],
+    payDate: contract?.payDate || '',
     contactInfo: {
       email: contract?.contactInfo.email || '',
       phone: contract?.contactInfo.phone || '',
       address: contract?.contactInfo.address || '',
       website: contract?.contactInfo.website || '',
-    },
-    paymentInfo: {
-      nextPaymentDate: contract?.paymentInfo.nextPaymentDate || '',
-      lastPaymentDate: contract?.paymentInfo.lastPaymentDate || '',
-      paymentMethod: contract?.paymentInfo.paymentMethod || '',
-      accountNumber: contract?.paymentInfo.accountNumber || '',
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
@@ -109,88 +104,14 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               rows={3}
             />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="category">Category</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value as Contract['category'] })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {getCategories().map(category => (
-                    <SelectItem key={category} value={category}>
-                      {getCategoryDisplayName(category)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as Contract['status'] })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="frequency">Frequency</Label>
-              <Select value={formData.frequency} onValueChange={(value) => setFormData({ ...formData, frequency: value as Contract['frequency'] })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="quarterly">Quarterly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
-                  <SelectItem value="one-time">One-time</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Information</CardTitle>
+          <CardTitle>Contract Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="amount">Amount</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                placeholder="0.00"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="currency">Currency</Label>
-              <Select value={formData.currency} onValueChange={(value) => setFormData({ ...formData, currency: value })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencies.map(currency => (
-                    <SelectItem key={currency} value={currency}>{currency}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="startDate">Start Date</Label>
@@ -212,67 +133,111 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="nextPaymentDate">Next Payment Date</Label>
+              <Label htmlFor="amount">Amount</Label>
               <Input
-                id="nextPaymentDate"
-                type="date"
-                value={formData.paymentInfo.nextPaymentDate}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  paymentInfo: { ...formData.paymentInfo, nextPaymentDate: e.target.value }
-                })}
+                id="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                placeholder="0.00"
+                required
               />
             </div>
             <div>
-              <Label htmlFor="lastPaymentDate">Last Payment Date</Label>
-              <Input
-                id="lastPaymentDate"
-                type="date"
-                value={formData.paymentInfo.lastPaymentDate}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  paymentInfo: { ...formData.paymentInfo, lastPaymentDate: e.target.value }
-                })}
-              />
+              <Label htmlFor="currency">Currency</Label>
+              <Select
+                value={formData.currency}
+                onValueChange={(value) => setFormData({ ...formData, currency: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencies.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="frequency">Frequency</Label>
+              <Select
+                value={formData.frequency}
+                onValueChange={(value) => setFormData({ ...formData, frequency: value as Contract['frequency'] })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="quarterly">Quarterly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
+                  <SelectItem value="one-time">One-time</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="paymentMethod">Payment Method</Label>
-              <Input
-                id="paymentMethod"
-                value={formData.paymentInfo.paymentMethod}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  paymentInfo: { ...formData.paymentInfo, paymentMethod: e.target.value }
-                })}
-                placeholder="e.g., Credit Card, Bank Transfer"
-              />
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value as Contract['status'] })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="terminated">Terminated</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <Label htmlFor="accountNumber">Account Number (Last 4 digits)</Label>
-              <Input
-                id="accountNumber"
-                value={formData.paymentInfo.accountNumber}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  paymentInfo: { ...formData.paymentInfo, accountNumber: e.target.value }
-                })}
-                placeholder="e.g., ***1234"
-                maxLength={8}
-              />
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData({ ...formData, category: value as Contract['category'] })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {getCategories().map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {getCategoryDisplayName(category)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="payDate">Pay Date (Optional)</Label>
+            <Input
+              id="payDate"
+              type="date"
+              value={formData.payDate}
+              onChange={(e) => setFormData({ ...formData, payDate: e.target.value })}
+              placeholder="Leave empty for auto-calculation"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Leave empty to automatically calculate based on start date and frequency
+            </p>
           </div>
         </CardContent>
       </Card>

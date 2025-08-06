@@ -1,6 +1,9 @@
 // Import the Vite environment mock
 import './mocks/vite-env';
 
+// Import testing library setup
+import '@testing-library/jest-dom';
+
 // Mock fetch for API tests
 global.fetch = jest.fn();
 

@@ -1,14 +1,13 @@
 import { Contract } from '@/types/contract';
+import { formatCurrency } from '@/lib/currencyFormatter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   DollarSign, 
   FileText, 
-  Calendar, 
   TrendingUp,
-  AlertTriangle,
   CheckCircle,
-  Clock,
-  XCircle
+  XCircle,
+  Coins
 } from 'lucide-react';
 
 interface ContractStatsProps {
@@ -18,8 +17,8 @@ interface ContractStatsProps {
 export const ContractStats = ({ contracts }: ContractStatsProps) => {
   const activeContracts = contracts.filter(c => c.status === 'active');
   const expiredContracts = contracts.filter(c => c.status === 'expired');
-  const pendingContracts = contracts.filter(c => c.status === 'pending');
   const cancelledContracts = contracts.filter(c => c.status === 'cancelled');
+  const closedContracts = contracts.filter(c => c.status === 'closed');
 
   const totalMonthlyAmount = contracts
     .filter(c => c.status === 'active')
@@ -35,6 +34,12 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
         case 'yearly':
           monthlyAmount = contract.amount / 12;
           break;
+        case 'weekly':
+          monthlyAmount = contract.amount * 4.33;
+          break;
+        case 'bi-weekly':
+          monthlyAmount = contract.amount * 2.17;
+          break;
         default:
           monthlyAmount = 0;
       }
@@ -43,13 +48,16 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
 
   const totalYearlyAmount = totalMonthlyAmount * 12;
 
-  const contractsDueSoon = contracts.filter(contract => {
-    if (!contract.paymentInfo.nextPaymentDate) return false;
-    const nextPayment = new Date(contract.paymentInfo.nextPaymentDate);
-    const today = new Date();
-    const daysUntilPayment = Math.ceil((nextPayment.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilPayment <= 7 && daysUntilPayment >= 0;
-  }).length;
+  // Get the most common currency from active contracts, default to USD
+  const activeContractsWithCurrency = contracts.filter(c => c.status === 'active');
+  const currencyCounts = activeContractsWithCurrency.reduce((acc, contract) => {
+    acc[contract.currency] = (acc[contract.currency] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const primaryCurrency = Object.keys(currencyCounts).length > 0 
+    ? Object.entries(currencyCounts).sort(([,a], [,b]) => b - a)[0][0]
+    : 'USD';
 
   const stats = [
     {
@@ -74,29 +82,22 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       bgColor: 'bg-destructive/10',
     },
     {
-      title: 'Pending Contracts',
-      value: pendingContracts.length,
-      icon: Clock,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
-    },
-    {
-      title: 'Due Soon',
-      value: contractsDueSoon,
-      icon: AlertTriangle,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
+      title: 'Closed Contracts',
+      value: closedContracts.length,
+      icon: XCircle,
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted/10',
     },
     {
       title: 'Monthly Spend',
-      value: `$${totalMonthlyAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      icon: DollarSign,
+      value: formatCurrency(totalMonthlyAmount, primaryCurrency),
+      icon: Coins,
       color: 'text-info',
       bgColor: 'bg-info/10',
     },
     {
       title: 'Yearly Spend',
-      value: `$${totalYearlyAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: formatCurrency(totalYearlyAmount, primaryCurrency),
       icon: TrendingUp,
       color: 'text-info',
       bgColor: 'bg-info/10',

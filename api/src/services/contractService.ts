@@ -220,9 +220,9 @@ class ContractService {
   }
 
   async exportToMarkdown(contracts: Contract[]): Promise<string> {
-    const now = new Date().toISOString();
-    const date = now.split('T')[0];
-    const time = now.split('T')[1].split('.')[0];
+    const now = new Date();
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString();
 
     let markdown = `# Contracts Export\n\n`;
     markdown += `**Generated:** ${date} at ${time}\n\n`;
@@ -258,6 +258,10 @@ class ContractService {
           markdown += `**End Date:** ${contract.endDate}\n\n`;
         }
         
+        if (contract.payDate) {
+          markdown += `**Pay Date:** ${contract.payDate}\n\n`;
+        }
+        
         if (contract.description) {
           markdown += `**Description:** ${contract.description}\n\n`;
         }
@@ -270,16 +274,14 @@ class ContractService {
           if (contract.contactInfo.phone) {
             markdown += `- Phone: ${contract.contactInfo.phone}\n`;
           }
-          markdown += `\n`;
-        }
-
-        if (contract.paymentInfo) {
-          markdown += `**Payment Information:**\n`;
-          if (contract.paymentInfo.nextPaymentDate) {
-            markdown += `- Next Payment: ${contract.paymentInfo.nextPaymentDate}\n`;
+          if (contract.contactInfo.website) {
+            markdown += `- Website: ${contract.contactInfo.website}\n`;
           }
-          if (contract.paymentInfo.paymentMethod) {
-            markdown += `- Method: ${contract.paymentInfo.paymentMethod}\n`;
+          if (contract.contactInfo.address) {
+            markdown += `- Address: ${contract.contactInfo.address}\n`;
+          }
+          if (contract.contactInfo.contactPerson) {
+            markdown += `- Contact Person: ${contract.contactInfo.contactPerson}\n`;
           }
           markdown += `\n`;
         }
@@ -288,12 +290,8 @@ class ContractService {
           markdown += `**Tags:** ${contract.tags.join(', ')}\n\n`;
         }
 
-        if (contract.paymentInfo.autoRenew !== undefined) {
-          markdown += `**Auto Renewal:** ${contract.paymentInfo.autoRenew ? 'Yes' : 'No'}\n\n`;
-        }
-
-        if (contract.paymentInfo.lateFees !== undefined) {
-          markdown += `**Late Fees:** ${contract.paymentInfo.lateFees ? 'Yes' : 'No'}\n\n`;
+        if (contract.notes) {
+          markdown += `**Notes:** ${contract.notes}\n\n`;
         }
 
         if (contract.documentLink) {

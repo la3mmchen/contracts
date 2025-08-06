@@ -22,8 +22,12 @@ import {
   CheckCircle, 
   Clock,
   FileText,
-  Building
+  Building,
+  Coins,
+  Info
 } from 'lucide-react';
+import { calculateNextThreePayments } from '@/lib/paymentCalculator';
+import { formatCurrency, formatAmount } from '@/lib/currencyFormatter';
 
 interface ContractAnalyticsProps {
   contracts: Contract[];
@@ -52,19 +56,40 @@ export const ContractAnalytics = ({ contracts, stats }: ContractAnalyticsProps) 
               contract.frequency === 'yearly' ? contract.amount / 12 :
               contract.frequency === 'weekly' ? contract.amount * 4.33 :
               contract.frequency === 'bi-weekly' ? contract.amount * 2.17 : contract.amount,
+      currency: contract.currency,
     }))
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 10);
 
+  // Get the most common currency from active contracts, default to USD
+  const activeContractsWithCurrency = contracts.filter(c => c.status === 'active');
+  const currencyCounts = activeContractsWithCurrency.reduce((acc, contract) => {
+    acc[contract.currency] = (acc[contract.currency] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const primaryCurrency = Object.keys(currencyCounts).length > 0 
+    ? Object.entries(currencyCounts).sort(([,a], [,b]) => b - a)[0][0]
+    : 'USD';
+
   const upcomingPayments = contracts
-    .filter(c => c.status === 'active' && c.paymentInfo.nextPaymentDate)
-    .map(contract => ({
-      name: contract.name,
-      date: new Date(contract.paymentInfo.nextPaymentDate!),
-      amount: contract.amount,
-      daysUntil: Math.ceil((new Date(contract.paymentInfo.nextPaymentDate!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
-    }))
-    .filter(payment => payment.daysUntil >= 0)
+    .filter(c => c.status === 'active')
+    .flatMap(contract => {
+      const payments = calculateNextThreePayments(contract);
+      return payments
+        .filter(payment => {
+          const paymentDate = new Date(payment.date);
+          const daysUntil = Math.ceil((paymentDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+          return daysUntil >= 0;
+        })
+        .map(payment => ({
+          name: contract.name,
+          date: new Date(payment.date),
+          amount: payment.amount,
+          currency: contract.currency,
+          daysUntil: Math.ceil((new Date(payment.date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
+        }));
+    })
     .sort((a, b) => a.daysUntil - b.daysUntil)
     .slice(0, 5);
 
@@ -73,8 +98,8 @@ export const ContractAnalytics = ({ contracts, stats }: ContractAnalyticsProps) 
       case 'active': return 'bg-green-100 text-green-800';
       case 'expired': return 'bg-red-100 text-red-800';
       case 'cancelled': return 'bg-gray-100 text-gray-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'draft': return 'bg-blue-100 text-blue-800';
+      case 'closed': return 'bg-gray-100 text-gray-800';
+      case 'terminated': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -99,12 +124,19 @@ export const ContractAnalytics = ({ contracts, stats }: ContractAnalyticsProps) 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Monthly Expenses</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-1">
+              <span className="text-2xl font-bold">
+                {formatAmount(stats.monthlyExpenses)}
+              </span>
+              <div className="relative group">
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  Note: Different currencies are not taken into consideration here. This shows the total amount in the primary currency.
+                </div>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              ${stats.monthlyExpenses.toLocaleString()}
-            </div>
             <p className="text-xs text-muted-foreground">
               From active contracts
             </p>
@@ -206,7 +238,7 @@ export const ContractAnalytics = ({ contracts, stats }: ContractAnalyticsProps) 
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip formatter={(value) => [`$${value}`, 'Monthly Cost']} />
+              <Tooltip formatter={(value) => [`${formatCurrency(Number(value), primaryCurrency)}`, 'Monthly Cost']} />
               <Bar dataKey="amount" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
@@ -233,7 +265,7 @@ export const ContractAnalytics = ({ contracts, stats }: ContractAnalyticsProps) 
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">${payment.amount.toLocaleString()}</div>
+                    <div className="font-medium">{formatCurrency(payment.amount, payment.currency)}</div>
                     <div className="text-sm text-muted-foreground">
                       {payment.daysUntil === 0 ? 'Today' : 
                        payment.daysUntil === 1 ? 'Tomorrow' : 

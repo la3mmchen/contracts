@@ -11,22 +11,30 @@ import {
   MapPin,
   Edit,
   Trash2,
+  FileText,
+  User,
   Clock,
-  FileText
+  CalendarDays,
+  X
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
+import { formatCurrency } from '@/lib/currencyFormatter';
+import { CurrencyIcon } from '@/lib/currencyIcons';
 
 interface ContractCardProps {
   contract: Contract;
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
+  onClose?: (contract: Contract) => void;
 }
 
 const statusColors = {
   active: 'bg-green-100 text-green-800 border-green-200',
   expired: 'bg-red-100 text-red-800 border-red-200',
   cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
-  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  closed: 'bg-gray-100 text-gray-800 border-gray-200',
+  terminated: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
 const categoryColors = {
@@ -39,28 +47,13 @@ const categoryColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete }: ContractCardProps) => {
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD',
-    }).format(amount);
+export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCardProps) => {
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'MMM dd, yyyy');
   };
 
-  const getNextPaymentDate = () => {
-    if (contract.paymentInfo.nextPaymentDate) {
-      return format(new Date(contract.paymentInfo.nextPaymentDate), 'MMM dd, yyyy');
-    }
-    return 'Not set';
-  };
-
-  const isExpiringSoon = () => {
-    if (!contract.paymentInfo.nextPaymentDate) return false;
-    const nextPayment = new Date(contract.paymentInfo.nextPaymentDate);
-    const today = new Date();
-    const daysUntilPayment = Math.ceil((nextPayment.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilPayment <= 7 && daysUntilPayment >= 0;
-  };
+  const payments = calculateNextThreePayments(contract);
+  const nextPayment = payments[0];
 
   return (
     <Card className="group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in">
@@ -81,14 +74,27 @@ export const ContractCard = ({ contract, onEdit, onDelete }: ContractCardProps) 
               size="sm"
               onClick={() => onEdit(contract)}
               className="opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Edit contract"
             >
               <Edit className="h-4 w-4" />
             </Button>
+            {contract.status === 'expired' && onClose && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onClose(contract)}
+                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
+                title="Close contract"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
               onClick={() => onDelete(contract.id)}
               className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
+              title="Delete contract"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -105,90 +111,170 @@ export const ContractCard = ({ contract, onEdit, onDelete }: ContractCardProps) 
           <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[contract.category]}`}>
             {contract.category}
           </span>
-          {isExpiringSoon() && (
-            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-warning text-warning-foreground animate-pulse">
-              <Clock className="h-3 w-3 mr-1" />
-              Due Soon
-            </span>
-          )}
+        </div>
+
+        {/* Contract Period */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CalendarDays className="h-4 w-4" />
+            <span>Contract Period:</span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span>Start: {formatDate(contract.startDate)}</span>
+            {contract.endDate && (
+              <span>End: {formatDate(contract.endDate)}</span>
+            )}
+          </div>
         </div>
 
         {/* Amount and Frequency */}
         <div className="flex items-center gap-2 text-lg font-semibold">
-          <DollarSign className="h-5 w-5 text-success" />
+          <CurrencyIcon currency={contract.currency} />
           <span>{formatCurrency(contract.amount, contract.currency)}</span>
           <span className="text-sm text-muted-foreground font-normal">
             / {contract.frequency}
           </span>
         </div>
 
-        {/* Payment Info */}
-        {contract.paymentInfo.nextPaymentDate && (
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="h-4 w-4 text-info" />
-            <span className="text-muted-foreground">Next payment:</span>
-            <span className={isExpiringSoon() ? 'text-warning font-medium' : 'text-foreground'}>
-              {getNextPaymentDate()}
-            </span>
+        {/* Payment Schedule */}
+        {payments.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <Calendar className="h-4 w-4 text-info" />
+              <span className="text-muted-foreground">Next 3 payments:</span>
+            </div>
+            <div className="space-y-1">
+              {payments.map((payment, index) => (
+                <div key={index} className="flex items-center justify-between text-xs">
+                  <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'}`}>
+                    {formatPaymentDate(payment.date)}
+                  </span>
+                  <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'}`}>
+                    {formatCurrency(payment.amount, payment.currency)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         {/* Contact Information */}
         <div className="space-y-2">
+          {contract.contactInfo.contactPerson && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span className="text-foreground font-medium">{contract.contactInfo.contactPerson}</span>
+            </div>
+          )}
           {contract.contactInfo.email && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Mail className="h-4 w-4" />
-              <span className="truncate">{contract.contactInfo.email}</span>
+              <a 
+                href={`mailto:${contract.contactInfo.email}`}
+                className="text-primary hover:underline truncate"
+                title={`Send email to ${contract.contactInfo.email}`}
+              >
+                {contract.contactInfo.email}
+              </a>
             </div>
           )}
           {contract.contactInfo.phone && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Phone className="h-4 w-4" />
-              <span>{contract.contactInfo.phone}</span>
+              <a 
+                href={`tel:${contract.contactInfo.phone}`}
+                className="text-primary hover:underline"
+                title={`Call ${contract.contactInfo.phone}`}
+              >
+                {contract.contactInfo.phone}
+              </a>
             </div>
           )}
           {contract.contactInfo.website && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Globe className="h-4 w-4" />
-              <span className="truncate">{contract.contactInfo.website}</span>
+              <a 
+                href={contract.contactInfo.website.startsWith('http') ? contract.contactInfo.website : `https://${contract.contactInfo.website}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline truncate"
+                title={`Visit ${contract.contactInfo.website}`}
+              >
+                {contract.contactInfo.website}
+              </a>
             </div>
           )}
           {contract.contactInfo.address && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="h-4 w-4" />
-              <span className="truncate">{contract.contactInfo.address}</span>
-            </div>
-          )}
-          {contract.documentLink && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <FileText className="h-4 w-4" />
               <a 
-                href={contract.documentLink} 
+                href={`https://maps.google.com/?q=${encodeURIComponent(contract.contactInfo.address)}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-primary hover:underline truncate"
+                title={`View ${contract.contactInfo.address} on Google Maps`}
               >
-                View Document
+                {contract.contactInfo.address}
               </a>
             </div>
           )}
         </div>
 
+        {/* Document Link */}
+        {contract.documentLink && (
+          <div className="flex items-center gap-2 text-sm">
+            <FileText className="h-4 w-4 text-info" />
+            <a 
+              href={contract.documentLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+              title="View contract document"
+            >
+              View Contract Document
+            </a>
+          </div>
+        )}
+
         {/* Description */}
         {contract.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {contract.description}
-          </p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <FileText className="h-4 w-4" />
+              <span>Description:</span>
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-2 pl-6">
+              {contract.description}
+            </p>
+          </div>
+        )}
+
+        {/* Notes */}
+        {contract.notes && (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>Notes:</span>
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-3 pl-6 bg-muted/30 p-2 rounded">
+              {contract.notes}
+            </p>
+          </div>
         )}
 
         {/* Tags */}
         {contract.tags && contract.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {contract.tags.map((tag, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                #{tag}
-              </Badge>
-            ))}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Tags:</span>
+            </div>
+            <div className="flex flex-wrap gap-1 pl-6">
+              {contract.tags.map((tag, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {`#${tag}`}
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
       </CardContent>

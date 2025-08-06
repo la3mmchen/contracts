@@ -2,6 +2,8 @@ import { Contract } from '@/types/contract';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Calendar, AlertTriangle, Clock, DollarSign } from 'lucide-react';
+import { calculateNextThreePayments, isPaymentDueSoon } from '@/lib/paymentCalculator';
+import { formatCurrency } from '@/lib/currencyFormatter';
 
 interface NotificationBannerProps {
   contracts: Contract[];
@@ -9,25 +11,42 @@ interface NotificationBannerProps {
 
 export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
   const now = new Date();
-  const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
   const upcomingPayments = contracts
-    .filter(c => c.status === 'active' && c.paymentInfo.nextPaymentDate)
-    .map(contract => ({
-      ...contract,
-      daysUntil: Math.ceil((new Date(contract.paymentInfo.nextPaymentDate!).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
-    }))
-    .filter(payment => payment.daysUntil >= 0 && payment.daysUntil <= 7)
+    .filter(c => c.status === 'active')
+    .flatMap(contract => {
+      const payments = calculateNextThreePayments(contract);
+      return payments
+        .filter(payment => {
+          const paymentDate = new Date(payment.date);
+          const daysUntil = Math.ceil((paymentDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          return daysUntil >= 0 && daysUntil <= 7;
+        })
+        .map(payment => ({
+          ...contract,
+          paymentDate: payment.date,
+          daysUntil: Math.ceil((new Date(payment.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+        }));
+    })
     .sort((a, b) => a.daysUntil - b.daysUntil);
 
   const expiredContracts = contracts.filter(c => c.status === 'expired');
   const overdueContracts = contracts
-    .filter(c => c.status === 'active' && c.paymentInfo.nextPaymentDate)
-    .map(contract => ({
-      ...contract,
-      daysOverdue: Math.ceil((now.getTime() - new Date(contract.paymentInfo.nextPaymentDate!).getTime()) / (1000 * 60 * 60 * 24)),
-    }))
-    .filter(payment => payment.daysOverdue > 0)
+    .filter(c => c.status === 'active')
+    .flatMap(contract => {
+      const payments = calculateNextThreePayments(contract);
+      return payments
+        .filter(payment => {
+          const paymentDate = new Date(payment.date);
+          const daysOverdue = Math.ceil((now.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
+          return daysOverdue > 0;
+        })
+        .map(payment => ({
+          ...contract,
+          paymentDate: payment.date,
+          daysOverdue: Math.ceil((now.getTime() - new Date(payment.date).getTime()) / (1000 * 60 * 60 * 24)),
+        }));
+    })
     .sort((a, b) => b.daysOverdue - a.daysOverdue);
 
   if (upcomingPayments.length === 0 && expiredContracts.length === 0 && overdueContracts.length === 0) {
@@ -45,10 +64,10 @@ export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
             You have {upcomingPayments.length} payment{upcomingPayments.length > 1 ? 's' : ''} due in the next 7 days:
             <div className="mt-2 space-y-1">
               {upcomingPayments.map((contract) => (
-                <div key={contract.id} className="flex items-center justify-between text-sm">
+                <div key={`${contract.id}-${contract.paymentDate}`} className="flex items-center justify-between text-sm">
                   <span>{contract.name}</span>
                   <span className="font-medium">
-                    ${contract.amount.toLocaleString()} - {contract.daysUntil === 0 ? 'Today' : 
+                    {formatCurrency(contract.amount, contract.currency)} - {contract.daysUntil === 0 ? 'Today' : 
                     contract.daysUntil === 1 ? 'Tomorrow' : `${contract.daysUntil} days`}
                   </span>
                 </div>
@@ -67,10 +86,10 @@ export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
             You have {overdueContracts.length} overdue payment{overdueContracts.length > 1 ? 's' : ''}:
             <div className="mt-2 space-y-1">
               {overdueContracts.map((contract) => (
-                <div key={contract.id} className="flex items-center justify-between text-sm">
+                <div key={`${contract.id}-${contract.paymentDate}`} className="flex items-center justify-between text-sm">
                   <span>{contract.name}</span>
                   <span className="font-medium">
-                    ${contract.amount.toLocaleString()} - {contract.daysOverdue} day{contract.daysOverdue > 1 ? 's' : ''} overdue
+                    {formatCurrency(contract.amount, contract.currency)} - {contract.daysOverdue} day{contract.daysOverdue > 1 ? 's' : ''} overdue
                   </span>
                 </div>
               ))}
