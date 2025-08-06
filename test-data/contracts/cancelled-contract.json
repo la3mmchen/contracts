@@ -1,0 +1,31 @@
+{
+  "contractId": "CANC-2024-001",
+  "name": "Cancelled Gym Membership",
+  "company": "Planet Fitness",
+  "description": "Monthly gym membership that was cancelled",
+  "startDate": "2024-03-01",
+  "endDate": "2024-08-01",
+  "amount": 10.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "cancelled",
+  "category": "services",
+  "contactInfo": {
+    "email": "membership@planetfitness.com",
+    "phone": "+1-800-765-4321",
+    "website": "https://planetfitness.com",
+    "address": "123 Fitness Ave, San Francisco, CA 94102",
+    "contactPerson": "Membership Services"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": null,
+    "lastPaymentDate": "2024-08-01",
+    "paymentMethod": "Credit Card",
+    "accountNumber": "****-****-****-3456",
+    "autoRenew": false,
+    "lateFees": 0
+  },
+  "notes": "Cancelled due to relocation. No refund issued.",
+  "tags": ["fitness", "cancelled", "membership"],
+  "documentLink": "https://planetfitness.com/membership/cancelled-2024-001"
+} 

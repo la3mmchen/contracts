@@ -1,0 +1,30 @@
+{
+  "contractId": "EXP-2024-009",
+  "name": "Gym Membership",
+  "company": "Fitness First",
+  "description": "Premium gym membership with access to all locations and classes",
+  "startDate": "2024-03-01",
+  "endDate": null,
+  "amount": 89.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "services",
+  "contactInfo": {
+    "email": "membership@fitnessfirst.com",
+    "phone": "+1-555-456-7890",
+    "website": "https://fitnessfirst.com",
+    "address": "789 Fitness Street, San Francisco, CA 94102",
+    "contactPerson": "Alex Thompson"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-09-01",
+    "lastPaymentDate": "2024-08-01",
+    "paymentMethod": "Credit Card",
+    "accountNumber": "****-****-****-7890",
+    "autoRenew": true,
+    "lateFees": 20.00
+  },
+  "notes": "Includes personal training sessions. Pool access. 24/7 access.",
+  "tags": ["fitness", "health", "membership"]
+} 

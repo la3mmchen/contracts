@@ -1,0 +1,31 @@
+{
+  "contractId": "RENT-2024-007",
+  "name": "Apartment Lease",
+  "company": "Sunset Properties LLC",
+  "description": "2-bedroom apartment lease in downtown area",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "amount": 2500.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "rent",
+  "contactInfo": {
+    "email": "leasing@sunsetproperties.com",
+    "phone": "+1-555-987-6543",
+    "website": "https://sunsetproperties.com",
+    "address": "456 Main Street, San Francisco, CA 94105",
+    "contactPerson": "Sarah Wilson"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-09-01",
+    "lastPaymentDate": "2024-08-01",
+    "paymentMethod": "Bank Transfer",
+    "accountNumber": "****-****-****-3456",
+    "autoRenew": false,
+    "lateFees": 100.00
+  },
+  "notes": "Includes utilities. Parking space #12. Pet deposit paid.",
+  "tags": ["rent", "housing", "apartment"],
+  "documentLink": "https://sunsetproperties.com/leases/2024-007-signed-lease.pdf"
+} 

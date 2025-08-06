@@ -1,0 +1,46 @@
+name: contracts-production
+services:
+  # Frontend application
+  frontend:
+    image: ghcr.io/la3mmchen/contracts/contracts-app:latest
+    environment:
+      API_URL: "https://contracts.yourdomain.com/api"
+      APP_NAME: "contracts"
+      CONTRACTS_CATEGORIES: "subscription,insurance,utilities,rent,services,software,maintenance,other"
+    restart: unless-stopped
+    networks:
+      - contracts-network
+
+  # Backend API
+  backend:
+    image: ghcr.io/la3mmchen/contracts/contracts-api:latest
+    environment:
+      PORT: 3001
+      CONTRACTS_DATA_DIR: "/data"
+    volumes:
+      - "/data/contracts:/data"
+    restart: unless-stopped
+    networks:
+      - contracts-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./htpasswd:/etc/nginx/.htpasswd:ro
+      - ./logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - contracts-network
+
+networks:
+  contracts-network:
+    driver: bridge

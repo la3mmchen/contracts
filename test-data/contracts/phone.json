@@ -1,0 +1,30 @@
+{
+  "contractId": "TERM-2024-010",
+  "name": "Cell Phone Plan",
+  "company": "Verizon Wireless",
+  "description": "Unlimited data plan with 5G access and international roaming",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "amount": 85.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "services",
+  "contactInfo": {
+    "email": "customer.service@verizon.com",
+    "phone": "+1-800-922-0204",
+    "website": "https://verizon.com",
+    "address": "1095 Avenue of the Americas, New York, NY 10036"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-09-01",
+    "lastPaymentDate": "2024-08-01",
+    "paymentMethod": "Auto Pay",
+    "accountNumber": "555-123-4567",
+    "autoRenew": true,
+    "lateFees": 15.00
+  },
+  "notes": "Includes unlimited talk, text, and data. 5G Ultra Wideband access.",
+  "tags": ["mobile", "telecommunications", "unlimited"],
+  "documentLink": "https://verizon.com/account/contracts/phone-plan-2024-010"
+} 

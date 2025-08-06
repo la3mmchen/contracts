@@ -1,0 +1,31 @@
+{
+  "contractId": "PEND-2024-001",
+  "name": "Pending Software License",
+  "company": "Adobe Creative Cloud",
+  "description": "Annual Adobe Creative Cloud subscription for design work",
+  "startDate": "2024-12-25",
+  "endDate": "2025-12-25",
+  "amount": 599.88,
+  "currency": "USD",
+  "frequency": "yearly",
+  "status": "pending",
+  "category": "software",
+  "contactInfo": {
+    "email": "billing@adobe.com",
+    "phone": "+1-800-833-6687",
+    "website": "https://adobe.com",
+    "address": "345 Park Avenue, San Jose, CA 95110",
+    "contactPerson": "Adobe Billing"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-12-25",
+    "lastPaymentDate": null,
+    "paymentMethod": "Credit Card",
+    "accountNumber": "****-****-****-5678",
+    "autoRenew": true,
+    "lateFees": 0
+  },
+  "notes": "Pending approval from IT department. Includes Photoshop, Illustrator, and InDesign.",
+  "tags": ["software", "design", "creative"],
+  "documentLink": "https://adobe.com/account/licenses/pending-2024-001"
+} 

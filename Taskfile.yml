@@ -1,0 +1,138 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build both frontend and backend Docker images
+    cmds:
+      - docker-compose build app
+      - docker-compose build api
+    sources:
+      - client/src/**/*
+      - client/public/**/*
+      - client/package*.json
+      - client/vite.config.ts
+      - client/tailwind.config.ts
+      - client/tsconfig*.json
+      - client/Dockerfile
+      - client/nginx.conf
+      - api/src/**/*
+      - api/package*.json
+      - api/Dockerfile
+    generates:
+      - client/.dockerignore
+
+  run:
+    desc: Run the full application with file-based storage
+    deps: [build]
+    cmds:
+      - docker-compose up -d
+    status:
+      - docker ps --format "table {{.Names}}\t{{.Status}}" | grep contracts-app || exit 1
+      - docker ps --format "table {{.Names}}\t{{.Status}}" | grep contracts-api || exit 1
+
+  stop:
+    desc: Stop all running containers
+    cmds:
+      - docker-compose down
+
+  clean:
+    desc: Clean up Docker images, containers, and volumes
+    cmds:
+      - docker-compose down -v
+      - docker rmi contracts-app contracts-api || true
+
+  logs:
+    desc: Show logs from all running containers
+    cmds:
+      - docker-compose logs -f
+
+  logs-api:
+    desc: Show logs from the API container
+    cmds:
+      - docker-compose logs -f api
+
+  logs-app:
+    desc: Show logs from the frontend container
+    cmds:
+      - docker-compose logs -f app
+
+  shell-api:
+    desc: Open a shell in the API container
+    cmds:
+      - docker exec -it contracts-api sh
+
+  shell-app:
+    desc: Open a shell in the frontend container
+    cmds:
+      - docker exec -it contracts-app sh
+
+  data-info:
+    desc: Get information about data storage
+    cmds:
+      - curl -s http://localhost:3001/api/contracts/info/data | jq .
+
+  file-stats:
+    desc: Get file statistics for individual JSON files
+    cmds:
+      - curl -s http://localhost:3001/api/contracts/info/stats | jq .
+
+  load-test-data:
+    desc: Load test contract data into the application
+    cmds:
+      - ./scripts/load-test-data.sh
+
+  clear-test-data:
+    desc: Remove only test data contracts from the system
+    cmds:
+      - echo "🗑️ Removing test data contracts..."
+      - |
+        # Get all contracts and filter by test data contract IDs
+        curl -s http://localhost:3001/api/contracts | jq -r '.[] | select(.contractId == "SOFT-2024-006" or .contractId == "UTL-2024-003" or .contractId == "EXP-2024-009" or .contractId == "MAINT-2024-005" or .contractId == "INS-2024-002" or .contractId == "SERV-2024-008" or .contractId == "NET-2024-001" or .contractId == "TERM-2024-010" or .contractId == "RENT-2024-007" or .contractId == "SW-2024-004" or .contractId == "PEND-2024-001" or .contractId == "EXP-2024-001" or .contractId == "CANC-2024-001" or .contractId == "DRAFT-2024-001" or .contractId == "TERM-2024-001") | .id' | while read id; do
+          if [ ! -z "$id" ]; then
+            echo "Deleting test contract: $id"
+            curl -s -X DELETE "http://localhost:3001/api/contracts/$id" > /dev/null
+          fi
+        done
+      - echo "✅ Test data contracts removed!"
+      - |
+        echo "📊 Current contract count: $(curl -s http://localhost:3001/api/contracts | jq length)"
+
+  test:
+    desc: Run all tests in containers
+    cmds:
+      - echo "🧪 Running client tests in container..."
+      - docker run --rm -v $(pwd)/client:/app -w /app node:18-alpine sh -c "npm install --legacy-peer-deps && npm install --save-dev ts-jest --legacy-peer-deps && npm test"
+      - echo "🧪 Running API tests in container..."
+      - docker run --rm -v $(pwd)/api:/app -w /app node:18-alpine sh -c "npm install --legacy-peer-deps && npm test"
+      - echo "✅ All tests completed!"
+
+  test-watch:
+    desc: Run tests in watch mode
+    cmds:
+      - echo "🧪 Running tests in watch mode..."
+      - cd client && npm run test:watch
+
+  health:
+    desc: Check health of all services
+    cmds:
+      - echo "Frontend:" && curl -s -I http://localhost:3000 | head -1 || echo "Frontend not responding"
+      - echo "API:" && curl -s http://localhost:3001/api/health | jq . || echo "API not responding"
+
+  test-export-markdown:
+    desc: Test Markdown export functionality
+    cmds:
+      - echo "Testing Markdown export functionality..."
+      - echo "Exporting all contracts to Markdown..."
+      - curl -s http://localhost:3001/api/contracts/export/markdown -o test-data/exports/contracts-export.md
+      - echo "Export completed! File contracts-export.md"
+      - echo "File size $(wc -c < test-data/exports/contracts-export.md) bytes"
+      - echo "Preview (first 10 lines):"
+      - head -10 test-data/exports/contracts-export.md
+      - echo ""
+      - echo "Exporting active contracts only..."
+      - curl -s "http://localhost:3001/api/contracts/export/markdown?status=active" -o test-data/exports/active-contracts.md
+      - echo "Active contracts exported! File active-contracts.md"
+      - echo "Active contracts file size $(wc -c < test-data/exports/active-contracts.md) bytes"
+      - echo ""
+      - echo "Available export files:"
+      - ls -la test-data/exports/*.md

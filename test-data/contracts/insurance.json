@@ -1,0 +1,31 @@
+{
+  "contractId": "INS-2024-002",
+  "name": "Home Insurance Policy",
+  "company": "State Farm Insurance",
+  "description": "Comprehensive home insurance covering fire, theft, and natural disasters",
+  "startDate": "2024-03-01",
+  "endDate": "2025-03-01",
+  "amount": 1200.00,
+  "currency": "USD",
+  "frequency": "yearly",
+  "status": "active",
+  "category": "insurance",
+  "contactInfo": {
+    "email": "agent@statefarm.com",
+    "phone": "+1-800-782-8332",
+    "website": "https://statefarm.com",
+    "address": "One State Farm Plaza, Bloomington, IL 61710",
+    "contactPerson": "John Smith"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2025-03-01",
+    "lastPaymentDate": "2024-03-01",
+    "paymentMethod": "Bank Transfer",
+    "accountNumber": "****-****-****-5678",
+    "autoRenew": true,
+    "lateFees": 50.00
+  },
+  "notes": "Covers dwelling up to $300,000. Deductible: $1,000",
+  "tags": ["insurance", "home", "protection"],
+  "documentLink": "https://statefarm.com/policy/documents/home-insurance-2024-002"
+} 

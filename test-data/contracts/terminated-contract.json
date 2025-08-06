@@ -1,0 +1,31 @@
+{
+  "contractId": "TERM-2024-001",
+  "name": "Terminated Internet Service",
+  "company": "Comcast Xfinity",
+  "description": "High-speed internet service that was terminated early",
+  "startDate": "2024-01-01",
+  "endDate": "2024-11-15",
+  "amount": 79.99,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "terminated",
+  "category": "utilities",
+  "contactInfo": {
+    "email": "customer.service@comcast.com",
+    "phone": "+1-800-934-6489",
+    "website": "https://comcast.com",
+    "address": "1701 John F Kennedy Boulevard, Philadelphia, PA 19103",
+    "contactPerson": "Customer Service"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": null,
+    "lastPaymentDate": "2024-11-15",
+    "paymentMethod": "Auto Pay",
+    "accountNumber": "987654321",
+    "autoRenew": false,
+    "lateFees": 0
+  },
+  "notes": "Terminated early due to poor service quality. Early termination fee waived.",
+  "tags": ["internet", "terminated", "utilities"],
+  "documentLink": "https://comcast.com/account/terminated-2024-001"
+} 

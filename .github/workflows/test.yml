@@ -1,0 +1,42 @@
+name: Test Application
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run client tests in container
+        run: |
+          echo "🧪 Running client tests in container..."
+          docker run --rm -v $(pwd)/client:/app -w /app node:18-alpine sh -c "
+            npm install --legacy-peer-deps &&
+            npm install --save-dev ts-jest --legacy-peer-deps &&
+            npm test
+          "
+
+      - name: Run API tests in container
+        run: |
+          echo "🧪 Running API tests in container..."
+          docker run --rm -v $(pwd)/api:/app -w /app node:18-alpine sh -c "
+            npm install --legacy-peer-deps &&
+            npm test
+          "
+
+      - name: Verify Docker builds
+        run: |
+          echo "Building Docker images for verification..."
+          docker build -t contracts-app-test ./client
+          docker build -t contracts-api-test ./api
+          echo "Docker builds completed successfully" 

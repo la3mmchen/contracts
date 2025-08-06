@@ -1,0 +1,31 @@
+{
+  "contractId": "MAINT-2024-005",
+  "name": "HVAC Maintenance Contract",
+  "company": "Cool Breeze HVAC Services",
+  "description": "Annual HVAC system maintenance and inspection service",
+  "startDate": "2024-06-01",
+  "endDate": "2025-06-01",
+  "amount": 299.00,
+  "currency": "USD",
+  "frequency": "yearly",
+  "status": "active",
+  "category": "maintenance",
+  "contactInfo": {
+    "email": "service@coolbreezehvac.com",
+    "phone": "+1-555-123-4567",
+    "website": "https://coolbreezehvac.com",
+    "address": "123 Service Lane, San Jose, CA 95112",
+    "contactPerson": "Mike Johnson"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2025-06-01",
+    "lastPaymentDate": "2024-06-01",
+    "paymentMethod": "Check",
+    "accountNumber": "CHK-2024-001",
+    "autoRenew": false,
+    "lateFees": 25.00
+  },
+  "notes": "Includes 2 annual inspections and emergency service calls.",
+  "tags": ["maintenance", "hvac", "home"],
+  "documentLink": "https://coolbreezehvac.com/contracts/maintenance-2024-005.pdf"
+} 

@@ -1,0 +1,31 @@
+{
+  "contractId": "EXP-2024-001",
+  "name": "Expired Domain Registration",
+  "company": "GoDaddy",
+  "description": "Domain registration for company website",
+  "startDate": "2023-01-15",
+  "endDate": "2024-01-15",
+  "amount": 12.99,
+  "currency": "USD",
+  "frequency": "yearly",
+  "status": "expired",
+  "category": "services",
+  "contactInfo": {
+    "email": "support@godaddy.com",
+    "phone": "+1-480-505-8877",
+    "website": "https://godaddy.com",
+    "address": "14455 N Hayden Rd, Scottsdale, AZ 85260",
+    "contactPerson": "Domain Services"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-01-15",
+    "lastPaymentDate": "2023-01-15",
+    "paymentMethod": "Credit Card",
+    "accountNumber": "****-****-****-9012",
+    "autoRenew": false,
+    "lateFees": 0
+  },
+  "notes": "Domain expired. Need to renew or transfer to new provider.",
+  "tags": ["domain", "website", "expired"],
+  "documentLink": "https://godaddy.com/domains/expired-2024-001"
+} 

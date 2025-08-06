@@ -1,0 +1,30 @@
+{
+  "contractId": "SERV-2024-008",
+  "name": "Internet Service",
+  "company": "Comcast Xfinity",
+  "description": "High-speed internet service with 1Gbps download speed",
+  "startDate": "2024-02-15",
+  "endDate": null,
+  "amount": 79.99,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "services",
+  "contactInfo": {
+    "email": "customer.service@comcast.com",
+    "phone": "+1-800-934-6489",
+    "website": "https://comcast.com",
+    "address": "1701 John F Kennedy Boulevard, Philadelphia, PA 19103"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-09-15",
+    "lastPaymentDate": "2024-08-15",
+    "paymentMethod": "Auto Pay",
+    "accountNumber": "987654321",
+    "autoRenew": true,
+    "lateFees": 10.00
+  },
+  "notes": "Includes unlimited data. Router included. Installation fee waived.",
+  "tags": ["internet", "utilities", "technology"],
+  "documentLink": "https://comcast.com/account/service-agreement/internet-2024-008"
+} 

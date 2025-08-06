@@ -1,0 +1,43 @@
+services:
+  # Backend API
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - CONTRACTS_DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+    container_name: contracts-api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend App
+  app:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - API_URL=http://localhost:3001/api
+      - APP_NAME=contracts
+      - CATEGORIES=subscription,insurance,utilities,rent,services,software,maintenance,other
+    depends_on:
+      - api
+    container_name: contracts-app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "if curl -f http://localhost:80; then exit 0; else exit 1; fi"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

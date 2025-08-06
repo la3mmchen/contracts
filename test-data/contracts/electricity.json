@@ -1,0 +1,30 @@
+{
+  "contractId": "UTL-2024-003",
+  "name": "Electricity Service",
+  "company": "Pacific Gas & Electric",
+  "description": "Residential electricity service with renewable energy options",
+  "startDate": "2024-02-01",
+  "endDate": null,
+  "amount": 89.50,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "utilities",
+  "contactInfo": {
+    "email": "customer.service@pge.com",
+    "phone": "+1-800-743-5000",
+    "website": "https://pge.com",
+    "address": "77 Beale Street, San Francisco, CA 94105"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-09-15",
+    "lastPaymentDate": "2024-08-15",
+    "paymentMethod": "Auto Pay",
+    "accountNumber": "123456789",
+    "autoRenew": true,
+    "lateFees": 15.00
+  },
+  "notes": "Average monthly usage: 650 kWh. Green energy option enabled.",
+  "tags": ["utilities", "electricity", "green"],
+  "documentLink": "https://pge.com/account/documents/contract-2024-003"
+} 

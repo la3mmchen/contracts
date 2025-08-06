@@ -1,0 +1,30 @@
+{
+  "contractId": "NET-2024-001",
+  "name": "Netflix Premium Subscription",
+  "company": "Netflix Inc.",
+  "description": "Premium streaming subscription with 4K content and 4 simultaneous streams",
+  "startDate": "2024-01-15",
+  "endDate": "2025-01-15",
+  "amount": 19.99,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "subscription",
+  "contactInfo": {
+    "email": "support@netflix.com",
+    "phone": "+1-800-585-7019",
+    "website": "https://netflix.com",
+    "address": "100 Winchester Circle, Los Gatos, CA 95032"
+  },
+  "paymentInfo": {
+    "nextPaymentDate": "2024-12-20",
+    "lastPaymentDate": "2024-11-15",
+    "paymentMethod": "Credit Card",
+    "accountNumber": "****-****-****-1234",
+    "autoRenew": true,
+    "lateFees": 0
+  },
+  "notes": "Auto-renewal enabled. Cancel anytime.",
+  "tags": ["streaming", "entertainment", "premium"],
+  "documentLink": "https://drive.google.com/file/d/1ABC123DEF456/view?usp=sharing"
+} 
