@@ -124,22 +124,17 @@ export const ContractAnalytics = ({ contracts, stats }: ContractAnalyticsProps) 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Monthly Expenses</CardTitle>
-            <div className="flex items-center gap-1">
-              <span className="text-2xl font-bold">
-                {formatAmount(stats.monthlyExpenses)}
-              </span>
-              <div className="relative group">
-                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  Note: Different currencies are not taken into consideration here. This shows the total amount in the primary currency.
-                </div>
-              </div>
-            </div>
+            <span className="text-2xl font-bold">
+              {formatAmount(stats.monthlyExpenses)}
+            </span>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">
               From active contracts
             </p>
+            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+              Note: Different currencies are not considered in this total
+            </div>
           </CardContent>
         </Card>
 

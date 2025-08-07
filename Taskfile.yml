@@ -87,7 +87,7 @@ tasks:
       - echo "🗑️ Removing test data contracts..."
       - |
         # Get all contracts and filter by test data contract IDs
-        curl -s http://localhost:3001/api/contracts | jq -r '.[] | select(.contractId == "SOFT-2024-006" or .contractId == "UTL-2024-003" or .contractId == "EXP-2024-009" or .contractId == "MAINT-2024-005" or .contractId == "INS-2024-002" or .contractId == "SERV-2024-008" or .contractId == "NET-2024-001" or .contractId == "TERM-2024-010" or .contractId == "RENT-2024-007" or .contractId == "SW-2024-004" or .contractId == "PEND-2024-001" or .contractId == "EXP-2024-001" or .contractId == "CANC-2024-001" or .contractId == "DRAFT-2024-001" or .contractId == "TERM-2024-001") | .id' | while read id; do
+        curl -s http://localhost:3001/api/contracts | jq -r '.[] | select(.contractId == "SOFT-2024-006" or .contractId == "UTL-2024-003" or .contractId == "EXP-2024-009" or .contractId == "MAINT-2024-005" or .contractId == "INS-2024-002" or .contractId == "SERV-2024-008" or .contractId == "NET-2024-001" or .contractId == "TERM-2024-010" or .contractId == "RENT-2024-007" or .contractId == "SW-2024-004" or .contractId == "PEND-2024-001" or .contractId == "EXP-2024-001" or .contractId == "CANC-2024-001" or .contractId == "DRAFT-2024-001" or .contractId == "TERM-2024-001" or .contractId == "LEGACY-MIGRATION-001") | .id' | while read id; do
           if [ ! -z "$id" ]; then
             echo "Deleting test contract: $id"
             curl -s -X DELETE "http://localhost:3001/api/contracts/$id" > /dev/null

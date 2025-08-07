@@ -1,5 +1,5 @@
 import { Contract } from '@/types/contract';
-import { formatCurrency } from '@/lib/currencyFormatter';
+import { formatCurrency, formatAmount } from '@/lib/currencyFormatter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   DollarSign, 
@@ -7,7 +7,8 @@ import {
   TrendingUp,
   CheckCircle,
   XCircle,
-  Coins
+  Coins,
+  Info
 } from 'lucide-react';
 
 interface ContractStatsProps {
@@ -17,8 +18,7 @@ interface ContractStatsProps {
 export const ContractStats = ({ contracts }: ContractStatsProps) => {
   const activeContracts = contracts.filter(c => c.status === 'active');
   const expiredContracts = contracts.filter(c => c.status === 'expired');
-  const cancelledContracts = contracts.filter(c => c.status === 'cancelled');
-  const closedContracts = contracts.filter(c => c.status === 'closed');
+  const terminatedContracts = contracts.filter(c => c.status === 'closed' || c.status === 'cancelled' || c.status === 'terminated');
 
   const totalMonthlyAmount = contracts
     .filter(c => c.status === 'active')
@@ -82,22 +82,22 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       bgColor: 'bg-destructive/10',
     },
     {
-      title: 'Closed Contracts',
-      value: closedContracts.length,
+      title: 'Terminated Contracts',
+      value: terminatedContracts.length,
       icon: XCircle,
       color: 'text-muted-foreground',
       bgColor: 'bg-muted/10',
     },
     {
       title: 'Monthly Spend',
-      value: formatCurrency(totalMonthlyAmount, primaryCurrency),
+      value: formatAmount(totalMonthlyAmount),
       icon: Coins,
       color: 'text-info',
       bgColor: 'bg-info/10',
     },
     {
       title: 'Yearly Spend',
-      value: formatCurrency(totalYearlyAmount, primaryCurrency),
+      value: formatAmount(totalYearlyAmount),
       icon: TrendingUp,
       color: 'text-info',
       bgColor: 'bg-info/10',
@@ -113,9 +113,19 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
               <div className={`${stat.bgColor} p-2 rounded-lg mb-1`}>
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </div>
-              <p className="text-xs font-medium text-muted-foreground leading-tight">
-                {stat.title}
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-medium text-muted-foreground leading-tight">
+                  {stat.title}
+                </p>
+                {(stat.title === 'Monthly Spend' || stat.title === 'Yearly Spend') && (
+                  <div className="relative group">
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                      Different currencies are not considered in this total
+                    </div>
+                  </div>
+                )}
+              </div>
               <p className="text-lg font-bold text-foreground leading-tight">
                 {stat.value}
               </p>
