@@ -28,9 +28,9 @@ services:
     ports:
       - "3000:80"
     environment:
-      - API_URL=http://localhost:3001/api
-      - APP_NAME=contracts
-      - CATEGORIES=subscription,insurance,utilities,rent,services,software,maintenance,other
+      API_URL: http://localhost:3001/api
+      APP_NAME: contracts
+      CATEGORIES: subscription,insurance,utilities,rent,services,software,maintenance,other
     depends_on:
       - api
     container_name: contracts-app
