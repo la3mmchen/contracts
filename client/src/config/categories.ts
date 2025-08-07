@@ -1,3 +1,5 @@
+import { getConfig } from '../services/config';
+
 // Default categories if no environment variable is provided
 const DEFAULT_CATEGORIES = [
   'subscription',
@@ -10,22 +12,12 @@ const DEFAULT_CATEGORIES = [
   'other'
 ] as const;
 
-// Load categories from environment variable or use defaults
+// Load categories from runtime config or use defaults
 export const getCategories = (): readonly string[] => {
-  // Handle test environment where import.meta might not be available
-  let envCategories: string | undefined;
-  
-  try {
-    // @ts-ignore - import.meta is available in Vite but not in Jest
-    envCategories = import.meta?.env?.VITE_CATEGORIES;
-  } catch {
-    // Fallback for test environment
-    envCategories = undefined;
-  }
-  
-  if (envCategories) {
-    // Parse comma-separated categories from environment variable
-    return envCategories.split(',').map(cat => cat.trim()) as readonly string[];
+  // Try to get categories from runtime config
+  const config = getConfig();
+  if (config?.CATEGORIES) {
+    return config.CATEGORIES.split(',').map(cat => cat.trim()) as readonly string[];
   }
   
   return DEFAULT_CATEGORIES;

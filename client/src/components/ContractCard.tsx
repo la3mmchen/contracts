@@ -15,12 +15,14 @@ import {
   User,
   Clock,
   CalendarDays,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
+import { isValidCategory } from '@/lib/utils';
 
 interface ContractCardProps {
   contract: Contract;
@@ -55,8 +57,12 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
   const payments = calculateNextThreePayments(contract);
   const nextPayment = payments[0];
 
+  const hasInvalidCategory = !isValidCategory(contract.category);
+  
   return (
-    <Card className="group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in">
+    <Card className={`group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in ${
+      hasInvalidCategory ? 'border-red-300 bg-red-50/30' : ''
+    }`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -108,10 +114,30 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
           <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusColors[contract.status]}`}>
             {contract.status}
           </span>
-          <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[contract.category]}`}>
+          <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+            isValidCategory(contract.category) 
+              ? categoryColors[contract.category] || 'bg-gray-100 text-gray-800 border-gray-200'
+              : 'bg-red-100 text-red-800 border-red-200'
+          }`}>
+            {!isValidCategory(contract.category) && (
+              <AlertTriangle className="h-3 w-3 mr-1" />
+            )}
             {contract.category}
+            {!isValidCategory(contract.category) && (
+              <span className="ml-1 text-xs opacity-75">(invalid)</span>
+            )}
           </span>
         </div>
+
+        {/* Invalid Category Warning */}
+        {hasInvalidCategory && (
+          <div className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-md">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <span className="text-sm text-red-700">
+              This contract uses a category that is no longer available. Please update the category.
+            </span>
+          </div>
+        )}
 
         {/* Contract Period */}
         <div className="space-y-2">
