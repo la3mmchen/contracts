@@ -45,9 +45,9 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="expired">Expired</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
               </SelectContent>
             </Select>
           </div>

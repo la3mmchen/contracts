@@ -4,7 +4,7 @@ Organize contracts, maintain visibility, and track your spendings.
 
 **Data is stored at the disk in single files. It works for me, but it may create data loss for you.**       
 
-![contracts](./docs/images/sneak-peak.png)
+![contracts](./docs/images/sneak-peek.png)
 
 
 ## Usage

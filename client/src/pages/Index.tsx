@@ -1,38 +1,71 @@
-import { useState, useMemo } from 'react';
-import { Contract, ContractFilters } from '@/types/contract';
-import { appConfig } from '@/config/app';
+import React, { useState, useMemo } from 'react';
+import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
-import { ContractFilters as FilterComponent } from '@/components/ContractFilters';
+import { ContractFilters } from '@/components/ContractFilters';
 import { ContractStats } from '@/components/ContractStats';
+import { ContractAnalytics } from '@/components/ContractAnalytics';
+import { NotificationBanner } from '@/components/NotificationBanner';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
+import { MigrationNotification } from '@/components/MigrationNotification';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Plus, Upload, Download, FileText, Loader2, AlertTriangle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { 
+  Plus, 
+  Download, 
+  Upload, 
+  Settings, 
+  BarChart3, 
+  Grid3X3, 
+  List,
+  Loader2,
+  FileText,
+  AlertTriangle
+} from 'lucide-react';
+import { appConfig } from '@/config/app';
+import { calculateNextThreePayments } from '@/lib/paymentCalculator';
+import { needsMigration } from '@/lib/contractMigration';
 
 const Index = () => {
-  const { contracts, loading, addContract, updateContract, deleteContract, exportContracts, importContracts } = useContractStorage();
+  const { 
+    contracts, 
+    loading, 
+    addContract, 
+    updateContract, 
+    deleteContract, 
+    importContracts,
+    exportContracts 
+  } = useContractStorage();
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | undefined>();
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [activeTab, setActiveTab] = useState('overview');
   const [apiConnected, setApiConnected] = useState<boolean | null>(null);
-  const [filters, setFilters] = useState<ContractFilters>({
-    sortBy: 'name',
-    sortOrder: 'asc',
+  const [showMigrationNotification, setShowMigrationNotification] = useState(true);
+  const [filters, setFilters] = useState<FilterType>({
+    searchTerm: '',
+    sortBy: 'createdAt',
+    sortOrder: 'desc'
   });
 
-  const filteredAndSortedContracts = useMemo(() => {
+  // Migration notification is handled in the storage hook
+  // Only show for actual legacy imports, not regular updates
+  const migrationCount = 0;
+
+  const filteredContracts = useMemo(() => {
     let filtered = contracts;
 
-    // Apply filters
+    // Apply search filter
     if (filters.searchTerm) {
       const searchLower = filters.searchTerm.toLowerCase();
-      filtered = filtered.filter(contract => 
+      filtered = filtered.filter(contract =>
         contract.name.toLowerCase().includes(searchLower) ||
         contract.company.toLowerCase().includes(searchLower) ||
         contract.contractId.toLowerCase().includes(searchLower) ||
@@ -41,30 +74,34 @@ const Index = () => {
       );
     }
 
+    // Apply status filter
     if (filters.status) {
       filtered = filtered.filter(contract => contract.status === filters.status);
     }
 
+    // Apply category filter
     if (filters.category) {
       filtered = filtered.filter(contract => contract.category === filters.category);
     }
 
+    // Apply frequency filter
     if (filters.frequency) {
       filtered = filtered.filter(contract => contract.frequency === filters.frequency);
     }
 
     // Apply sorting
+    const direction = filters.sortOrder === 'asc' ? 1 : -1;
     filtered.sort((a, b) => {
-      const direction = filters.sortOrder === 'asc' ? 1 : -1;
-      
       switch (filters.sortBy) {
         case 'name':
           return direction * a.name.localeCompare(b.name);
         case 'amount':
           return direction * (a.amount - b.amount);
         case 'nextPaymentDate': {
-          const aDate = a.paymentInfo.nextPaymentDate ? new Date(a.paymentInfo.nextPaymentDate).getTime() : 0;
-          const bDate = b.paymentInfo.nextPaymentDate ? new Date(b.paymentInfo.nextPaymentDate).getTime() : 0;
+          const aPayments = calculateNextThreePayments(a);
+          const bPayments = calculateNextThreePayments(b);
+          const aDate = aPayments[0] ? new Date(aPayments[0].date).getTime() : 0;
+          const bDate = bPayments[0] ? new Date(bPayments[0].date).getTime() : 0;
           return direction * (aDate - bDate);
         }
         case 'createdAt':
@@ -96,6 +133,10 @@ const Index = () => {
       setEditingContract(undefined);
       setIsFormOpen(false);
     }
+  };
+
+  const handleCloseContract = (contract: Contract) => {
+    updateContract(contract.id, { ...contract, status: 'closed' });
   };
 
   const handleDeleteContract = () => {
@@ -200,8 +241,17 @@ const Index = () => {
         {/* Statistics */}
         <ContractStats contracts={contracts} />
 
-        {/* Filters */}
-        <FilterComponent filters={filters} onFiltersChange={setFilters} />
+        {/* Migration Notification */}
+        {showMigrationNotification && migrationCount > 0 && (
+          <MigrationNotification
+            migratedCount={migrationCount}
+            totalCount={contracts.length}
+            onDismiss={() => setShowMigrationNotification(false)}
+          />
+        )}
+
+        {/* Notifications */}
+        <NotificationBanner contracts={contracts} />
 
         {/* API Connection Warning */}
         {apiConnected === false && contracts.length > 0 && (
@@ -217,9 +267,12 @@ const Index = () => {
           </div>
         )}
 
+        {/* Filters */}
+        <ContractFilters filters={filters} onFiltersChange={(newFilters) => setFilters(newFilters)} />
+
         {/* Contracts Grid */}
         <div className="mt-8">
-          {filteredAndSortedContracts.length === 0 ? (
+          {filteredContracts.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="h-24 w-24 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -248,12 +301,13 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAndSortedContracts.map((contract, index) => (
+              {filteredContracts.map((contract, index) => (
                 <div key={contract.id} style={{ animationDelay: `${index * 0.1}s` }}>
                   <ContractCard
                     contract={contract}
                     onEdit={openEditForm}
                     onDelete={(id) => setDeleteConfirmId(id)}
+                    onClose={handleCloseContract}
                   />
                 </div>
               ))}

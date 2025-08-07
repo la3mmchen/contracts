@@ -10,20 +10,13 @@
   "frequency": "yearly",
   "status": "active",
   "category": "insurance",
+  "payDate": "2025-03-01",
   "contactInfo": {
     "email": "agent@statefarm.com",
     "phone": "+1-800-782-8332",
     "website": "https://statefarm.com",
     "address": "One State Farm Plaza, Bloomington, IL 61710",
     "contactPerson": "John Smith"
-  },
-  "paymentInfo": {
-    "nextPaymentDate": "2025-03-01",
-    "lastPaymentDate": "2024-03-01",
-    "paymentMethod": "Bank Transfer",
-    "accountNumber": "****-****-****-5678",
-    "autoRenew": true,
-    "lateFees": 50.00
   },
   "notes": "Covers dwelling up to $300,000. Deductible: $1,000",
   "tags": ["insurance", "home", "protection"],

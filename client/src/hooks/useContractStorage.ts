@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Contract, ContractStats } from '@/types/contract';
 import { api } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
+import { migrateContract, needsMigration } from '@/lib/contractMigration';
 
 export const useContractStorage = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
@@ -16,7 +17,20 @@ export const useContractStorage = () => {
     try {
       setLoading(true);
       const data = await api.getContracts();
-      setContracts(data);
+      
+      // Migrate legacy contracts if needed
+      const migratedContracts = data.map((contract: any) => {
+        if (needsMigration(contract)) {
+          const result = migrateContract(contract);
+          if (result.wasMigrated) {
+            console.log(`Migrated contract ${contract.contractId}:`, result.migrationNotes);
+          }
+          return result.contract;
+        }
+        return contract;
+      });
+      
+      setContracts(migratedContracts);
     } catch (error) {
       console.error('Error loading contracts:', error);
       toast({
@@ -106,22 +120,17 @@ export const useContractStorage = () => {
 
   const exportContracts = async () => {
     try {
-      const contracts = await api.exportContracts();
       const dataStr = JSON.stringify(contracts, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
       
       const link = document.createElement('a');
-      link.href = url;
-      link.download = `contracts-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `contracts-${new Date().toISOString().split('T')[0]}.json`;
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
       
       toast({
         title: "Export successful",
-        description: "Your contracts have been exported successfully.",
+        description: `${contracts.length} contracts have been exported.`,
       });
     } catch (error) {
       console.error('Error exporting contracts:', error);
@@ -144,8 +153,20 @@ export const useContractStorage = () => {
           throw new Error('Invalid file format');
         }
         
+        // Migrate imported contracts if needed
+        const migratedContracts = importedContracts.map((contract: any) => {
+          if (needsMigration(contract)) {
+            const result = migrateContract(contract);
+            if (result.wasMigrated) {
+              console.log(`Migrated imported contract ${contract.contractId}:`, result.migrationNotes);
+            }
+            return result.contract;
+          }
+          return contract;
+        });
+        
         // Import contracts one by one
-        for (const contract of importedContracts) {
+        for (const contract of migratedContracts) {
           const { id, createdAt, updatedAt, ...contractData } = contract;
           await api.createContract(contractData);
         }
@@ -171,8 +192,6 @@ export const useContractStorage = () => {
 
   const getContractStats = (): ContractStats => {
     const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
 
     const stats = contracts.reduce((acc, contract) => {
       // Count by status
@@ -218,9 +237,9 @@ export const useContractStorage = () => {
         }
       }
       
-      // Upcoming payments (next 30 days)
-      if (contract.paymentInfo.nextPaymentDate) {
-        const nextPayment = new Date(contract.paymentInfo.nextPaymentDate);
+      // Upcoming payments (next 30 days) - using new payDate field
+      if (contract.payDate) {
+        const nextPayment = new Date(contract.payDate);
         const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
         
         if (nextPayment <= thirtyDaysFromNow && contract.status === 'active') {

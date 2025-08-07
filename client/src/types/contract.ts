@@ -11,22 +11,15 @@ export interface Contract {
   amount: number;
   currency: string;
   frequency: 'monthly' | 'quarterly' | 'yearly' | 'one-time' | 'weekly' | 'bi-weekly';
-  status: 'active' | 'expired' | 'cancelled' | 'pending' | 'draft' | 'terminated';
+  status: 'active' | 'expired' | 'cancelled' | 'terminated' | 'closed';
   category: Category;
+  payDate?: string; // Calculated payment date
   contactInfo: {
     email?: string;
     phone?: string;
     address?: string;
     website?: string;
     contactPerson?: string;
-  };
-  paymentInfo: {
-    nextPaymentDate?: string;
-    lastPaymentDate?: string;
-    paymentMethod?: string;
-    accountNumber?: string;
-    autoRenew?: boolean;
-    lateFees?: number;
   };
   notes?: string;
   tags?: string[];
@@ -85,11 +78,10 @@ export interface CreateContractRequest {
   frequency: Contract['frequency'];
   status: Contract['status'];
   category: Contract['category'];
+  payDate?: string;
   contactInfo: Contract['contactInfo'];
-  paymentInfo: Contract['paymentInfo'];
   notes?: string;
   tags?: string[];
-  documentLink?: string;
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

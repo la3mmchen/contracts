@@ -1,0 +1,24 @@
+{
+  "contractId": "LEGACY-MIGRATION-001",
+  "name": "Legacy Migration Test Contract",
+  "company": "Legacy Test Company",
+  "description": "This contract demonstrates the migration utility by using the old format with paymentInfo, pending status, and legacy category",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "amount": 150.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "subscriptions",
+  "paymentInfo": {
+    "nextPaymentDate": "2024-02-01",
+    "lastPaymentDate": "2024-01-01",
+    "paymentMethod": "Credit Card",
+    "accountNumber": "****-****-****-5678",
+    "autoRenew": true,
+    "lateFees": 25.00
+  },
+  "notes": "This contract will be automatically migrated to the new format when loaded. It demonstrates: 1) paymentInfo → payDate conversion, 2) pending → active status, 3) subscriptions → subscription category, 4) missing contactInfo structure addition",
+  "tags": ["legacy", "migration", "test", "pending"],
+  "documentLink": "https://example.com/legacy-contract"
+} 

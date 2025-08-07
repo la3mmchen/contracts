@@ -6,23 +6,16 @@
   "startDate": "2024-01-01",
   "endDate": null,
   "amount": 19.99,
-  "currency": "USD",
+  "currency": "EUR",
   "frequency": "monthly",
   "status": "active",
   "category": "software",
+  "payDate": "2024-09-01",
   "contactInfo": {
     "email": "support@cursor.com",
     "phone": "+1-800-123-4567",
     "website": "https://cursor.com",
     "address": "123 AI Street, San Francisco, CA 94105"
-  },
-  "paymentInfo": {
-    "nextPaymentDate": "2024-09-01",
-    "lastPaymentDate": "2024-08-01",
-    "paymentMethod": "Credit Card",
-    "accountNumber": "****-****-****-9012",
-    "autoRenew": true,
-    "lateFees": 0
   },
   "notes": "Includes unlimited AI completions and team collaboration features.",
   "tags": ["software", "development", "ai", "coding"]

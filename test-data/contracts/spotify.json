@@ -10,19 +10,12 @@
   "frequency": "monthly",
   "status": "active",
   "category": "subscription",
+  "payDate": "2024-09-10",
   "contactInfo": {
     "email": "support@spotify.com",
     "phone": "+1-800-878-2345",
     "website": "https://spotify.com",
     "address": "4 World Trade Center, New York, NY 10007"
-  },
-  "paymentInfo": {
-    "nextPaymentDate": "2024-09-10",
-    "lastPaymentDate": "2024-08-10",
-    "paymentMethod": "PayPal",
-    "accountNumber": "user@email.com",
-    "autoRenew": true,
-    "lateFees": 0
   },
   "notes": "Includes 6 family members. Premium features enabled.",
   "tags": ["music", "streaming", "family"],
