@@ -2,7 +2,7 @@ name: contracts-production
 services:
   # Frontend application
   frontend:
-    image: ghcr.io/la3mmchen/contracts/contracts-app:latest
+    image: ghcr.io/la3mmchen/contracts-app:latest
     environment:
       API_URL: "https://contracts.yourdomain.com/api"
       APP_NAME: "contracts"
@@ -13,7 +13,7 @@ services:
 
   # Backend API
   backend:
-    image: ghcr.io/la3mmchen/contracts/contracts-api:latest
+    image: ghcr.io/la3mmchen/contracts-api:latest
     environment:
       PORT: 3001
       CONTRACTS_DATA_DIR: "/data"

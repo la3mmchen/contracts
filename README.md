@@ -2,17 +2,29 @@
 
 Organize contracts, maintain visibility, and track your spendings.
 
-**Data is stored at the disk in single files. It works for me, but it may create data loss for you.**       
+**⚠️ Data Storage Warning: Contracts are stored as individual JSON files on disk. While this works for personal use, consider backing up your data regularly to prevent potential data loss.**       
 
 ![contracts](./docs/images/sneak-peek.png)
 
+
+## features
+
+- **Contract Management**: Create, edit, and delete contracts with detailed information
+- **Multi-Currency Support**: Track contracts in USD, EUR, GBP, CAD, AUD, JPY, CHF, SEK, NOK, DKK
+- **Payment Tracking**: Automatic calculation of next payment dates and upcoming payments
+- **Analytics Dashboard**: Visual charts showing spending breakdown, contract categories, and status distribution
+- **Search & Filtering**: Find contracts by name, company, status, or category
+- **Export Functionality**: Export contracts to Markdown format for backup
+- **Responsive Design**: Works on desktop and mobile devices
+- **Local Data Storage**: JSON-based file storage for data persistence
+- **Real-time Statistics**: Live updates of monthly/yearly spending and contract counts
 
 ## Usage
 
 The project consists of 2 parts: a frontend app and an API that stores your data locally. You can use these container images:
 
-* ghcr.io/la3mmchen/contracts/contracts-app:latest
-* ghcr.io/la3mmchen/contracts/contracts-api:latest
+* ghcr.io/la3mmchen/contracts-app:latest
+* ghcr.io/la3mmchen/contracts-api:latest
 
 ### Example 
 
@@ -22,7 +34,7 @@ You can use `docker-compose.yml` file:
 name: apps
 services:
   frontend:
-    image: ghcr.io/la3mmchen/contracts/contracts-app:latest
+    image: ghcr.io/la3mmchen/contracts-app:latest
     environment:
       API_URL: "https://contracts.yourdomain.com/api"
       APP_NAME: "contracts"
@@ -30,7 +42,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: ghcr.io/la3mmchen/contracts/contracts-api:latest
+    image: ghcr.io/la3mmchen/contracts-api:latest
     environment:
       PORT: 3001
       CONTRACTS_DATA_DIR: "/data"
@@ -119,17 +131,17 @@ cp -r /backup/contracts-20241201/* /data/contracts/
 
 ### Docker Images
 Images are available at:
-- **App**: `ghcr.io/{username}/contracts-app`
-- **API**: `ghcr.io/{username}/contracts-api`
+- **App**: `ghcr.io/la3mmchen/contracts-app`
+- **API**: `ghcr.io/la3mmchen/contracts-api`
 
 **Usage:**
 ```bash
 # Pull and run from registry
-docker pull ghcr.io/{username}/contracts-app:latest
-docker pull ghcr.io/{username}/contracts-api:latest
+docker pull ghcr.io/la3mmchen/contracts-app:latest
+docker pull ghcr.io/la3mmchen/contracts-api:latest
 
 # Run with custom configuration
-docker run -e APP_NAME="My Contracts" -e API_URL="http://api:3001/api" ghcr.io/{username}/contracts-app:latest
+docker run -e APP_NAME="My Contracts" -e API_URL="http://api:3001/api" ghcr.io/la3mmchen/contracts-app:latest
 ```
 
 ## 🌐 Access Points
