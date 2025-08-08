@@ -8,14 +8,16 @@ import {
   CheckCircle,
   XCircle,
   Coins,
-  Info
+  Info,
+  MousePointer
 } from 'lucide-react';
 
 interface ContractStatsProps {
   contracts: Contract[];
+  onFilter?: (filterType: string, value: string) => void;
 }
 
-export const ContractStats = ({ contracts }: ContractStatsProps) => {
+export const ContractStats = ({ contracts, onFilter }: ContractStatsProps) => {
   const activeContracts = contracts.filter(c => c.status === 'active');
   const expiredContracts = contracts.filter(c => c.status === 'expired');
   const terminatedContracts = contracts.filter(c => c.status === 'closed' || c.status === 'cancelled' || c.status === 'terminated');
@@ -66,6 +68,9 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       icon: FileText,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
+      clickable: true,
+      filterType: 'reset',
+      filterValue: 'all',
     },
     {
       title: 'Active Contracts',
@@ -73,6 +78,9 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       icon: CheckCircle,
       color: 'text-success',
       bgColor: 'bg-success/10',
+      clickable: true,
+      filterType: 'status',
+      filterValue: 'active',
     },
     {
       title: 'Expired Contracts',
@@ -80,6 +88,9 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       icon: XCircle,
       color: 'text-destructive',
       bgColor: 'bg-destructive/10',
+      clickable: true,
+      filterType: 'status',
+      filterValue: 'expired',
     },
     {
       title: 'Terminated Contracts',
@@ -87,6 +98,7 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       icon: XCircle,
       color: 'text-muted-foreground',
       bgColor: 'bg-muted/10',
+      clickable: false,
     },
     {
       title: 'Monthly Spend',
@@ -94,6 +106,7 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       icon: Coins,
       color: 'text-info',
       bgColor: 'bg-info/10',
+      clickable: false,
     },
     {
       title: 'Yearly Spend',
@@ -101,13 +114,21 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
       icon: TrendingUp,
       color: 'text-info',
       bgColor: 'bg-info/10',
+      clickable: false,
     },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-6">
       {stats.map((stat, index) => (
-        <Card key={index} className="bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+        <Card 
+          key={index} 
+          className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
+            stat.clickable && onFilter ? 'cursor-pointer hover:scale-105 border-primary/30 hover:border-primary/50' : ''
+          }`} 
+          style={{ animationDelay: `${index * 0.1}s` }}
+          onClick={stat.clickable && onFilter ? () => onFilter(stat.filterType!, stat.filterValue!) : undefined}
+        >
           <CardContent className="p-3">
             <div className="flex flex-col items-center text-center space-y-1">
               <div className={`${stat.bgColor} p-2 rounded-lg mb-1`}>
@@ -117,6 +138,7 @@ export const ContractStats = ({ contracts }: ContractStatsProps) => {
                 <p className="text-xs font-medium text-muted-foreground leading-tight">
                   {stat.title}
                 </p>
+
                 {(stat.title === 'Monthly Spend' || stat.title === 'Yearly Spend') && (
                   <div className="relative group">
                     <Info className="h-3 w-3 text-muted-foreground cursor-help" />

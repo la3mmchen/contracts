@@ -256,7 +256,20 @@ const Index = () => {
         <ConnectionStatus onStatusChange={setApiConnected} />
 
         {/* Statistics */}
-        <ContractStats contracts={contracts} />
+        <ContractStats 
+          contracts={contracts} 
+          onFilter={(filterType, value) => {
+            if (filterType === 'status') {
+              setFilters(prev => ({ ...prev, status: value as Contract['status'] }));
+            } else if (filterType === 'reset') {
+              setFilters({
+                searchTerm: '',
+                sortBy: 'createdAt',
+                sortOrder: 'desc'
+              });
+            }
+          }}
+        />
 
         {/* Migration Notification */}
         {showMigrationNotification && migrationCount > 0 && (
