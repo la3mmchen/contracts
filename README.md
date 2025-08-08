@@ -2,10 +2,6 @@
 
 Organize contracts, maintain visibility, and track your spendings.
 
-**⚠️ Data Storage Warning: Contracts are stored as individual JSON files on disk. While this works for personal use, consider backing up your data regularly to prevent potential data loss.**       
-
-![contracts](./docs/images/sneak-peek.png)
-
 
 ## features
 
@@ -18,6 +14,10 @@ Organize contracts, maintain visibility, and track your spendings.
 - **Responsive Design**: Works on desktop and mobile devices
 - **Local Data Storage**: JSON-based file storage for data persistence
 - **Real-time Statistics**: Live updates of monthly/yearly spending and contract counts
+
+![contracts](./docs/images/sneak-peek.png)
+
+**⚠️ Data Storage Warning: Contracts are stored as individual JSON files on disk. While this works for personal use, consider backing up your data regularly to prevent potential data loss.**       
 
 ## Usage
 
