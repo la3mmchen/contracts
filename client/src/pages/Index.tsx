@@ -260,7 +260,19 @@ const Index = () => {
           contracts={contracts} 
           onFilter={(filterType, value) => {
             if (filterType === 'status') {
-              setFilters(prev => ({ ...prev, status: value as Contract['status'] }));
+              // If clicking the same status filter, reset it
+              if (filters.status === value) {
+                setFilters(prev => ({ ...prev, status: undefined }));
+              } else {
+                setFilters(prev => ({ ...prev, status: value as Contract['status'] }));
+              }
+            } else if (filterType === 'category') {
+              // If clicking the same category filter, reset it
+              if (filters.category === value) {
+                setFilters(prev => ({ ...prev, category: undefined }));
+              } else {
+                setFilters(prev => ({ ...prev, category: value as Contract['category'] }));
+              }
             } else if (filterType === 'reset') {
               setFilters({
                 searchTerm: '',
@@ -268,6 +280,10 @@ const Index = () => {
                 sortOrder: 'desc'
               });
             }
+          }}
+          activeFilters={{
+            status: filters.status,
+            category: filters.category
           }}
         />
 
