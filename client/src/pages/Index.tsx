@@ -106,6 +106,8 @@ const Index = () => {
         }
         case 'createdAt':
           return direction * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        case 'updatedAt':
+          return direction * (new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
         default:
           return 0;
       }
@@ -162,6 +164,21 @@ const Index = () => {
   const openAddForm = () => {
     setEditingContract(undefined);
     setIsFormOpen(true);
+  };
+
+  const scrollToContract = (contract: Contract) => {
+    const element = document.getElementById(`contract-${contract.id}`);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      // Add a temporary highlight effect
+      element.classList.add('ring-2', 'ring-primary', 'ring-opacity-50');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-primary', 'ring-opacity-50');
+      }, 2000);
+    }
   };
 
   if (loading) {
@@ -251,7 +268,7 @@ const Index = () => {
         )}
 
         {/* Notifications */}
-        <NotificationBanner contracts={contracts} />
+        <NotificationBanner contracts={contracts} onEdit={scrollToContract} />
 
         {/* API Connection Warning */}
         {apiConnected === false && contracts.length > 0 && (

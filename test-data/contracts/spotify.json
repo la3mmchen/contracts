@@ -1,23 +1,25 @@
 {
-  "contractId": "SW-2024-004",
-  "name": "Spotify Family Plan",
+  "contractId": "SPOT-2024-001",
+  "name": "Spotify Premium Family",
   "company": "Spotify Technology S.A.",
-  "description": "Family music streaming plan for up to 6 family members",
-  "startDate": "2024-04-10",
-  "endDate": null,
+  "description": "Family plan with 6 premium accounts, ad-free music and offline downloads",
+  "startDate": "2024-03-01",
+  "endDate": "2025-03-01",
   "amount": 14.99,
   "currency": "USD",
   "frequency": "monthly",
   "status": "active",
   "category": "subscription",
-  "payDate": "2024-09-10",
+  "payDate": "2024-12-15",
   "contactInfo": {
     "email": "support@spotify.com",
-    "phone": "+1-800-878-2345",
+    "phone": "+1-800-456-9374",
     "website": "https://spotify.com",
-    "address": "4 World Trade Center, New York, NY 10007"
+    "address": "4 World Trade Center, 150 Greenwich Street, New York, NY 10007"
   },
-  "notes": "Includes 6 family members. Premium features enabled.",
+  "notes": "Family plan with 6 accounts. Shared payment method.",
   "tags": ["music", "streaming", "family"],
-  "documentLink": "https://spotify.com/account/subscription/family-plan-terms"
+  "documentLink": "https://drive.google.com/file/d/2DEF456GHI789/view?usp=sharing",
+  "createdAt": "2024-03-01T10:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
 } 

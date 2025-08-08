@@ -16,13 +16,14 @@ import {
   Clock,
   CalendarDays,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Clock3
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
-import { isValidCategory } from '@/lib/utils';
+import { isValidCategory, formatRelativeTime } from '@/lib/utils';
 
 interface ContractCardProps {
   contract: Contract;
@@ -58,11 +59,18 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
   const nextPayment = payments[0];
 
   const hasInvalidCategory = !isValidCategory(contract.category);
+  const isRecentlyUpdated = new Date(contract.updatedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000; // Last 24 hours
+  const isStale = new Date(contract.updatedAt).getTime() < Date.now() - 6 * 30 * 24 * 60 * 60 * 1000; // 6 months ago
+  const isOld = new Date(contract.updatedAt).getTime() < Date.now() - 3 * 30 * 24 * 60 * 60 * 1000; // 3 months ago
   
   return (
-    <Card className={`group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in ${
-      hasInvalidCategory ? 'border-red-300 bg-red-50/30' : ''
-    }`}>
+    <Card 
+      id={`contract-${contract.id}`}
+      className={`group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in ${
+        hasInvalidCategory ? 'border-red-300 bg-red-50/30' : ''
+      } ${isRecentlyUpdated && !hasInvalidCategory ? 'border-blue-300 bg-blue-50/30' : ''} ${
+        isStale && !hasInvalidCategory ? 'border-red-200 bg-red-50/20' : ''
+      } ${isOld && !isStale && !hasInvalidCategory ? 'border-yellow-200 bg-yellow-50/20' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -72,6 +80,11 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
             <p className="text-sm text-muted-foreground mt-1">{contract.company}</p>
             <p className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-1 rounded mt-2 inline-block">
               ID: {contract.contractId}
+            </p>
+            <p className={`text-xs text-muted-foreground mt-1 flex items-center gap-1 ${isOld || isStale ? 'font-semibold' : ''}`}>
+              {isStale && <AlertTriangle className="h-3 w-3 text-red-600" />}
+              {isOld && !isStale && <Clock3 className="h-3 w-3 text-yellow-600" />}
+              Updated {formatRelativeTime(contract.updatedAt)}
             </p>
           </div>
           <div className="flex gap-2">

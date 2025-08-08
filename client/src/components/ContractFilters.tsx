@@ -96,6 +96,7 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
                 <SelectItem value="amount">Amount</SelectItem>
                 <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
                 <SelectItem value="createdAt">Created Date</SelectItem>
+                <SelectItem value="updatedAt">Last Updated</SelectItem>
               </SelectContent>
             </Select>
           </div>

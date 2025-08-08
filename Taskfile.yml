@@ -81,6 +81,11 @@ tasks:
     cmds:
       - ./scripts/load-test-data.sh
 
+  modify-test-dates:
+    desc: Modify test contract dates for visual testing of color coding
+    cmds:
+      - ./scripts/modify-test-dates.sh
+
   clear-test-data:
     desc: Remove only test data contracts from the system
     cmds:

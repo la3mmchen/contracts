@@ -43,7 +43,7 @@ export interface ContractFilters {
   category?: Contract['category'];
   frequency?: Contract['frequency'];
   searchTerm?: string;
-  sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'company' | 'endDate';
+  sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {
     min?: number;

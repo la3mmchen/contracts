@@ -7,9 +7,10 @@ import { formatCurrency } from '@/lib/currencyFormatter';
 
 interface NotificationBannerProps {
   contracts: Contract[];
+  onEdit?: (contract: Contract) => void;
 }
 
-export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
+export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProps) => {
   const now = new Date();
 
   const upcomingPayments = contracts
@@ -65,11 +66,24 @@ export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
             <div className="mt-2 space-y-1">
               {upcomingPayments.map((contract) => (
                 <div key={`${contract.id}-${contract.paymentDate}`} className="flex items-center justify-between text-sm">
-                  <span>{contract.name}</span>
-                  <span className="font-medium">
-                    {formatCurrency(contract.amount, contract.currency)} - {contract.daysUntil === 0 ? 'Today' : 
-                    contract.daysUntil === 1 ? 'Tomorrow' : `${contract.daysUntil} days`}
+                  <span 
+                    className={onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}
+                    onClick={onEdit ? () => onEdit(contract) : undefined}
+                  >
+                    {contract.name}
                   </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-xs">
+                      {formatCurrency(contract.amount, contract.currency)} - {contract.daysUntil === 0 ? 'Today' : 
+                      contract.daysUntil === 1 ? 'Tomorrow' : `${contract.daysUntil} days`}
+                    </span>
+                    <span 
+                      className={`font-mono text-xs ${onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}`}
+                      onClick={onEdit ? () => onEdit(contract) : undefined}
+                    >
+                      {contract.contractId}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -88,8 +102,11 @@ export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
               {overdueContracts.map((contract) => (
                 <div key={`${contract.id}-${contract.paymentDate}`} className="flex items-center justify-between text-sm">
                   <span>{contract.name}</span>
-                  <span className="font-medium">
-                    {formatCurrency(contract.amount, contract.currency)} - {contract.daysOverdue} day{contract.daysOverdue > 1 ? 's' : ''} overdue
+                  <span 
+                    className={`font-mono text-xs ${onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}`}
+                    onClick={onEdit ? () => onEdit(contract) : undefined}
+                  >
+                    {contract.contractId}
                   </span>
                 </div>
               ))}
@@ -108,8 +125,18 @@ export const NotificationBanner = ({ contracts }: NotificationBannerProps) => {
             <div className="mt-2 space-y-1">
               {expiredContracts.slice(0, 3).map((contract) => (
                 <div key={contract.id} className="flex items-center justify-between text-sm">
-                  <span>{contract.name}</span>
-                  <span className="font-medium">{contract.company}</span>
+                  <span 
+                    className={onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}
+                    onClick={onEdit ? () => onEdit(contract) : undefined}
+                  >
+                    {contract.name}
+                  </span>
+                  <span 
+                    className={`font-mono text-xs ${onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}`}
+                    onClick={onEdit ? () => onEdit(contract) : undefined}
+                  >
+                    {contract.contractId}
+                  </span>
                 </div>
               ))}
               {expiredContracts.length > 3 && (
