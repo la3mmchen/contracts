@@ -17,9 +17,11 @@ import {
   CalendarDays,
   X,
   AlertTriangle,
-  Clock3
+  Clock3,
+  ExternalLink
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
@@ -30,6 +32,7 @@ interface ContractCardProps {
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
   onClose?: (contract: Contract) => void;
+  onFilter?: (filterType: string, value: string) => void;
 }
 
 const statusColors = {
@@ -50,7 +53,7 @@ const categoryColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCardProps) => {
+export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter }: ContractCardProps) => {
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
@@ -75,7 +78,12 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-              {contract.name}
+              <Link 
+                to={`/contract/${contract.id}`}
+                className="hover:underline cursor-pointer"
+              >
+                {contract.name}
+              </Link>
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-1">{contract.company}</p>
             <p className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-1 rounded mt-2 inline-block">
@@ -88,6 +96,17 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
             </p>
           </div>
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              title="View details"
+            >
+              <Link to={`/contract/${contract.id}`}>
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -124,14 +143,26 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose }: ContractCa
       <CardContent className="space-y-4">
         {/* Status and Category Badges */}
         <div className="flex flex-wrap gap-2">
-          <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusColors[contract.status]}`}>
+          <span 
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusColors[contract.status]} ${
+              onFilter ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+            }`}
+            onClick={onFilter ? () => onFilter('status', contract.status) : undefined}
+            title={onFilter ? `Filter by status: ${contract.status}` : undefined}
+          >
             {contract.status}
           </span>
-          <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-            isValidCategory(contract.category) 
-              ? categoryColors[contract.category] || 'bg-gray-100 text-gray-800 border-gray-200'
-              : 'bg-red-100 text-red-800 border-red-200'
-          }`}>
+          <span 
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+              isValidCategory(contract.category) 
+                ? categoryColors[contract.category] || 'bg-gray-100 text-gray-800 border-gray-200'
+                : 'bg-red-100 text-red-800 border-red-200'
+            } ${
+              onFilter && isValidCategory(contract.category) ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+            }`}
+            onClick={onFilter && isValidCategory(contract.category) ? () => onFilter('category', contract.category) : undefined}
+            title={onFilter && isValidCategory(contract.category) ? `Filter by category: ${contract.category}` : undefined}
+          >
             {!isValidCategory(contract.category) && (
               <AlertTriangle className="h-3 w-3 mr-1" />
             )}

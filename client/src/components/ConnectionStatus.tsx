@@ -88,18 +88,30 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
     }
   };
 
+  // When connected, show minimal info
+  if (status === 'connected') {
+    return (
+      <div className="flex items-center justify-between mb-4 px-1">
+        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 border-green-200">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          Connected
+        </span>
+        {lastChecked && (
+          <span className="text-xs text-muted-foreground">
+            Last checked: {lastChecked.toLocaleTimeString()}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // When checking or error, show full card
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CardTitle className="text-lg">Server Connection Status</CardTitle>
-            {status === 'connected' && (
-              <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 border-green-200">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Connected
-              </span>
-            )}
           </div>
           <Button
             variant="outline"
@@ -114,16 +126,14 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Status Badge - Only show when not connected */}
-          {status !== 'connected' && (
-            <div className="flex items-center gap-2">
-              {getStatusIcon()}
-              <Badge variant={status === 'checking' ? 'default' : 'destructive'}>
-                {status === 'checking' && 'Checking...'}
-                {status === 'error' && 'Connection Error'}
-              </Badge>
-            </div>
-          )}
+          {/* Status Badge */}
+          <div className="flex items-center gap-2">
+            {getStatusIcon()}
+            <Badge variant={status === 'checking' ? 'default' : 'destructive'}>
+              {status === 'checking' && 'Checking...'}
+              {status === 'error' && 'Connection Error'}
+            </Badge>
+          </div>
 
           {/* Status Message - Only show when there's an error */}
           {status === 'error' && details && (

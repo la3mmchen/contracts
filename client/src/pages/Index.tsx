@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
@@ -32,6 +33,7 @@ import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { needsMigration } from '@/lib/contractMigration';
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { 
     contracts, 
     loading, 
@@ -54,6 +56,23 @@ const Index = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
+
+  // Apply URL parameters to filters on component mount
+  useEffect(() => {
+    const statusParam = searchParams.get('status');
+    const categoryParam = searchParams.get('category');
+    
+    if (statusParam || categoryParam) {
+      setFilters(prev => ({
+        ...prev,
+        ...(statusParam && { status: statusParam as Contract['status'] }),
+        ...(categoryParam && { category: categoryParam as Contract['category'] })
+      }));
+      
+      // Clear URL parameters after applying them
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   // Migration notification is handled in the storage hook
   // Only show for actual legacy imports, not regular updates
@@ -354,6 +373,23 @@ const Index = () => {
                     onEdit={openEditForm}
                     onDelete={(id) => setDeleteConfirmId(id)}
                     onClose={handleCloseContract}
+                    onFilter={(filterType, value) => {
+                      if (filterType === 'status') {
+                        // If clicking the same status filter, reset it
+                        if (filters.status === value) {
+                          setFilters(prev => ({ ...prev, status: undefined }));
+                        } else {
+                          setFilters(prev => ({ ...prev, status: value as Contract['status'] }));
+                        }
+                      } else if (filterType === 'category') {
+                        // If clicking the same category filter, reset it
+                        if (filters.category === value) {
+                          setFilters(prev => ({ ...prev, category: undefined }));
+                        } else {
+                          setFilters(prev => ({ ...prev, category: value as Contract['category'] }));
+                        }
+                      }
+                    }}
                   />
                 </div>
               ))}
