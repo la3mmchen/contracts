@@ -3,17 +3,16 @@
 Organize contracts, maintain visibility, and track your spendings.
 
 
-## features
+## ✨ Features
 
-- **Contract Management**: Create, edit, and delete contracts with detailed information
-- **Multi-Currency Support**: Track contracts in USD, EUR, GBP, CAD, AUD, JPY, CHF, SEK, NOK, DKK
-- **Payment Tracking**: Automatic calculation of next payment dates and upcoming payments
-- **Analytics Dashboard**: Visual charts showing spending breakdown, contract categories, and status distribution
-- **Search & Filtering**: Find contracts by name, company, status, or category
-- **Export Functionality**: Export contracts to Markdown format for backup
-- **Responsive Design**: Works on desktop and mobile devices
-- **Local Data Storage**: JSON-based file storage for data persistence
-- **Real-time Statistics**: Live updates of monthly/yearly spending and contract counts
+- 📝 **Contract Management** - Create, edit, delete with rich details
+- 💰 **Multi-Currency** - Support for 10 major currencies
+- 📊 **Analytics Dashboard** - Visual spending & category breakdowns
+- 🔍 **Smart Search & Filters** - Find contracts instantly
+- 📱 **Mobile Responsive** - Works seamlessly on all devices
+- 📤 **Export to Markdown** - Backup & share your data
+- 🚫 **Data Loss Prevention** - Unsaved changes protection
+- ⚡ **Real-time Stats** - Live spending & payment tracking
 
 ![contracts](./docs/images/sneak-peek.png)
 
