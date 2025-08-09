@@ -64,6 +64,16 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
     };
     
     initializeConnection();
+
+    // Set up periodic connectivity check every 15 seconds
+    const intervalId = setInterval(() => {
+      checkConnection();
+    }, 15000);
+
+    // Cleanup interval on component unmount
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getStatusIcon = () => {

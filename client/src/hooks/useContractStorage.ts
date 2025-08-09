@@ -18,17 +18,41 @@ export const useContractStorage = () => {
       setLoading(true);
       const data = await api.getContracts();
       
-      // Migrate legacy contracts if needed
-      const migratedContracts = data.map((contract: any) => {
+      // Migrate legacy contracts if needed and save them back to the API
+      const migratedContracts = [];
+      const contractsToUpdate = [];
+      
+      for (const contract of data) {
         if (needsMigration(contract)) {
           const result = migrateContract(contract);
           if (result.wasMigrated) {
             console.log(`Migrated contract ${contract.contractId}:`, result.migrationNotes);
+            contractsToUpdate.push(result.contract);
           }
-          return result.contract;
+          migratedContracts.push(result.contract);
+        } else {
+          migratedContracts.push(contract);
         }
-        return contract;
-      });
+      }
+      
+      // Save migrated contracts back to the API
+      if (contractsToUpdate.length > 0) {
+        console.log(`Saving ${contractsToUpdate.length} migrated contracts back to API...`);
+        for (const contract of contractsToUpdate) {
+          try {
+            const { id, createdAt, updatedAt, ...updateData } = contract;
+            // Create a clean update data object without legacy fields
+            const cleanUpdateData = { ...updateData };
+            // Explicitly mark legacy fields for removal by setting them to null
+            (cleanUpdateData as any).paymentInfo = null;
+            
+            await api.updateContract(id, cleanUpdateData);
+          } catch (updateError) {
+            console.error(`Failed to save migrated contract ${contract.contractId}:`, updateError);
+          }
+        }
+        console.log('Migration complete - contracts saved to disk');
+      }
       
       setContracts(migratedContracts);
     } catch (error) {

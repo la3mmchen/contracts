@@ -1,10 +1,9 @@
 import React from 'react';
 import { 
-  DollarSign, 
+  Coins, 
   Euro, 
   PoundSterling, 
   IndianRupee, 
-  Coins,
   CreditCard,
   Wallet
 } from 'lucide-react';
@@ -14,7 +13,7 @@ import {
  */
 export const getCurrencyIcon = (currency: string) => {
   const currencyMap: Record<string, React.ComponentType<any>> = {
-    'USD': DollarSign,
+    'USD': Coins,
     'EUR': Euro,
     'GBP': PoundSterling,
     'JPY': Coins,
@@ -22,11 +21,11 @@ export const getCurrencyIcon = (currency: string) => {
     'CNY': Coins, // Chinese Yuan
     'KRW': Coins, // Korean Won
     'THB': Coins, // Thai Baht
-    'SGD': DollarSign, // Singapore Dollar
-    'HKD': DollarSign, // Hong Kong Dollar
-    'CAD': DollarSign, // Canadian Dollar
-    'AUD': DollarSign, // Australian Dollar
-    'NZD': DollarSign, // New Zealand Dollar
+    'SGD': Coins, // Singapore Dollar
+    'HKD': Coins, // Hong Kong Dollar
+    'CAD': Coins, // Canadian Dollar
+    'AUD': Coins, // Australian Dollar
+    'NZD': Coins, // New Zealand Dollar
     'CHF': Coins, // Swiss Franc
     'SEK': Coins, // Swedish Krona
     'NOK': Coins, // Norwegian Krone
@@ -45,18 +44,18 @@ export const getCurrencyIcon = (currency: string) => {
     'PEN': Coins, // Peruvian Sol
     'UYU': Coins, // Uruguayan Peso
     'VEF': Coins, // Venezuelan Bolívar
-    'BBD': DollarSign, // Barbados Dollar
-    'BMD': DollarSign, // Bermudian Dollar
-    'BND': DollarSign, // Brunei Dollar
-    'FJD': DollarSign, // Fijian Dollar
-    'GYD': DollarSign, // Guyanese Dollar
-    'JMD': DollarSign, // Jamaican Dollar
-    'LRD': DollarSign, // Liberian Dollar
-    'NAD': DollarSign, // Namibian Dollar
-    'SRD': DollarSign, // Surinamese Dollar
-    'TTD': DollarSign, // Trinidad and Tobago Dollar
-    'TWD': DollarSign, // Taiwan Dollar
-    'XCD': DollarSign, // East Caribbean Dollar
+    'BBD': Coins, // Barbados Dollar
+    'BMD': Coins, // Bermudian Dollar
+    'BND': Coins, // Brunei Dollar
+    'FJD': Coins, // Fijian Dollar
+    'GYD': Coins, // Guyanese Dollar
+    'JMD': Coins, // Jamaican Dollar
+    'LRD': Coins, // Liberian Dollar
+    'NAD': Coins, // Namibian Dollar
+    'SRD': Coins, // Surinamese Dollar
+    'TTD': Coins, // Trinidad and Tobago Dollar
+    'TWD': Coins, // Taiwan Dollar
+    'XCD': Coins, // East Caribbean Dollar
     'XPF': Coins, // CFP Franc
     'XOF': Coins, // West African CFA Franc
     'XAF': Coins, // Central African CFA Franc

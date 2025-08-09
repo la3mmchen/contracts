@@ -139,6 +139,13 @@ class ContractService {
       updatedAt: new Date().toISOString(),
     };
 
+    // Remove fields that are explicitly set to null (for migration cleanup)
+    Object.keys(updatedContract).forEach(key => {
+      if (updatedContract[key as keyof Contract] === null) {
+        delete updatedContract[key as keyof Contract];
+      }
+    });
+
     await this.saveContractToFile(updatedContract);
     console.log(`Updated contract: ${updatedContract.name} (${id})`);
     return updatedContract;

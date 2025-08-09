@@ -17,13 +17,12 @@ import {
 import { 
   TrendingUp, 
   Calendar, 
-  DollarSign, 
+  Coins, 
   AlertTriangle, 
   CheckCircle, 
   Clock,
   FileText,
   Building,
-  Coins,
   Info
 } from 'lucide-react';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';

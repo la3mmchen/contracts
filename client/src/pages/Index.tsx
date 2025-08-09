@@ -47,6 +47,8 @@ const Index = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | undefined>();
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState('overview');
   const [apiConnected, setApiConnected] = useState<boolean | null>(null);
@@ -178,11 +180,40 @@ const Index = () => {
   const openEditForm = (contract: Contract) => {
     setEditingContract(contract);
     setIsFormOpen(true);
+    setIsFormDirty(false);
   };
 
   const openAddForm = () => {
     setEditingContract(undefined);
     setIsFormOpen(true);
+    setIsFormDirty(false);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    if (!open && isFormDirty) {
+      // User is trying to close but form has unsaved changes
+      setShowUnsavedChangesDialog(true);
+    } else {
+      // Safe to close
+      setIsFormOpen(open);
+      if (!open) {
+        setEditingContract(undefined);
+        setIsFormDirty(false);
+      }
+    }
+  };
+
+  const handleUnsavedChangesConfirm = () => {
+    // User confirmed they want to discard changes
+    setShowUnsavedChangesDialog(false);
+    setIsFormOpen(false);
+    setEditingContract(undefined);
+    setIsFormDirty(false);
+  };
+
+  const handleUnsavedChangesCancel = () => {
+    // User wants to keep editing
+    setShowUnsavedChangesDialog(false);
   };
 
   const scrollToContract = (contract: Contract) => {
@@ -245,14 +276,14 @@ const Index = () => {
                 <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
-              <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+              <Dialog open={isFormOpen} onOpenChange={handleDialogClose}>
                 <DialogTrigger asChild>
                   <Button onClick={openAddForm} className="bg-white text-primary hover:bg-white/90">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Contract
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>
                       {editingContract ? 'Edit Contract' : 'Add New Contract'}
@@ -261,10 +292,34 @@ const Index = () => {
                   <ContractForm
                     contract={editingContract}
                     onSubmit={editingContract ? handleEditContract : handleAddContract}
-                    onCancel={() => setIsFormOpen(false)}
+                    onCancel={() => handleDialogClose(false)}
+                    onDirtyStateChange={setIsFormDirty}
                   />
                 </DialogContent>
               </Dialog>
+
+              {/* Unsaved Changes Confirmation Dialog */}
+              <AlertDialog open={showUnsavedChangesDialog} onOpenChange={setShowUnsavedChangesDialog}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You have unsaved changes in the form. Are you sure you want to close without saving? All changes will be lost.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={handleUnsavedChangesCancel}>
+                      Continue Editing
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleUnsavedChangesConfirm}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Discard Changes
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>

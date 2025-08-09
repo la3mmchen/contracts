@@ -30,6 +30,8 @@ const ContractDetail = () => {
   const [contract, setContract] = useState<Contract | null>(null);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
 
   // Find the contract by ID
   useEffect(() => {
@@ -200,15 +202,29 @@ const ContractDetail = () => {
       </div>
 
       {/* Edit Form Dialog */}
-      <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={isEditFormOpen} onOpenChange={(open) => {
+        if (!open && isFormDirty) {
+          setShowUnsavedChangesDialog(true);
+        } else {
+          setIsEditFormOpen(open);
+          if (!open) setIsFormDirty(false);
+        }
+      }}>
+        <DialogContent className="max-w-5xl w-[90vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Contract</DialogTitle>
           </DialogHeader>
           <ContractForm
             contract={contract}
             onSubmit={handleEdit}
-            onCancel={() => setIsEditFormOpen(false)}
+            onCancel={() => {
+              if (isFormDirty) {
+                setShowUnsavedChangesDialog(true);
+              } else {
+                setIsEditFormOpen(false);
+              }
+            }}
+            onDirtyStateChange={setIsFormDirty}
           />
         </DialogContent>
       </Dialog>
@@ -229,6 +245,33 @@ const ContractDetail = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Unsaved Changes Confirmation Dialog */}
+      <AlertDialog open={showUnsavedChangesDialog} onOpenChange={setShowUnsavedChangesDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes in the form. Are you sure you want to close without saving? All changes will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowUnsavedChangesDialog(false)}>
+              Continue Editing
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                setShowUnsavedChangesDialog(false);
+                setIsEditFormOpen(false);
+                setIsFormDirty(false);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Discard Changes
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,7 +1,7 @@
 import { Contract } from '@/types/contract';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Calendar, AlertTriangle, Clock, DollarSign } from 'lucide-react';
+import { Calendar, AlertTriangle, Clock, Coins } from 'lucide-react';
 import { calculateNextThreePayments, isPaymentDueSoon } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Contract } from '@/types/contract';
 import { getCategories, getCategoryDisplayName } from '@/config/categories';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,10 @@ interface ContractFormProps {
   contract?: Contract;
   onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
+  onDirtyStateChange?: (isDirty: boolean) => void;
 }
 
-export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps) => {
+export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
   const [formData, setFormData] = useState({
     contractId: contract?.contractId || '',
     name: contract?.name || '',
@@ -40,6 +41,49 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
     documentLink: contract?.documentLink || '',
   });
 
+  // Track initial form data for dirty state detection
+  const initialFormData = useRef({
+    contractId: contract?.contractId || '',
+    name: contract?.name || '',
+    company: contract?.company || '',
+    description: contract?.description || '',
+    startDate: contract?.startDate || new Date().toISOString().split('T')[0],
+    endDate: contract?.endDate || '',
+    amount: contract?.amount || 0,
+    currency: contract?.currency || 'USD',
+    frequency: contract?.frequency || 'monthly' as Contract['frequency'],
+    status: contract?.status || 'active' as Contract['status'],
+    category: contract?.category || 'other' as Contract['category'],
+    payDate: contract?.payDate || '',
+    contactInfo: {
+      email: contract?.contactInfo.email || '',
+      phone: contract?.contactInfo.phone || '',
+      address: contract?.contactInfo.address || '',
+      website: contract?.contactInfo.website || '',
+    },
+    notes: contract?.notes || '',
+    tags: contract?.tags?.join(', ') || '',
+    documentLink: contract?.documentLink || '',
+  });
+
+  const [isDirty, setIsDirty] = useState(false);
+
+  // Check if form is dirty (has unsaved changes)
+  const checkDirtyState = (newFormData: typeof formData) => {
+    const isFormDirty = JSON.stringify(newFormData) !== JSON.stringify(initialFormData.current);
+    if (isFormDirty !== isDirty) {
+      setIsDirty(isFormDirty);
+      onDirtyStateChange?.(isFormDirty);
+    }
+  };
+
+  // Update formData and check dirty state
+  const updateFormData = (updates: Partial<typeof formData>) => {
+    const newFormData = { ...formData, ...updates };
+    setFormData(newFormData);
+    checkDirtyState(newFormData);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -47,6 +91,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
       ...formData,
       tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
     };
+    
+    // Reset dirty state after successful submission
+    setIsDirty(false);
+    onDirtyStateChange?.(false);
     
     onSubmit(contractData);
   };
@@ -66,7 +114,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Input
                 id="contractId"
                 value={formData.contractId}
-                onChange={(e) => setFormData({ ...formData, contractId: e.target.value })}
+                onChange={(e) => updateFormData({ contractId: e.target.value })}
                 placeholder="e.g., NETFLIX-2024-001"
                 required
               />
@@ -76,7 +124,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => updateFormData({ name: e.target.value })}
                 placeholder="e.g., Netflix Subscription"
                 required
               />
@@ -88,7 +136,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
             <Input
               id="company"
               value={formData.company}
-              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              onChange={(e) => updateFormData({ company: e.target.value })}
               placeholder="e.g., Netflix Inc."
               required
             />
@@ -99,7 +147,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => updateFormData({ description: e.target.value })}
               placeholder="Brief description of the contract"
               rows={3}
             />
@@ -119,7 +167,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
                 id="startDate"
                 type="date"
                 value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                onChange={(e) => updateFormData({ startDate: e.target.value })}
                 required
               />
             </div>
@@ -129,7 +177,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
                 id="endDate"
                 type="date"
                 value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                onChange={(e) => updateFormData({ endDate: e.target.value })}
               />
             </div>
           </div>
@@ -143,7 +191,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
                 step="0.01"
                 min="0"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => updateFormData({ amount: parseFloat(e.target.value) || 0 })}
                 placeholder="0.00"
                 required
               />
@@ -152,7 +200,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Label htmlFor="currency">Currency</Label>
               <Select
                 value={formData.currency}
-                onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                onValueChange={(value) => updateFormData({ currency: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -170,7 +218,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Label htmlFor="frequency">Frequency</Label>
               <Select
                 value={formData.frequency}
-                onValueChange={(value) => setFormData({ ...formData, frequency: value as Contract['frequency'] })}
+                onValueChange={(value) => updateFormData({ frequency: value as Contract['frequency'] })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -192,7 +240,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as Contract['status'] })}
+                onValueChange={(value) => updateFormData({ status: value as Contract['status'] })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -210,7 +258,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value as Contract['category'] })}
+                onValueChange={(value) => updateFormData({ category: value as Contract['category'] })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -232,7 +280,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               id="payDate"
               type="date"
               value={formData.payDate}
-              onChange={(e) => setFormData({ ...formData, payDate: e.target.value })}
+              onChange={(e) => updateFormData({ payDate: e.target.value })}
               placeholder="Leave empty for auto-calculation"
             />
             <p className="text-sm text-muted-foreground mt-1">
@@ -254,8 +302,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
                 id="email"
                 type="email"
                 value={formData.contactInfo.email}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
+                onChange={(e) => updateFormData({ 
                   contactInfo: { ...formData.contactInfo, email: e.target.value }
                 })}
                 placeholder="contact@company.com"
@@ -266,8 +313,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               <Input
                 id="phone"
                 value={formData.contactInfo.phone}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
+                onChange={(e) => updateFormData({ 
                   contactInfo: { ...formData.contactInfo, phone: e.target.value }
                 })}
                 placeholder="+1 (555) 123-4567"
@@ -280,8 +326,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
             <Input
               id="website"
               value={formData.contactInfo.website}
-              onChange={(e) => setFormData({ 
-                ...formData, 
+              onChange={(e) => updateFormData({ 
                 contactInfo: { ...formData.contactInfo, website: e.target.value }
               })}
               placeholder="https://www.company.com"
@@ -293,8 +338,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
             <Textarea
               id="address"
               value={formData.contactInfo.address}
-              onChange={(e) => setFormData({ 
-                ...formData, 
+              onChange={(e) => updateFormData({ 
                 contactInfo: { ...formData.contactInfo, address: e.target.value }
               })}
               placeholder="123 Main St, City, State, ZIP"
@@ -315,7 +359,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
               id="documentLink"
               type="url"
               value={formData.documentLink}
-              onChange={(e) => setFormData({ ...formData, documentLink: e.target.value })}
+              onChange={(e) => updateFormData({ documentLink: e.target.value })}
               placeholder="https://docs.company.com/contract/123 or https://drive.google.com/file/..."
             />
           </div>
@@ -325,7 +369,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
             <Input
               id="tags"
               value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              onChange={(e) => updateFormData({ tags: e.target.value })}
               placeholder="e.g., streaming, entertainment, monthly (comma-separated)"
             />
           </div>
@@ -335,7 +379,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel }: ContractFormProps
             <Textarea
               id="notes"
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e) => updateFormData({ notes: e.target.value })}
               placeholder="Additional notes about this contract"
               rows={3}
             />
