@@ -56,7 +56,11 @@ const ContractDetail = () => {
   const handleFilter = (filterType: string, value: string) => {
     // Navigate back to home with filter applied
     const searchParams = new URLSearchParams();
-    searchParams.set(filterType, value);
+    if (filterType === 'tags') {
+      searchParams.set('tags', value);
+    } else {
+      searchParams.set(filterType, value);
+    }
     navigate(`/?${searchParams.toString()}`);
   };
 

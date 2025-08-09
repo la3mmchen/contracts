@@ -63,12 +63,14 @@ const Index = () => {
   useEffect(() => {
     const statusParam = searchParams.get('status');
     const categoryParam = searchParams.get('category');
+    const tagsParam = searchParams.get('tags');
     
-    if (statusParam || categoryParam) {
+    if (statusParam || categoryParam || tagsParam) {
       setFilters(prev => ({
         ...prev,
         ...(statusParam && { status: statusParam as Contract['status'] }),
-        ...(categoryParam && { category: categoryParam as Contract['category'] })
+        ...(categoryParam && { category: categoryParam as Contract['category'] }),
+        ...(tagsParam && { tags: [tagsParam] })
       }));
       
       // Clear URL parameters after applying them
@@ -79,6 +81,15 @@ const Index = () => {
   // Migration notification is handled in the storage hook
   // Only show for actual legacy imports, not regular updates
   const migrationCount = 0;
+
+  // Extract all available tags from contracts
+  const availableTags = useMemo(() => {
+    const tagsSet = new Set<string>();
+    contracts.forEach(contract => {
+      contract.tags?.forEach(tag => tagsSet.add(tag));
+    });
+    return Array.from(tagsSet).sort();
+  }, [contracts]);
 
   const filteredContracts = useMemo(() => {
     let filtered = contracts;
@@ -108,6 +119,13 @@ const Index = () => {
     // Apply frequency filter
     if (filters.frequency) {
       filtered = filtered.filter(contract => contract.frequency === filters.frequency);
+    }
+
+    // Apply tags filter
+    if (filters.tags && filters.tags.length > 0) {
+      filtered = filtered.filter(contract => 
+        contract.tags && contract.tags.some(tag => filters.tags!.includes(tag))
+      );
     }
 
     // Apply sorting
@@ -347,6 +365,13 @@ const Index = () => {
               } else {
                 setFilters(prev => ({ ...prev, category: value as Contract['category'] }));
               }
+            } else if (filterType === 'tags') {
+              // If clicking the same tag filter, reset it
+              if (filters.tags?.includes(value)) {
+                setFilters(prev => ({ ...prev, tags: undefined }));
+              } else {
+                setFilters(prev => ({ ...prev, tags: [value] }));
+              }
             } else if (filterType === 'reset') {
               setFilters({
                 searchTerm: '',
@@ -388,7 +413,11 @@ const Index = () => {
         )}
 
         {/* Filters */}
-        <ContractFilters filters={filters} onFiltersChange={(newFilters) => setFilters(newFilters)} />
+        <ContractFilters 
+          filters={filters} 
+          onFiltersChange={(newFilters) => setFilters(newFilters)} 
+          availableTags={availableTags}
+        />
 
         {/* Contracts Grid */}
         <div className="mt-8">
@@ -442,6 +471,13 @@ const Index = () => {
                           setFilters(prev => ({ ...prev, category: undefined }));
                         } else {
                           setFilters(prev => ({ ...prev, category: value as Contract['category'] }));
+                        }
+                      } else if (filterType === 'tags') {
+                        // If clicking the same tag filter, reset it
+                        if (filters.tags?.includes(value)) {
+                          setFilters(prev => ({ ...prev, tags: undefined }));
+                        } else {
+                          setFilters(prev => ({ ...prev, tags: [value] }));
                         }
                       }
                     }}

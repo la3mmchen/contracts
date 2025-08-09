@@ -340,7 +340,16 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter }: 
             </div>
             <div className="flex flex-wrap gap-1 pl-6">
               {contract.tags.map((tag, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
+                <Badge 
+                  key={index} 
+                  variant="outline" 
+                  className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onFilter?.('tags', tag);
+                  }}
+                  title={`Filter by tag: ${tag}`}
+                >
                   {`#${tag}`}
                 </Badge>
               ))}

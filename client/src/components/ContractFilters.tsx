@@ -12,9 +12,10 @@ import { Search, Filter, ChevronDown, ChevronUp, X } from 'lucide-react';
 interface ContractFiltersProps {
   filters: FilterType;
   onFiltersChange: (filters: FilterType) => void;
+  availableTags?: string[];
 }
 
-export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersProps) => {
+export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }: ContractFiltersProps) => {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   
   const updateFilter = (key: keyof FilterType, value: any) => {
@@ -31,6 +32,7 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
       status: undefined,
       category: undefined,
       frequency: undefined,
+      tags: undefined,
       sortBy: 'name'
     });
   };
@@ -41,6 +43,7 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
     if (filters.status) count++;
     if (filters.category) count++;
     if (filters.frequency) count++;
+    if (filters.tags && filters.tags.length > 0) count++;
     return count;
   };
 
@@ -162,6 +165,19 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
               </Button>
             </Badge>
           )}
+          {filters.tags && filters.tags.length > 0 && (
+            <Badge variant="secondary" className="gap-1">
+              Tags: {filters.tags.join(', ')}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                onClick={() => clearFilter('tags')}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
         </div>
       )}
 
@@ -169,7 +185,7 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
       <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
         <CollapsibleContent className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-4 border">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="category-filter" className="text-sm font-medium">Category</Label>
                 <Select value={filters.category || 'all'} onValueChange={(value) => updateFilter('category', value === 'all' ? undefined : value)}>
@@ -215,6 +231,32 @@ export const ContractFilters = ({ filters, onFiltersChange }: ContractFiltersPro
                     <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
                     <SelectItem value="createdAt">Created Date</SelectItem>
                     <SelectItem value="updatedAt">Last Updated</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="tags-filter" className="text-sm font-medium">Tags</Label>
+                <Select 
+                  value={filters.tags?.length ? filters.tags[0] : 'all'} 
+                  onValueChange={(value) => {
+                    if (value === 'all') {
+                      updateFilter('tags', undefined);
+                    } else {
+                      updateFilter('tags', [value]);
+                    }
+                  }}
+                >
+                  <SelectTrigger id="tags-filter">
+                    <SelectValue placeholder="All Tags" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {availableTags.map(tag => (
+                      <SelectItem key={tag} value={tag}>
+                        {tag}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
