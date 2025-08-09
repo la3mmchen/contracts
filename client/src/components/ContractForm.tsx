@@ -35,6 +35,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
       phone: contract?.contactInfo.phone || '',
       address: contract?.contactInfo.address || '',
       website: contract?.contactInfo.website || '',
+      contactPerson: contract?.contactInfo.contactPerson || '',
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
@@ -60,6 +61,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
       phone: contract?.contactInfo.phone || '',
       address: contract?.contactInfo.address || '',
       website: contract?.contactInfo.website || '',
+      contactPerson: contract?.contactInfo.contactPerson || '',
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
@@ -296,6 +298,17 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="contactPerson">Contact Person</Label>
+              <Input
+                id="contactPerson"
+                value={formData.contactInfo.contactPerson}
+                onChange={(e) => updateFormData({ 
+                  contactInfo: { ...formData.contactInfo, contactPerson: e.target.value }
+                })}
+                placeholder="John Smith"
+              />
+            </div>
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
