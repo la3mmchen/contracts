@@ -220,22 +220,6 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
               </div>
 
               <div>
-                <Label htmlFor="sort-filter" className="text-sm font-medium">Sort By</Label>
-                <Select value={filters.sortBy || 'name'} onValueChange={(value) => updateFilter('sortBy', value)}>
-                  <SelectTrigger id="sort-filter">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="name">Name</SelectItem>
-                    <SelectItem value="amount">Amount</SelectItem>
-                    <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
-                    <SelectItem value="createdAt">Created Date</SelectItem>
-                    <SelectItem value="updatedAt">Last Updated</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
                 <Label htmlFor="tags-filter" className="text-sm font-medium">Tags</Label>
                 <Select 
                   value={filters.tags?.length ? filters.tags[0] : 'all'} 
@@ -257,6 +241,22 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
                         {tag}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="sort-filter" className="text-sm font-medium">Sort By</Label>
+                <Select value={filters.sortBy || 'name'} onValueChange={(value) => updateFilter('sortBy', value)}>
+                  <SelectTrigger id="sort-filter">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="amount">Amount</SelectItem>
+                    <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
+                    <SelectItem value="createdAt">Created Date</SelectItem>
+                    <SelectItem value="updatedAt">Last Updated</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

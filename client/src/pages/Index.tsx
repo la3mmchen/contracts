@@ -57,7 +57,7 @@ const Index = () => {
   const [filters, setFilters] = useState<FilterType>({
     searchTerm: '',
     sortBy: 'createdAt',
-    sortOrder: 'desc'
+    sortOrder: 'asc'
   });
 
   // Apply URL parameters to filters on component mount
