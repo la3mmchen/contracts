@@ -102,20 +102,7 @@ tasks:
       - |
         echo "📊 Current contract count: $(curl -s http://localhost:3001/api/contracts | jq length)"
 
-  test:
-    desc: Run all tests in containers
-    cmds:
-      - echo "🧪 Running client tests in container..."
-      - docker run --rm -v $(pwd)/client:/app -w /app node:18-alpine sh -c "npm install --legacy-peer-deps && npm install --save-dev ts-jest --legacy-peer-deps && npm test"
-      - echo "🧪 Running API tests in container..."
-      - docker run --rm -v $(pwd)/api:/app -w /app node:18-alpine sh -c "npm install --legacy-peer-deps && npm test"
-      - echo "✅ All tests completed!"
 
-  test-watch:
-    desc: Run tests in watch mode
-    cmds:
-      - echo "🧪 Running tests in watch mode..."
-      - cd client && npm run test:watch
 
   health:
     desc: Check health of all services
