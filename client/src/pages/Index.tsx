@@ -156,7 +156,7 @@ const Index = () => {
     return filtered;
   }, [contracts, filters]);
 
-  const handleAddContract = async (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddContract = async (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => {
     try {
       const result = await addContract(contractData);
       // Only close the form if the contract was actually created
@@ -169,9 +169,34 @@ const Index = () => {
     }
   };
 
-  const handleEditContract = (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleEditContract = (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => {
     if (editingContract) {
-      updateContract(editingContract.id, contractData);
+      // Check if amount changed and create price change entry
+      let updatedData = { ...contractData };
+      
+      if (contractData.amount !== editingContract.amount) {
+        // Create new price change entry
+        const newPriceChange = {
+          date: new Date().toISOString(),
+          previousAmount: editingContract.amount,
+          newAmount: contractData.amount,
+          reason: priceChangeReason?.trim() || 'Amount updated via edit form',
+          effectiveDate: new Date().toISOString()
+        };
+        
+        // Add to existing price changes or create new array
+        const updatedPriceChanges = [
+          ...(editingContract.priceChanges || []),
+          newPriceChange
+        ];
+        
+        updatedData = {
+          ...contractData,
+          priceChanges: updatedPriceChanges
+        };
+      }
+      
+      updateContract(editingContract.id, updatedData);
       setEditingContract(undefined);
       setIsFormOpen(false);
     }
@@ -459,6 +484,7 @@ const Index = () => {
                     onEdit={openEditForm}
                     onDelete={(id) => setDeleteConfirmId(id)}
                     onClose={handleCloseContract}
+                    onUpdate={updateContract}
                     onFilter={(filterType, value) => {
                       if (filterType === 'status') {
                         // If clicking the same status filter, reset it

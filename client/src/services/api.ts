@@ -91,8 +91,9 @@ export const api = {
     return response.json();
   },
 
-  async updateContract(id: string, data: Partial<CreateContractRequest>): Promise<Contract> {
+    async updateContract(id: string, data: Partial<Contract>): Promise<Contract> {
     await ensureConfigLoaded();
+
     const response = await fetch(`${API_BASE}/contracts/${id}`, {
       method: 'PUT',
       headers: {
@@ -100,8 +101,15 @@ export const api = {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update contract');
-    return response.json();
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API service: Response error:', errorText);
+      throw new Error(`Failed to update contract: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
   },
 
   async deleteContract(id: string): Promise<void> {

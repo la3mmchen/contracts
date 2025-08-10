@@ -40,7 +40,10 @@ class ContractService {
   private async saveContractToFile(contract: Contract): Promise<void> {
     await this.ensureDataDirectory();
     const filePath = this.getContractFilePath(contract.id);
-    await fs.writeFile(filePath, JSON.stringify(contract, null, 2));
+    
+    const jsonData = JSON.stringify(contract, null, 2);
+    
+    await fs.writeFile(filePath, jsonData);
   }
 
   private async deleteContractFile(id: string): Promise<void> {
@@ -127,7 +130,7 @@ class ContractService {
     return { contract, created: true };
   }
 
-  async updateContract(id: string, data: Partial<CreateContractRequest>): Promise<Contract | null> {
+  async updateContract(id: string, data: Partial<Contract>): Promise<Contract | null> {
     const existingContract = await this.loadContractFromFile(id);
     if (!existingContract) {
       return null;
@@ -148,6 +151,7 @@ class ContractService {
 
     await this.saveContractToFile(updatedContract);
     console.log(`Updated contract: ${updatedContract.name} (${id})`);
+    
     return updatedContract;
   }
 

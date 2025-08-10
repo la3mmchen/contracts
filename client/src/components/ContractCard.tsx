@@ -1,4 +1,4 @@
-import { Contract } from '@/types/contract';
+import { Contract, PriceChange } from '@/types/contract';
 import { 
   Card, 
   CardContent, 
@@ -8,6 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   Calendar, 
   Coins, 
@@ -27,7 +28,9 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronRight,
-  Tag
+  Tag,
+  Save,
+  Check
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -44,6 +47,7 @@ interface ContractCardProps {
   onClose?: (contract: Contract) => void;
   onFilter?: (filterType: string, value: string) => void;
   defaultExpandCustomFields?: boolean;
+  onUpdate?: (id: string, updates: Partial<Contract>) => Promise<void>;
 }
 
 const statusColors = {
@@ -64,11 +68,83 @@ const categoryColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, defaultExpandCustomFields = false }: ContractCardProps) => {
+export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, defaultExpandCustomFields = false, onUpdate }: ContractCardProps) => {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
+  const [isEditingAmount, setIsEditingAmount] = useState(false);
+  const [editingAmount, setEditingAmount] = useState(contract.amount.toString());
+  const [editingReason, setEditingReason] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy');
+  };
+
+  const handleAmountSave = async () => {
+    if (!onUpdate) {
+      console.error('onUpdate function is not available!');
+      return;
+    }
+    
+    const newAmount = parseFloat(editingAmount);
+    if (isNaN(newAmount) || newAmount < 0) {
+      setEditingAmount(contract.amount.toString());
+      setIsEditingAmount(false);
+      return;
+    }
+
+    if (newAmount === contract.amount) {
+      setIsEditingAmount(false);
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      
+      // Create a new price change entry
+      const newPriceChange: PriceChange = {
+        date: new Date().toISOString(),
+        previousAmount: contract.amount,
+        newAmount: newAmount,
+        reason: editingReason.trim() || 'Amount updated via inline editing',
+        effectiveDate: new Date().toISOString()
+      };
+
+      // Add to existing price changes or create new array
+      const updatedPriceChanges = [
+        ...(contract.priceChanges || []),
+        newPriceChange
+      ];
+
+      const updateData = { 
+        amount: newAmount,
+        priceChanges: updatedPriceChanges
+      };
+
+      await onUpdate(contract.id, updateData);
+      setIsEditingAmount(false);
+    } catch (error) {
+      console.error('Failed to update amount:', error);
+      setEditingAmount(contract.amount.toString());
+      setIsEditingAmount(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+
+
+  const handleAmountCancel = () => {
+    setEditingAmount(contract.amount.toString());
+    setEditingReason('');
+    setIsEditingAmount(false);
+  };
+
+  const handleAmountKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAmountSave();
+    } else if (e.key === 'Escape') {
+      handleAmountCancel();
+    }
   };
 
   const payments = calculateNextThreePayments(contract);
@@ -213,11 +289,114 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
         {/* Amount and Frequency */}
         <div className="flex items-center gap-2 text-lg font-semibold">
           <CurrencyIcon currency={contract.currency} />
-          <span>{formatCurrency(contract.amount, contract.currency)}</span>
+          {isEditingAmount ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={editingAmount}
+                onChange={(e) => setEditingAmount(e.target.value)}
+                onKeyDown={handleAmountKeyDown}
+                className="w-24 h-8 text-lg font-semibold"
+                autoFocus
+              />
+              <Input
+                type="text"
+                placeholder="Reason for change..."
+                value={editingReason}
+                onChange={(e) => setEditingReason(e.target.value)}
+                className="w-32 h-8 text-sm"
+                maxLength={100}
+              />
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleAmountSave}
+                  disabled={isSaving}
+                  className="h-6 w-6 p-0"
+                >
+                  {isSaving ? (
+                    <Clock className="h-3 w-3" />
+                  ) : (
+                    <Check className="h-3 w-3" />
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleAmountCancel}
+                  disabled={isSaving}
+                  className="h-6 w-6 p-0"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="group relative">
+              <span 
+                className="cursor-pointer hover:bg-muted/30 hover:text-foreground transition-all duration-200 inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-transparent hover:border-border font-medium"
+                onClick={() => onUpdate && setIsEditingAmount(true)}
+                title={onUpdate ? "Click to edit amount" : undefined}
+              >
+                {formatCurrency(contract.amount, contract.currency)}
+                {onUpdate && (
+                  <Edit className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />
+                )}
+              </span>
+            </div>
+          )}
           <span className="text-sm text-muted-foreground font-normal">
             / {contract.frequency}
           </span>
         </div>
+
+        {/* Latest Price Changes Summary */}
+        {contract.priceChanges && contract.priceChanges.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Coins className="h-4 w-4 text-amber-600" />
+                <span>Recent price changes:</span>
+              </div>
+              {contract.priceChanges.length > 3 && (
+                <span className="text-xs text-muted-foreground">
+                  {contract.priceChanges.length} total
+                </span>
+              )}
+            </div>
+            <div className="space-y-1 pl-6">
+              {contract.priceChanges
+                .slice(-3) // Get the 3 most recent changes
+                .reverse() // Show newest first
+                .map((change, index) => (
+                  <div key={index} className="flex items-center justify-between text-xs bg-muted/30 px-2 py-1 rounded">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">
+                        {formatDate(change.effectiveDate)}
+                      </span>
+                      <span className="text-muted-foreground">→</span>
+                      <span className="font-medium text-foreground">
+                        {formatCurrency(change.newAmount, contract.currency)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground max-w-24 truncate" title={change.reason}>
+                      {change.reason}
+                    </span>
+                  </div>
+                ))}
+              {contract.priceChanges.length > 3 && (
+                <div className="text-xs text-muted-foreground italic">
+                  +{contract.priceChanges.length - 3} more changes
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+
 
         {/* Payment Schedule */}
         {payments.length > 0 && (
@@ -342,6 +521,40 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
             <p className="text-sm text-muted-foreground line-clamp-3 pl-6 bg-muted/30 p-2 rounded">
               {contract.notes}
             </p>
+          </div>
+        )}
+
+        {/* Price Changes History */}
+        {contract.priceChanges && contract.priceChanges.length > 0 && (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Coins className="h-4 w-4" />
+              <span>Price Changes:</span>
+            </div>
+            <div className="space-y-2 pl-6">
+              {contract.priceChanges.map((change, index) => (
+                <div key={index} className="bg-muted/30 p-2 rounded text-sm">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-foreground">
+                      {formatDate(change.effectiveDate)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(change.date)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="line-through">${change.previousAmount.toFixed(2)}</span>
+                    <span className="text-foreground">→</span>
+                    <span className="font-medium text-foreground">${change.newAmount.toFixed(2)}</span>
+                  </div>
+                  {change.reason && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Reason: {change.reason}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

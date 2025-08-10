@@ -186,6 +186,7 @@ const ContractDetail = () => {
             onDelete={() => setDeleteConfirmOpen(true)}
             onFilter={handleFilter}
             defaultExpandCustomFields={true}
+            onUpdate={updateContract}
           />
         </div>
 

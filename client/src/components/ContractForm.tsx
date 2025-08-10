@@ -12,7 +12,7 @@ import { Plus, X } from 'lucide-react';
 
 interface ContractFormProps {
   contract?: Contract;
-  onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => void;
   onCancel: () => void;
   onDirtyStateChange?: (isDirty: boolean) => void;
 }
@@ -42,6 +42,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     tags: contract?.tags?.join(', ') || '',
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
+    priceChangeReason: '',
   });
 
   // Track initial form data for dirty state detection
@@ -69,6 +70,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     tags: contract?.tags?.join(', ') || '',
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
+    priceChangeReason: '',
   });
 
   const [isDirty, setIsDirty] = useState(false);
@@ -156,7 +158,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     setIsDirty(false);
     onDirtyStateChange?.(false);
     
-    onSubmit(contractData);
+    onSubmit(contractData, formData.priceChangeReason);
   };
 
   const currencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'SEK', 'NOK', 'DKK'];
@@ -294,6 +296,23 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
               </Select>
             </div>
           </div>
+
+          {/* Price Change Reason - Only show when amount has changed */}
+          {contract && formData.amount !== contract.amount.toString() && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="priceChangeReason">Reason for Price Change</Label>
+                <Input
+                  id="priceChangeReason"
+                  type="text"
+                  value={formData.priceChangeReason}
+                  onChange={(e) => updateFormData({ priceChangeReason: e.target.value })}
+                  placeholder="e.g., Annual price increase, Plan upgrade, etc."
+                  maxLength={100}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

@@ -20,5 +20,22 @@
   },
   "notes": "Includes utilities. Parking space #12. Pet deposit paid.",
   "tags": ["rent", "housing", "apartment"],
-  "documentLink": "https://sunsetproperties.com/leases/2024-007-signed-lease.pdf"
+  "priceChanges": [
+    {
+      "date": "2024-01-01",
+      "previousAmount": 2400.00,
+      "newAmount": 2500.00,
+      "reason": "Annual lease renewal",
+      "effectiveDate": "2024-01-01"
+    }
+  ],
+  "customFields": {
+    "Parking Space": "#12",
+    "Pet Deposit": "Paid",
+    "Utilities Included": "Yes",
+    "Lease Term": "12 months"
+  },
+  "documentLink": "https://sunsetproperties.com/leases/2024-007-signed-lease.pdf",
+  "createdAt": "2024-01-01T09:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
 } 

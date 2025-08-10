@@ -5,26 +5,58 @@
   "description": "Residential electricity service with renewable energy options",
   "startDate": "2024-02-01",
   "endDate": null,
-  "amount": 89.50,
+  "amount": 95.75,
   "currency": "USD",
   "frequency": "monthly",
   "status": "active",
   "category": "utilities",
+  "payDate": "2024-09-15",
   "contactInfo": {
     "email": "customer.service@pge.com",
     "phone": "+1-800-743-5000",
     "website": "https://pge.com",
     "address": "77 Beale Street, San Francisco, CA 94105"
   },
-  "paymentInfo": {
-    "nextPaymentDate": "2024-09-15",
-    "lastPaymentDate": "2024-08-15",
-    "paymentMethod": "Auto Pay",
-    "accountNumber": "123456789",
-    "autoRenew": true,
-    "lateFees": 15.00
-  },
   "notes": "Average monthly usage: 650 kWh. Green energy option enabled.",
   "tags": ["utilities", "electricity", "green"],
-  "documentLink": "https://pge.com/account/documents/contract-2024-003"
+  "priceChanges": [
+    {
+      "date": "2024-08-01",
+      "previousAmount": 89.50,
+      "newAmount": 95.75,
+      "reason": "Summer rate adjustment + usage increase",
+      "effectiveDate": "2024-08-01"
+    },
+    {
+      "date": "2024-06-01",
+      "previousAmount": 85.25,
+      "newAmount": 89.50,
+      "reason": "Summer rate adjustment",
+      "effectiveDate": "2024-06-01"
+    },
+    {
+      "date": "2024-04-01",
+      "previousAmount": 82.00,
+      "newAmount": 85.25,
+      "reason": "Spring rate adjustment",
+      "effectiveDate": "2024-04-01"
+    },
+    {
+      "date": "2024-02-01",
+      "previousAmount": 78.50,
+      "newAmount": 82.00,
+      "reason": "Initial contract rate",
+      "effectiveDate": "2024-02-01"
+    }
+  ],
+  "customFields": {
+    "Account Number": "123456789",
+    "Payment Method": "Auto Pay",
+    "Auto Renew": "Yes",
+    "Late Fees": "$15.00",
+    "Usage Average": "650 kWh/month"
+  },
+  "documentLink": "https://pge.com/account/documents/contract-2024-003",
+  "createdAt": "2024-02-01T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
 } 

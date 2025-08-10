@@ -1,5 +1,13 @@
 import { Category } from '@/config/categories';
 
+export interface PriceChange {
+  date: string;
+  previousAmount: number;
+  newAmount: number;
+  reason: string;
+  effectiveDate: string;
+}
+
 export interface Contract {
   id: string;
   contractId: string;
@@ -23,6 +31,7 @@ export interface Contract {
   };
   notes?: string;
   tags?: string[];
+  priceChanges?: PriceChange[]; // Array of amount changes over time
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
@@ -84,6 +93,7 @@ export interface CreateContractRequest {
   contactInfo: Contract['contactInfo'];
   notes?: string;
   tags?: string[];
+  priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
 }
 

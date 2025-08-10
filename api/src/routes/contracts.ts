@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { contractService } from '../services/contractService';
 import { CreateContractRequest, UpdateContractRequest } from '../types/contract';
+import { Contract } from '../types/contract';
 
 export const contractRoutes = Router();
 
@@ -70,14 +71,13 @@ contractRoutes.post('/', async (req: Request, res: Response) => {
 contractRoutes.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updateData: Partial<CreateContractRequest> = req.body;
+    const updateData: Partial<Contract> = req.body;
     
     const updatedContract = await contractService.updateContract(id, updateData);
     
     if (!updatedContract) {
       return res.status(404).json({ error: 'Contract not found' });
     }
-    
     res.json(updatedContract);
   } catch (error) {
     console.error('Error updating contract:', error);
@@ -149,4 +149,6 @@ contractRoutes.get('/export/markdown', async (req: Request, res: Response) => {
     console.error('Error exporting contracts to markdown:', error);
     res.status(500).json({ error: 'Failed to export contracts' });
   }
-}); 
+});
+
+ 

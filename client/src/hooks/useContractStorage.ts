@@ -99,27 +99,28 @@ export const useContractStorage = () => {
     }
   };
 
-  const updateContract = async (id: string, updates: Partial<Contract>) => {
-    try {
-      const updatedContract = await api.updateContract(id, updates);
-      setContracts(prev => prev.map(contract =>
-        contract.id === id ? updatedContract : contract
-      ));
-      
-      toast({
-        title: "Contract updated",
-        description: "Contract has been updated successfully.",
-      });
-    } catch (error) {
-      console.error('Error updating contract:', error);
-      toast({
-        title: "Error updating contract",
-        description: "There was an issue updating your contract.",
-        variant: "destructive",
-      });
-      throw error;
-    }
-  };
+      const updateContract = async (id: string, updates: Partial<Contract>) => {
+      try {
+        const updatedContract = await api.updateContract(id, updates);
+
+        setContracts(prev => prev.map(contract =>
+          contract.id === id ? updatedContract : contract
+        ));
+
+        toast({
+          title: "Contract updated",
+          description: "Contract has been updated successfully.",
+        });
+      } catch (error) {
+        console.error('Error updating contract:', error);
+        toast({
+          title: "Error updating contract",
+          description: "There was an issue updating your contract.",
+          variant: "destructive",
+        });
+        throw error;
+      }
+    };
 
   const deleteContract = async (id: string) => {
     try {

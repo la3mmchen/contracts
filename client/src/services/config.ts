@@ -22,7 +22,7 @@ export const loadConfig = async (): Promise<AppConfig> => {
     console.warn('Failed to load config.json, using defaults:', error);
     // Fallback to defaults
     config = {
-      API_URL: 'http://localhost:3001/api',
+      API_URL: '/api',
       APP_NAME: 'Contract Manager',
       CATEGORIES: 'subscription,insurance,utilities,rent,services,software,maintenance,other'
     };

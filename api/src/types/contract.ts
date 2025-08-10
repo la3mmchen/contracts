@@ -1,3 +1,11 @@
+export interface PriceChange {
+  date: string;
+  previousAmount: number;
+  newAmount: number;
+  reason: string;
+  effectiveDate: string;
+}
+
 export interface Contract {
   id: string;
   contractId: string;
@@ -21,6 +29,7 @@ export interface Contract {
   };
   notes?: string;
   tags?: string[];
+  priceChanges?: PriceChange[]; // Array of amount changes over time
   attachments?: ContractAttachment[];
   documentLink?: string;
   createdAt: string;
@@ -52,6 +61,7 @@ export interface CreateContractRequest {
   contactInfo: Contract['contactInfo'];
   notes?: string;
   tags?: string[];
+  priceChanges?: PriceChange[];
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

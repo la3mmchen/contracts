@@ -1,33 +1,50 @@
 {
-  "contractId": "NET-2024-001",
-  "name": "Netflix Premium Subscription",
-  "company": "Netflix Inc.",
-  "description": "Premium streaming subscription with 4K content and 4 simultaneous streams",
-  "startDate": "2024-01-15",
-  "endDate": "2025-01-15",
-  "amount": 19.99,
+  "contractId": "NFLX-2024-002",
+  "name": "Netflix Premium",
+  "company": "Netflix, Inc.",
+  "description": "Premium streaming plan with 4K Ultra HD and 4 simultaneous streams",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "amount": 22.99,
   "currency": "USD",
   "frequency": "monthly",
   "status": "active",
   "category": "subscription",
-  "payDate": "2024-12-20",
+  "payDate": "2024-12-15",
   "contactInfo": {
-    "email": "support@netflix.com",
-    "phone": "+1-800-585-7019",
+    "email": "help@netflix.com",
+    "phone": "+1-866-579-7172",
     "website": "https://netflix.com",
     "address": "100 Winchester Circle, Los Gatos, CA 95032"
   },
-  "notes": "Auto-renewal enabled. Cancel anytime.",
-  "tags": ["streaming", "entertainment", "premium"],
+  "notes": "Premium plan with 4K Ultra HD quality and 4 simultaneous streams. Shared account with family.",
+  "tags": ["streaming", "entertainment", "4K"],
+  "priceChanges": [
+    {
+      "date": "2024-07-01",
+      "previousAmount": 19.99,
+      "newAmount": 22.99,
+      "reason": "Annual price increase",
+      "effectiveDate": "2024-07-01"
+    },
+    {
+      "date": "2024-01-01",
+      "previousAmount": 17.99,
+      "newAmount": 19.99,
+      "reason": "Plan upgrade to Premium",
+      "effectiveDate": "2024-01-01"
+    }
+  ],
   "customFields": {
-    "Account Email": "user@example.com",
-    "Login URL": "https://netflix.com/login",
-    "Account ID": "NF-12345",
-    "Profile Count": "4",
-    "Billing Cycle": "Monthly",
-    "Payment Method": "Credit Card ending in 1234"
+    "Account Email": "family@example.com",
+    "Plan Type": "Premium",
+    "Streams": "4",
+    "Quality": "4K Ultra HD",
+    "Account ID": "NF-45678",
+    "Payment Method": "Credit Card",
+    "Auto Renew": "Yes"
   },
-  "documentLink": "https://drive.google.com/file/d/1ABC123DEF456/view?usp=sharing",
-  "createdAt": "2024-01-15T10:00:00.000Z",
-  "updatedAt": "2024-02-15T10:00:00.000Z"
+  "documentLink": "https://netflix.com/account/billing",
+  "createdAt": "2024-01-01T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
 } 

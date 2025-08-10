@@ -5,7 +5,7 @@
   "description": "Family plan with 6 premium accounts, ad-free music and offline downloads",
   "startDate": "2024-03-01",
   "endDate": "2025-03-01",
-  "amount": 14.99,
+  "amount": 16.99,
   "currency": "USD",
   "frequency": "monthly",
   "status": "active",
@@ -19,6 +19,15 @@
   },
   "notes": "Family plan with 6 accounts. Shared payment method.",
   "tags": ["music", "streaming", "family"],
+  "priceChanges": [
+    {
+      "date": "2024-09-01",
+      "previousAmount": 14.99,
+      "newAmount": 16.99,
+      "reason": "Annual price adjustment",
+      "effectiveDate": "2024-09-01"
+    }
+  ],
   "customFields": {
     "Account Email": "family@example.com",
     "Login URL": "https://open.spotify.com/account",
