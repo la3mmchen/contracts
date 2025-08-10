@@ -18,6 +18,7 @@ interface ContractStatsProps {
   activeFilters?: {
     status?: string;
     category?: string;
+    needsMoreInfo?: boolean;
   };
 }
 
@@ -32,7 +33,6 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
     }
   };
   const activeContracts = contracts.filter(c => c.status === 'active');
-  const expiredContracts = contracts.filter(c => c.status === 'expired');
   
   const totalMonthlySpend = contracts
     .filter(c => c.status === 'active')
@@ -150,14 +150,14 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
       filterValue: 'active',
     },
     {
-      title: 'Expired Contracts',
-      value: expiredContracts.length,
+      title: 'Needs More Info',
+      value: contracts.filter(c => c.needsMoreInfo).length,
       icon: AlertTriangle,
-      color: 'text-destructive',
-      bgColor: 'bg-destructive/10',
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-100',
       clickable: true,
-      filterType: 'status',
-      filterValue: 'expired',
+      filterType: 'needsMoreInfo',
+      filterValue: 'true',
     },
     {
       title: 'Monthly Spend',
@@ -175,7 +175,8 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
     const isActive = activeFilters && (
       (stat.filterType === 'status' && activeFilters.status === stat.filterValue) ||
       (stat.filterType === 'reset' && !activeFilters.status && !activeFilters.category) ||
-      (stat.filterType === 'category' && activeFilters.category === stat.filterValue)
+      (stat.filterType === 'category' && activeFilters.category === stat.filterValue) ||
+      (stat.filterType === 'needsMoreInfo' && activeFilters.needsMoreInfo === (stat.filterValue === 'true'))
     );
     
     return (

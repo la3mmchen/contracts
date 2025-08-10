@@ -31,6 +31,7 @@ export interface Contract {
   };
   notes?: string;
   tags?: string[];
+  needsMoreInfo?: boolean; // Flag to indicate contract needs more information
   priceChanges?: PriceChange[]; // Array of amount changes over time
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
@@ -54,6 +55,7 @@ export interface ContractFilters {
   frequency?: Contract['frequency'];
   searchTerm?: string;
   tags?: string[];
+  needsMoreInfo?: boolean;
   sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {
@@ -93,6 +95,7 @@ export interface CreateContractRequest {
   contactInfo: Contract['contactInfo'];
   notes?: string;
   tags?: string[];
+  needsMoreInfo?: boolean;
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
 }

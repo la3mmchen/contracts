@@ -19,6 +19,7 @@
   },
   "notes": "Average monthly usage: 650 kWh. Green energy option enabled.",
   "tags": ["utilities", "electricity", "green"],
+  "needsMoreInfo": true,
   "priceChanges": [
     {
       "date": "2024-08-01",

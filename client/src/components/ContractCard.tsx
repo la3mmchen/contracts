@@ -260,6 +260,12 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
               <span className="ml-1 text-xs opacity-75">(invalid)</span>
             )}
           </span>
+          {contract.needsMoreInfo && (
+            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Needs Info
+            </span>
+          )}
         </div>
 
         {/* Invalid Category Warning */}

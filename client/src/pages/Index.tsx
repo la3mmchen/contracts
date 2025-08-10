@@ -129,6 +129,11 @@ const Index = () => {
       );
     }
 
+    // Apply needsMoreInfo filter
+    if (filters.needsMoreInfo !== undefined) {
+      filtered = filtered.filter(contract => contract.needsMoreInfo === filters.needsMoreInfo);
+    }
+
     // Apply sorting
     const direction = filters.sortOrder === 'asc' ? 1 : -1;
     filtered.sort((a, b) => {
@@ -399,6 +404,13 @@ const Index = () => {
               } else {
                 setFilters(prev => ({ ...prev, tags: [value] }));
               }
+            } else if (filterType === 'needsMoreInfo') {
+              // If clicking the same needsMoreInfo filter, reset it
+              if (filters.needsMoreInfo === (value === 'true')) {
+                setFilters(prev => ({ ...prev, needsMoreInfo: undefined }));
+              } else {
+                setFilters(prev => ({ ...prev, needsMoreInfo: value === 'true' }));
+              }
             } else if (filterType === 'reset') {
               setFilters({
                 searchTerm: '',
@@ -409,7 +421,8 @@ const Index = () => {
           }}
           activeFilters={{
             status: filters.status,
-            category: filters.category
+            category: filters.category,
+            needsMoreInfo: filters.needsMoreInfo
           }}
         />
 

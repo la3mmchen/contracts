@@ -40,6 +40,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
+    needsMoreInfo: contract?.needsMoreInfo || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -68,6 +69,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
+    needsMoreInfo: contract?.needsMoreInfo || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -475,6 +477,21 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
             />
           </div>
 
+          <div className="flex items-center space-x-2">
+            <input
+              id="needsMoreInfo"
+              type="checkbox"
+              checked={formData.needsMoreInfo}
+              onChange={(e) => updateFormData({ needsMoreInfo: e.target.checked })}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="needsMoreInfo" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Needs More Information
+            </Label>
+          </div>
+          <p className="text-sm text-muted-foreground -mt-2">
+            Check this box if you need to gather more details about this contract
+          </p>
           <div>
             <div className="flex items-center justify-between mb-2">
               <Label>Custom Fields</Label>

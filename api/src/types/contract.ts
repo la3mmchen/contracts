@@ -29,6 +29,7 @@ export interface Contract {
   };
   notes?: string;
   tags?: string[];
+  needsMoreInfo?: boolean; // Flag to indicate contract needs more information
   priceChanges?: PriceChange[]; // Array of amount changes over time
   attachments?: ContractAttachment[];
   documentLink?: string;
@@ -61,6 +62,7 @@ export interface CreateContractRequest {
   contactInfo: Contract['contactInfo'];
   notes?: string;
   tags?: string[];
+  needsMoreInfo?: boolean;
   priceChanges?: PriceChange[];
 }
 

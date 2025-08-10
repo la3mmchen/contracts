@@ -33,6 +33,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       category: undefined,
       frequency: undefined,
       tags: undefined,
+      needsMoreInfo: undefined,
       sortBy: 'name'
     });
   };
@@ -44,6 +45,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
     if (filters.category) count++;
     if (filters.frequency) count++;
     if (filters.tags && filters.tags.length > 0) count++;
+    if (filters.needsMoreInfo !== undefined) count++;
     return count;
   };
 
@@ -76,6 +78,18 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
               <SelectItem value="expired">Expired</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
               <SelectItem value="closed">Closed</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Quick Needs More Info Filter */}
+          <Select value={filters.needsMoreInfo === true ? 'yes' : filters.needsMoreInfo === false ? 'no' : 'all'} onValueChange={(value) => updateFilter('needsMoreInfo', value === 'all' ? undefined : value === 'yes')}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Info Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Info</SelectItem>
+              <SelectItem value="yes">Needs Info</SelectItem>
+              <SelectItem value="no">Complete</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -173,6 +187,19 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
                 size="sm"
                 className="h-auto p-0 text-muted-foreground hover:text-foreground"
                 onClick={() => clearFilter('tags')}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          {filters.needsMoreInfo !== undefined && (
+            <Badge variant="secondary" className="gap-1">
+              Info Status: {filters.needsMoreInfo ? 'Needs Info' : 'Complete'}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                onClick={() => clearFilter('needsMoreInfo')}
               >
                 <X className="h-3 w-3" />
               </Button>
