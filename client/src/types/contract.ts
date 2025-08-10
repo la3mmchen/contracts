@@ -23,6 +23,7 @@ export interface Contract {
   };
   notes?: string;
   tags?: string[];
+  customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
   createdAt: string;
@@ -83,6 +84,7 @@ export interface CreateContractRequest {
   contactInfo: Contract['contactInfo'];
   notes?: string;
   tags?: string[];
+  customFields?: Record<string, string>;
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

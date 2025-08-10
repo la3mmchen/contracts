@@ -32,10 +32,21 @@ export const calculateNextPaymentDate = (
       nextDate.setDate(nextDate.getDate() + 14);
       break;
     case 'monthly':
+      // Preserve the day of month when possible
+      const currentDay = nextDate.getDate();
       nextDate.setMonth(nextDate.getMonth() + 1);
+      // If the day changed (e.g., Jan 31 -> Feb 28), keep the last day of the new month
+      if (nextDate.getDate() !== currentDay) {
+        nextDate.setDate(0); // Go to last day of previous month
+      }
       break;
     case 'quarterly':
+      // Preserve the day of month when possible
+      const currentDayQuarterly = nextDate.getDate();
       nextDate.setMonth(nextDate.getMonth() + 3);
+      if (nextDate.getDate() !== currentDayQuarterly) {
+        nextDate.setDate(0);
+      }
       break;
     case 'yearly':
       nextDate.setFullYear(nextDate.getFullYear() + 1);
@@ -54,10 +65,20 @@ export const calculateNextPaymentDate = (
         nextDate.setDate(nextDate.getDate() + 14);
         break;
       case 'monthly':
+        // Preserve the day of month when possible
+        const currentDay = nextDate.getDate();
         nextDate.setMonth(nextDate.getMonth() + 1);
+        if (nextDate.getDate() !== currentDay) {
+          nextDate.setDate(0);
+        }
         break;
       case 'quarterly':
+        // Preserve the day of month when possible
+        const currentDayQuarterly = nextDate.getDate();
         nextDate.setMonth(nextDate.getMonth() + 3);
+        if (nextDate.getDate() !== currentDayQuarterly) {
+          nextDate.setDate(0);
+        }
         break;
       case 'yearly':
         nextDate.setFullYear(nextDate.getFullYear() + 1);
@@ -114,10 +135,20 @@ export const calculateNextThreePayments = (
         currentPaymentDate.setDate(currentPaymentDate.getDate() + 14);
         break;
       case 'monthly':
+        // Preserve the day of month when possible
+        const currentDay = currentPaymentDate.getDate();
         currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 1);
+        if (currentPaymentDate.getDate() !== currentDay) {
+          currentPaymentDate.setDate(0);
+        }
         break;
       case 'quarterly':
+        // Preserve the day of month when possible
+        const currentDayQuarterly = currentPaymentDate.getDate();
         currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 3);
+        if (currentPaymentDate.getDate() !== currentDayQuarterly) {
+          currentPaymentDate.setDate(0);
+        }
         break;
       case 'yearly':
         currentPaymentDate.setFullYear(currentPaymentDate.getFullYear() + 1);

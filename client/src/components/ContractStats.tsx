@@ -3,20 +3,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Contract } from '@/types/contract';
 import { 
-  Coins, 
+  TrendingUp, 
   Calendar, 
-  CheckCircle, 
-  XCircle, 
-  Info,
-  Home,
-  Car,
-  Wifi,
-  Shield,
-  Heart,
-  Briefcase,
-  Settings,
-  Palette,
-  MoreHorizontal
+  AlertTriangle, 
+  DollarSign, 
+  Tag, 
+  Coins, 
+  Building2 
 } from 'lucide-react';
 
 interface ContractStatsProps {
@@ -84,14 +77,14 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
     const categories = ['subscription', 'insurance', 'utilities', 'house', 'services', 'software', 'maintenance', 'other', 'marketing'];
     const categoryIcons = {
       subscription: Coins,
-      insurance: Shield,
-      utilities: Wifi,
-      house: Home,
-      services: Briefcase,
-      software: Settings,
-      maintenance: Settings,
-      other: MoreHorizontal,
-      marketing: Palette
+      insurance: AlertTriangle,
+      utilities: DollarSign,
+      house: Building2,
+      services: Tag,
+      software: TrendingUp,
+      maintenance: TrendingUp,
+      other: Tag,
+      marketing: TrendingUp
     };
     const categoryColors = {
       subscription: 'text-blue-600',
@@ -118,7 +111,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
 
     return categories.map(category => {
       const count = contracts.filter(c => c.category === category).length;
-      const Icon = categoryIcons[category as keyof typeof categoryIcons] || MoreHorizontal;
+      const Icon = categoryIcons[category as keyof typeof categoryIcons] || Tag;
       const color = categoryColors[category as keyof typeof categoryColors] || 'text-gray-600';
       const bgColor = categoryBgColors[category as keyof typeof categoryBgColors] || 'bg-gray-100';
 
@@ -149,7 +142,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
     {
       title: 'Active Contracts',
       value: activeContracts.length,
-      icon: CheckCircle,
+      icon: TrendingUp,
       color: 'text-success',
       bgColor: 'bg-success/10',
       clickable: true,
@@ -159,7 +152,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
     {
       title: 'Expired Contracts',
       value: expiredContracts.length,
-      icon: XCircle,
+      icon: AlertTriangle,
       color: 'text-destructive',
       bgColor: 'bg-destructive/10',
       clickable: true,
@@ -169,7 +162,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
     {
       title: 'Monthly Spend',
       value: `$${totalMonthlySpend.toFixed(2)}`,
-      icon: Coins,
+      icon: DollarSign,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
       clickable: false,
@@ -205,7 +198,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
               </p>
               {(stat.title === 'Monthly Spend' || stat.title === 'Yearly Spend') && (
                 <div className="relative group">
-                  <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                  <Tag className="h-3 w-3 text-muted-foreground cursor-help" />
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                     Different currencies are not considered in this total
                   </div>

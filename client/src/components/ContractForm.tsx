@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Plus, X } from 'lucide-react';
 
 interface ContractFormProps {
   contract?: Contract;
@@ -39,6 +40,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
+    customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
   });
 
@@ -65,6 +67,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     },
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
+    customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
   });
 
@@ -92,6 +95,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     const contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'> = {
       ...formData,
       tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
+      customFields: formData.customFields,
     };
     
     // Reset dirty state after successful submission
@@ -396,6 +400,78 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
               placeholder="Additional notes about this contract"
               rows={3}
             />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label>Custom Fields</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newKey = `field_${Object.keys(formData.customFields).length + 1}`;
+                  updateFormData({
+                    customFields: { ...formData.customFields, [newKey]: '' }
+                  });
+                }}
+                className="h-8 px-3"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Add Field
+              </Button>
+            </div>
+            
+            {Object.keys(formData.customFields).length === 0 ? (
+              <div className="text-sm text-muted-foreground py-4 text-center border-2 border-dashed border-muted rounded-lg">
+                No custom fields added yet. Click "Add Field" to add custom information like contract numbers, login URLs, etc.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {Object.entries(formData.customFields).map(([key, value], index) => (
+                  <div key={key} className="flex gap-2 items-start">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Field name (e.g., Contract Number, Login URL)"
+                        value={key}
+                        onChange={(e) => {
+                          const newCustomFields = { ...formData.customFields };
+                          delete newCustomFields[key];
+                          newCustomFields[e.target.value] = value;
+                          updateFormData({ customFields: newCustomFields });
+                        }}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Field value"
+                        value={value}
+                        onChange={(e) => {
+                          updateFormData({
+                            customFields: { ...formData.customFields, [key]: e.target.value }
+                          });
+                        }}
+                        className="text-sm"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newCustomFields = { ...formData.customFields };
+                        delete newCustomFields[key];
+                        updateFormData({ customFields: newCustomFields });
+                      }}
+                      className="h-8 w-8 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

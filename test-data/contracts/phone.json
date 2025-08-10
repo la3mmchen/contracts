@@ -26,5 +26,16 @@
   },
   "notes": "Includes unlimited talk, text, and data. 5G Ultra Wideband access.",
   "tags": ["mobile", "telecommunications", "unlimited"],
+  "customFields": {
+    "Phone Number": "+1-555-123-4567",
+    "Account Number": "555-123-4567",
+    "Login URL": "https://verizon.com/myverizon",
+    "Plan Type": "Unlimited",
+    "Data Speed": "5G Ultra Wideband",
+    "International Roaming": "Yes",
+    "Device Payment": "$0 (BYOD)",
+    "Hotspot": "Unlimited",
+    "Streaming Quality": "4K Ultra HD"
+  },
   "documentLink": "https://verizon.com/account/contracts/phone-plan-2024-010"
 } 

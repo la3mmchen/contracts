@@ -1,6 +1,12 @@
 import { Contract } from '@/types/contract';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { 
   Calendar, 
@@ -18,7 +24,10 @@ import {
   X,
   AlertTriangle,
   Clock3,
-  ExternalLink
+  ExternalLink,
+  ChevronDown,
+  ChevronRight,
+  Tag
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -26,6 +35,7 @@ import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalc
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
 import { isValidCategory, formatRelativeTime } from '@/lib/utils';
+import { useState } from 'react';
 
 interface ContractCardProps {
   contract: Contract;
@@ -54,6 +64,8 @@ const categoryColors = {
 };
 
 export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter }: ContractCardProps) => {
+  const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
+  
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
@@ -209,11 +221,11 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter }: 
         {/* Payment Schedule */}
         {payments.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4 text-info" />
-              <span className="text-muted-foreground">Next 3 payments:</span>
+              <span>Next 3 payments:</span>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 pl-6">
               {payments.map((payment, index) => (
                 <div key={index} className="flex items-center justify-between text-xs">
                   <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'}`}>
@@ -332,10 +344,57 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter }: 
           </div>
         )}
 
+        {/* Custom Fields */}
+        {contract.customFields && Object.keys(contract.customFields).length > 0 && (
+          <Collapsible 
+            open={isCustomFieldsOpen}
+            onOpenChange={setIsCustomFieldsOpen}
+          >
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
+                <FileText className="h-4 w-4" />
+                <span>Additional Info:</span>
+                {isCustomFieldsOpen ? (
+                  <ChevronDown className="h-4 w-4 ml-auto" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 ml-auto" />
+                )}
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="space-y-2 pl-6">
+                {Object.entries(contract.customFields).map(([key, value]) => (
+                  <div key={key} className="flex items-start gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium min-w-0 flex-shrink-0">
+                      {key}:
+                    </span>
+                    <span className="text-foreground break-words">
+                      {value.startsWith('http') ? (
+                        <a 
+                          href={value.startsWith('http') ? value : `https://${value}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                          title={`Open ${value}`}
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        value
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
         {/* Tags */}
         {contract.tags && contract.tags.length > 0 && (
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Tag className="h-4 w-4" />
               <span>Tags:</span>
             </div>
             <div className="flex flex-wrap gap-1 pl-6">

@@ -19,5 +19,15 @@
     "contactPerson": "Alex Thompson"
   },
   "notes": "Membership closed due to relocation. Included personal training sessions, pool access, and 24/7 access.",
-  "tags": ["fitness", "health", "membership", "closed"]
+  "tags": ["fitness", "health", "membership", "closed"],
+  "customFields": {
+    "Member ID": "FF-45678",
+    "Membership Type": "Premium",
+    "Home Location": "San Francisco Downtown",
+    "Access Hours": "24/7",
+    "Personal Trainer": "Sarah Johnson",
+    "Pool Access": "Yes",
+    "Spa Access": "Yes",
+    "Guest Passes": "2 per month"
+  }
 } 

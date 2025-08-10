@@ -26,5 +26,16 @@
   },
   "notes": "Includes unlimited data. Router included. Installation fee waived.",
   "tags": ["internet", "utilities", "technology"],
+  "customFields": {
+    "Account Number": "987654321",
+    "Login URL": "https://customer.xfinity.com",
+    "WiFi Name": "Xfinity_2.4G_ABC123",
+    "WiFi Password": "SecurePass456!",
+    "Speed": "1 Gbps",
+    "Data Cap": "Unlimited",
+    "Router Model": "XB7",
+    "Installation Date": "2024-02-15",
+    "Technician": "Mike Rodriguez"
+  },
   "documentLink": "https://comcast.com/account/service-agreement/internet-2024-008"
 } 

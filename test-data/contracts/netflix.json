@@ -19,6 +19,14 @@
   },
   "notes": "Auto-renewal enabled. Cancel anytime.",
   "tags": ["streaming", "entertainment", "premium"],
+  "customFields": {
+    "Account Email": "user@example.com",
+    "Login URL": "https://netflix.com/login",
+    "Account ID": "NF-12345",
+    "Profile Count": "4",
+    "Billing Cycle": "Monthly",
+    "Payment Method": "Credit Card ending in 1234"
+  },
   "documentLink": "https://drive.google.com/file/d/1ABC123DEF456/view?usp=sharing",
   "createdAt": "2024-01-15T10:00:00.000Z",
   "updatedAt": "2024-02-15T10:00:00.000Z"
