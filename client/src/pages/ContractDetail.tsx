@@ -4,6 +4,7 @@ import { Contract } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -171,6 +172,7 @@ const ContractDetail = () => {
               <Trash2 className="h-4 w-4" />
               Delete
             </Button>
+            <ThemeToggle />
           </div>
         </div>
 

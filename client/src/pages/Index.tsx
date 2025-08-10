@@ -10,6 +10,7 @@ import { ContractAnalytics } from '@/components/ContractAnalytics';
 import { NotificationBanner } from '@/components/NotificationBanner';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { MigrationNotification } from '@/components/MigrationNotification';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -263,25 +264,25 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="text-white" style={{ backgroundColor: 'var(--primary-color)' }}>
+      <div className="bg-primary text-primary-foreground border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">{appConfig.name}</h1>
-              <p className="text-white/80 mt-1">Manage your contracts efficiently</p>
+              <p className="text-primary-foreground/80 mt-1">Manage your contracts efficiently</p>
             </div>
             <div className="flex items-center gap-4">
               <Button
                 variant="secondary"
                 onClick={exportContracts}
-                className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
               <Button 
                 variant="secondary" 
-                className="bg-white/10 text-white border-white/20 hover:bg-white/30 hover:border-white/40 transition-colors"
+                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/30 hover:border-primary-foreground/40 transition-colors"
                 onClick={() => document.getElementById('file-upload')?.click()}
               >
                 <input
@@ -294,9 +295,10 @@ const Index = () => {
                 <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
+              <ThemeToggle />
               <Dialog open={isFormOpen} onOpenChange={handleDialogClose}>
                 <DialogTrigger asChild>
-                  <Button onClick={openAddForm} className="bg-white text-primary hover:bg-white/90">
+                  <Button onClick={openAddForm} className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Contract
                   </Button>
