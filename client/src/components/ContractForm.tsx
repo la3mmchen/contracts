@@ -25,7 +25,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     description: contract?.description || '',
     startDate: contract?.startDate || new Date().toISOString().split('T')[0],
     endDate: contract?.endDate || '',
-    amount: contract?.amount || 0,
+    amount: contract?.amount || '',
     currency: contract?.currency || 'USD',
     frequency: contract?.frequency || 'monthly' as Contract['frequency'],
     status: contract?.status || 'active' as Contract['status'],
@@ -52,7 +52,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     description: contract?.description || '',
     startDate: contract?.startDate || new Date().toISOString().split('T')[0],
     endDate: contract?.endDate || '',
-    amount: contract?.amount || 0,
+    amount: contract?.amount || '',
     currency: contract?.currency || 'USD',
     frequency: contract?.frequency || 'monthly' as Contract['frequency'],
     status: contract?.status || 'active' as Contract['status'],
@@ -72,6 +72,32 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
   });
 
   const [isDirty, setIsDirty] = useState(false);
+  const [customFieldIds, setCustomFieldIds] = useState<string[]>([]);
+  const [customFieldNames, setCustomFieldNames] = useState<Record<string, string>>({});
+  const [customFieldError, setCustomFieldError] = useState<string>('');
+
+  // Initialize custom field IDs and names from existing custom fields
+  useEffect(() => {
+    if (contract?.customFields) {
+      const keys = Object.keys(contract.customFields);
+      setCustomFieldIds(keys);
+      
+      // Create a mapping where the key is the field name and value is the field value
+      const fieldNames: Record<string, string> = {};
+      const fieldValues: Record<string, string> = {};
+      
+      keys.forEach(key => {
+        fieldNames[key] = key; // Use the key as both name and ID
+        fieldValues[key] = contract.customFields[key];
+      });
+      
+      setCustomFieldNames(fieldNames);
+      setFormData(prev => ({
+        ...prev,
+        customFields: fieldValues
+      }));
+    }
+  }, [contract?.customFields]);
 
   // Check if form is dirty (has unsaved changes)
   const checkDirtyState = (newFormData: typeof formData) => {
@@ -89,13 +115,41 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     checkDirtyState(newFormData);
   };
 
+  // Check for duplicate custom field names
+  const checkForDuplicateFields = (): boolean => {
+    const fieldNames = Object.values(customFieldNames).filter(name => name.trim() !== '');
+    const uniqueNames = new Set(fieldNames);
+    
+    if (fieldNames.length !== uniqueNames.size) {
+      setCustomFieldError('Duplicate field names are not allowed. Please ensure each custom field has a unique name.');
+      return true;
+    }
+    
+    setCustomFieldError('');
+    return false;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check for duplicate field names
+    if (checkForDuplicateFields()) {
+      return; // Stop submission if duplicates found
+    }
+    
+    // Convert custom fields from ID-based structure to key-value pairs
+    const finalCustomFields: Record<string, string> = {};
+    customFieldIds.forEach(id => {
+      if (customFieldNames[id] && customFieldNames[id].trim() !== '') {
+        finalCustomFields[customFieldNames[id].trim()] = formData.customFields[id] || '';
+      }
+    });
+    
     const contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'> = {
       ...formData,
+      amount: typeof formData.amount === 'string' ? parseFloat(formData.amount) || 0 : formData.amount,
       tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
-      customFields: formData.customFields,
+      customFields: finalCustomFields,
     };
     
     // Reset dirty state after successful submission
@@ -197,7 +251,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                 step="0.01"
                 min="0"
                 value={formData.amount}
-                onChange={(e) => updateFormData({ amount: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => updateFormData({ amount: e.target.value || '' })}
                 placeholder="0.00"
                 required
               />
@@ -410,10 +464,13 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const newKey = `field_${Object.keys(formData.customFields).length + 1}`;
+                  const newId = `field_${customFieldIds.length + 1}`;
+                  setCustomFieldIds(prev => [...prev, newId]);
+                  setCustomFieldNames(prev => ({ ...prev, [newId]: '' }));
                   updateFormData({
-                    customFields: { ...formData.customFields, [newKey]: '' }
+                    customFields: { ...formData.customFields, [newId]: '' }
                   });
+                  setCustomFieldError(''); // Clear error when adding new field
                 }}
                 className="h-8 px-3"
               >
@@ -422,23 +479,29 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
               </Button>
             </div>
             
-            {Object.keys(formData.customFields).length === 0 ? (
+            {customFieldError && (
+              <div className="mb-3 p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                {customFieldError}
+              </div>
+            )}
+            
+            {customFieldIds.length === 0 ? (
               <div className="text-sm text-muted-foreground py-4 text-center border-2 border-dashed border-muted rounded-lg">
                 No custom fields added yet. Click "Add Field" to add custom information like contract numbers, login URLs, etc.
               </div>
             ) : (
               <div className="space-y-3">
-                {Object.entries(formData.customFields).map(([key, value], index) => (
-                  <div key={key} className="flex gap-2 items-start">
+                {customFieldIds.map((id, index) => (
+                  <div key={id} className="flex gap-2 items-start">
                     <div className="flex-1">
                       <Input
                         placeholder="Field name (e.g., Contract Number, Login URL)"
-                        value={key}
+                        value={customFieldNames[id] || ''}
                         onChange={(e) => {
-                          const newCustomFields = { ...formData.customFields };
-                          delete newCustomFields[key];
-                          newCustomFields[e.target.value] = value;
-                          updateFormData({ customFields: newCustomFields });
+                          const newCustomFieldNames = { ...customFieldNames };
+                          newCustomFieldNames[id] = e.target.value;
+                          setCustomFieldNames(newCustomFieldNames);
+                          setCustomFieldError(''); // Clear error when user types
                         }}
                         className="text-sm"
                       />
@@ -446,10 +509,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                     <div className="flex-1">
                       <Input
                         placeholder="Field value"
-                        value={value}
+                        value={formData.customFields[id] || ''}
                         onChange={(e) => {
                           updateFormData({
-                            customFields: { ...formData.customFields, [key]: e.target.value }
+                            customFields: { ...formData.customFields, [id]: e.target.value }
                           });
                         }}
                         className="text-sm"
@@ -461,8 +524,15 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                       size="sm"
                       onClick={() => {
                         const newCustomFields = { ...formData.customFields };
-                        delete newCustomFields[key];
+                        delete newCustomFields[id];
+                        setCustomFieldIds(prev => prev.filter(fid => fid !== id));
+                        setCustomFieldNames(prev => {
+                          const newNames = { ...prev };
+                          delete newNames[id];
+                          return newNames;
+                        });
                         updateFormData({ customFields: newCustomFields });
+                        setCustomFieldError(''); // Clear error when removing field
                       }}
                       className="h-8 w-8 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
                     >

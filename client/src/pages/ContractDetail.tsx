@@ -54,9 +54,11 @@ const ContractDetail = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [navigate, isEditFormOpen]);
 
-  const handleEdit = (updatedContract: Contract) => {
-    updateContract(updatedContract.id, updatedContract);
-    setIsEditFormOpen(false);
+  const handleEdit = (updatedContract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (contract) {
+      updateContract(contract.id, updatedContract);
+      setIsEditFormOpen(false);
+    }
   };
 
   const handleDelete = async () => {
