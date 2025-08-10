@@ -91,11 +91,21 @@ tasks:
     cmds:
       - echo "🗑️ Removing test data contracts..."
       - |
-        # Get all contracts and filter by test data contract IDs
-        curl -s http://localhost:3001/api/contracts | jq -r '.[] | select(.contractId == "SOFT-2024-006" or .contractId == "UTL-2024-003" or .contractId == "EXP-2024-009" or .contractId == "MAINT-2024-005" or .contractId == "INS-2024-002" or .contractId == "SERV-2024-008" or .contractId == "NET-2024-001" or .contractId == "TERM-2024-010" or .contractId == "RENT-2024-007" or .contractId == "SW-2024-004" or .contractId == "PEND-2024-001" or .contractId == "EXP-2024-001" or .contractId == "CANC-2024-001" or .contractId == "DRAFT-2024-001" or .contractId == "TERM-2024-001" or .contractId == "LEGACY-MIGRATION-001") | .id' | while read id; do
-          if [ ! -z "$id" ]; then
-            echo "Deleting test contract: $id"
-            curl -s -X DELETE "http://localhost:3001/api/contracts/$id" > /dev/null
+        # Delete test data contracts directly by contractId (stable identifier)
+        for contractId in "SOFT-2024-006" "UTL-2024-003" "EXP-2024-009" "MAINT-2024-005" "INS-2024-002" "SERV-2024-008" "TERM-2024-010" "RENT-2024-007" "EXP-2024-001" "CANC-2024-001" "TERM-2024-001" "LEGACY-MIGRATION-001" "SPOT-2024-001" "NFLX-2024-002"; do
+          echo "Checking for contract: $contractId"
+          # Find the contract by contractId and get its current id
+          contract_id=$(curl -s http://localhost:3001/api/contracts | jq -r ".[] | select(.contractId == \"$contractId\") | .id")
+          if [ ! -z "$contract_id" ] && [ "$contract_id" != "null" ]; then
+            echo "Deleting test contract: $contractId (id: $contract_id)"
+            curl -s -X DELETE "http://localhost:3001/api/contracts/$contract_id" > /dev/null
+            if [ $? -eq 0 ]; then
+              echo "✅ Successfully deleted $contractId"
+            else
+              echo "❌ Failed to delete $contractId"
+            fi
+          else
+            echo "ℹ️  Contract $contractId not found (already deleted or doesn't exist)"
           fi
         done
       - echo "✅ Test data contracts removed!"
