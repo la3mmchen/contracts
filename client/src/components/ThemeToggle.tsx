@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Moon, Sun, Monitor, Check } from 'lucide-react';
+import { Moon, Sun, Monitor, Check, Palette, Contrast } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 
 export function ThemeToggle() {
@@ -22,14 +22,26 @@ export function ThemeToggle() {
     if (theme === 'system') {
       return <Monitor className="h-4 w-4" />;
     }
-    return theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />;
+    if (theme === 'dark') {
+      return <Moon className="h-4 w-4" />;
+    }
+    if (theme === 'sepia') {
+      return <Palette className="h-4 w-4" />;
+    }
+    if (theme === 'black-and-white') {
+      return <Contrast className="h-4 w-4" />;
+    }
+    return <Sun className="h-4 w-4" />;
   };
 
   const getLabel = () => {
     if (theme === 'system') {
-      return `System (${resolvedTheme === 'dark' ? 'Dark' : 'Light'})`;
+      return `System (${resolvedTheme === 'dark' ? 'Dark' : resolvedTheme === 'sepia' ? 'Sepia' : resolvedTheme === 'black-and-white' ? 'B&W' : 'Light'})`;
     }
-    return theme === 'dark' ? 'Dark' : 'Light';
+    if (theme === 'dark') return 'Dark';
+    if (theme === 'sepia') return 'Sepia';
+    if (theme === 'black-and-white') return 'B&W';
+    return 'Light';
   };
 
   return (
@@ -57,6 +69,16 @@ export function ThemeToggle() {
                 <Moon className="mr-2 h-4 w-4" />
                 <span>Dark</span>
                 {theme === 'dark' && <Check className="ml-auto h-4 w-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('sepia')}>
+                <Palette className="mr-2 h-4 w-4" />
+                <span>Sepia</span>
+                {theme === 'sepia' && <Check className="ml-auto h-4 w-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('black-and-white')}>
+                <Contrast className="mr-2 h-4 w-4" />
+                <span>Black & White</span>
+                {theme === 'black-and-white' && <Check className="ml-auto h-4 w-4" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('system')}>
                 <Monitor className="mr-2 h-4 w-4" />

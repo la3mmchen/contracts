@@ -9,6 +9,10 @@ const initializeTheme = () => {
   
   if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     root.classList.add('dark');
+  } else if (theme === 'sepia') {
+    root.classList.add('sepia');
+  } else if (theme === 'black-and-white') {
+    root.classList.add('black-and-white');
   } else {
     root.classList.add('light');
   }
