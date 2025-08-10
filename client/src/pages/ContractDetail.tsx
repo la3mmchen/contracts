@@ -41,6 +41,18 @@ const ContractDetail = () => {
     }
   }, [contracts, id, loading]);
 
+  // Handle ESC key to go back to main view
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isEditFormOpen) {
+        navigate('/');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [navigate, isEditFormOpen]);
+
   const handleEdit = (updatedContract: Contract) => {
     updateContract(updatedContract.id, updatedContract);
     setIsEditFormOpen(false);
