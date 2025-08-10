@@ -43,6 +43,7 @@ interface ContractCardProps {
   onDelete: (id: string) => void;
   onClose?: (contract: Contract) => void;
   onFilter?: (filterType: string, value: string) => void;
+  defaultExpandCustomFields?: boolean;
 }
 
 const statusColors = {
@@ -63,8 +64,8 @@ const categoryColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter }: ContractCardProps) => {
-  const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
+export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, defaultExpandCustomFields = false }: ContractCardProps) => {
+  const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
   
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy');

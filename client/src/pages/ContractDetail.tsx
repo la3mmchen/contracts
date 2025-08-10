@@ -185,6 +185,7 @@ const ContractDetail = () => {
             onEdit={() => setIsEditFormOpen(true)}
             onDelete={() => setDeleteConfirmOpen(true)}
             onFilter={handleFilter}
+            defaultExpandCustomFields={true}
           />
         </div>
 
