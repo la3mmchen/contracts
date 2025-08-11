@@ -124,7 +124,7 @@ contractRoutes.get('/info/stats', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/contracts/export/markdown - Export contracts to Markdown
+// GET /api/contracts/export/markdown - Export contracts to Markdown (ZIP with individual files)
 contractRoutes.get('/export/markdown', async (req: Request, res: Response) => {
   try {
     const { search, status } = req.query;
@@ -138,15 +138,53 @@ contractRoutes.get('/export/markdown', async (req: Request, res: Response) => {
       contracts = await contractService.getAllContracts();
     }
     
-    const markdown = await contractService.exportToMarkdown(contracts);
+    // Export each contract to a separate markdown file
+    const exportResults = await contractService.exportContractsToSeparateFiles(contracts);
     
-    // Set headers for file download
-    res.setHeader('Content-Type', 'text/markdown');
-    res.setHeader('Content-Disposition', `attachment; filename="contracts-export-${new Date().toISOString().split('T')[0]}.md"`);
+    // Create a zip file containing all individual markdown files
+    const zipBuffer = await contractService.createExportZip(exportResults);
     
-    res.send(markdown);
+    // Set headers for zip file download
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="contracts-export-${new Date().toISOString().split('T')[0]}.zip"`);
+    
+    res.send(zipBuffer);
   } catch (error) {
     console.error('Error exporting contracts to markdown:', error);
+    res.status(500).json({ error: 'Failed to export contracts' });
+  }
+});
+
+// GET /api/contracts/export/markdown/individual - Export each contract as separate markdown file
+contractRoutes.get('/export/markdown/individual', async (req: Request, res: Response) => {
+  try {
+    const { search, status } = req.query;
+    
+    let contracts;
+    if (search && typeof search === 'string') {
+      contracts = await contractService.searchContracts(search);
+    } else if (status && typeof status === 'string') {
+      contracts = await contractService.getContractsByStatus(status as any);
+    } else {
+      contracts = await contractService.getAllContracts();
+    }
+    
+    // Export each contract to a separate markdown file
+    const exportResults = await contractService.exportContractsToSeparateFiles(contracts);
+    
+    // Return the list of available files and their content
+    res.json({
+      totalContracts: contracts.length,
+      exportDate: new Date().toISOString(),
+      files: exportResults.map(result => ({
+        filename: result.filename,
+        contractId: result.filename.replace('.md', ''),
+        size: result.content.length
+      })),
+      message: `Successfully exported ${contracts.length} contracts as individual markdown files`
+    });
+  } catch (error) {
+    console.error('Error exporting contracts to individual markdown files:', error);
     res.status(500).json({ error: 'Failed to export contracts' });
   }
 });

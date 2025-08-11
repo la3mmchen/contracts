@@ -121,20 +121,27 @@ tasks:
       - echo "API:" && curl -s http://localhost:3001/api/health | jq . || echo "API not responding"
 
   test-export-markdown:
-    desc: Test Markdown export functionality
+    desc: Test Markdown export functionality (now exports ZIP files with individual contracts)
     cmds:
-      - echo "Testing Markdown export functionality..."
-      - echo "Exporting all contracts to Markdown..."
-      - curl -s http://localhost:3001/api/contracts/export/markdown -o test-data/exports/contracts-export.md
-      - echo "Export completed! File contracts-export.md"
-      - echo "File size $(wc -c < test-data/exports/contracts-export.md) bytes"
-      - echo "Preview (first 10 lines):"
-      - head -10 test-data/exports/contracts-export.md
+      - echo "🧪 Testing Enhanced Markdown Export Functionality..."
+      - echo "📦 Exporting all contracts to ZIP with individual files..."
+      - curl -s http://localhost:3001/api/contracts/export/markdown -o test-data/exports/contracts-export.zip
+      - echo "✅ Export completed! File contracts-export.zip"
+      - echo "📊 File size $(wc -c < test-data/exports/contracts-export.zip | tr -d ' ') bytes"
       - echo ""
-      - echo "Exporting active contracts only..."
-      - curl -s "http://localhost:3001/api/contracts/export/markdown?status=active" -o test-data/exports/active-contracts.md
-      - echo "Active contracts exported! File active-contracts.md"
-      - echo "Active contracts file size $(wc -c < test-data/exports/active-contracts.md) bytes"
+      - echo "🔍 Testing individual export metadata endpoint..."
+      - curl -s http://localhost:3001/api/contracts/export/markdown/individual | jq .
       - echo ""
-      - echo "Available export files:"
-      - ls -la test-data/exports/*.md
+      - echo "📦 Exporting active contracts only..."
+      - curl -s "http://localhost:3001/api/contracts/export/markdown?status=active" -o test-data/exports/active-contracts.zip
+      - echo "✅ Active contracts exported! File active-contracts.zip"
+      - echo "📊 File size $(wc -c < test-data/exports/active-contracts.zip | tr -d ' ') bytes"
+      - echo ""
+      - echo "📋 Available export files"
+      - ls -la test-data/exports/*.zip
+      - echo ""
+      - echo "🔍 ZIP file contents (all contracts)"
+      - unzip -l test-data/exports/contracts-export.zip | head -20
+      - echo ""
+      - echo "💡 Each contract is now exported as a separate .md file in the ZIP"
+      - echo "📁 Individual files use contractId as filename (e.g., UTL-2024-003.md)"

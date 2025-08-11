@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import JSZip from 'jszip';
 import { Contract, CreateContractRequest, UpdateContractRequest } from '../types/contract';
 
 class ContractService {
@@ -329,6 +330,134 @@ class ContractService {
     markdown += `**Export completed successfully.**\n`;
 
     return markdown;
+  }
+
+  async exportContractsToSeparateFiles(contracts: Contract[]): Promise<Array<{ filename: string; content: string }>> {
+    const exportResults: Array<{ filename: string; content: string }> = [];
+    
+    for (const contract of contracts) {
+      const markdown = this.generateSingleContractMarkdown(contract);
+      const filename = `${contract.contractId}.md`;
+      exportResults.push({ filename, content: markdown });
+    }
+    
+    return exportResults;
+  }
+
+  private generateSingleContractMarkdown(contract: Contract): string {
+    const now = new Date();
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString();
+
+    let markdown = `# ${contract.name}\n\n`;
+    markdown += `**Generated:** ${date} at ${time}\n\n`;
+    markdown += `---\n\n`;
+    
+    markdown += `**Contract ID:** ${contract.contractId}\n\n`;
+    markdown += `**Company:** ${contract.company}\n\n`;
+    markdown += `**Status:** ${contract.status}\n\n`;
+    markdown += `**Category:** ${contract.category}\n\n`;
+    markdown += `**Amount:** ${contract.currency} ${contract.amount.toFixed(2)}\n\n`;
+    markdown += `**Frequency:** ${contract.frequency}\n\n`;
+    markdown += `**Start Date:** ${contract.startDate}\n\n`;
+    
+    if (contract.endDate) {
+      markdown += `**End Date:** ${contract.endDate}\n\n`;
+    }
+    
+    if (contract.payDate) {
+      markdown += `**Pay Date:** ${contract.payDate}\n\n`;
+    }
+    
+    if (contract.description) {
+      markdown += `**Description:** ${contract.description}\n\n`;
+    }
+
+    if (contract.contactInfo) {
+      markdown += `**Contact Information:**\n`;
+      if (contract.contactInfo.email) {
+        markdown += `- Email: ${contract.contactInfo.email}\n`;
+      }
+      if (contract.contactInfo.phone) {
+        markdown += `- Phone: ${contract.contactInfo.phone}\n`;
+      }
+      if (contract.contactInfo.website) {
+        markdown += `- Website: ${contract.contactInfo.website}\n`;
+      }
+      if (contract.contactInfo.address) {
+        markdown += `- Address: ${contract.contactInfo.address}\n`;
+      }
+      if (contract.contactInfo.contactPerson) {
+        markdown += `- Contact Person: ${contract.contactInfo.contactPerson}\n`;
+      }
+      markdown += `\n`;
+    }
+
+    if (contract.tags && contract.tags.length > 0) {
+      markdown += `**Tags:** ${contract.tags.join(', ')}\n\n`;
+    }
+
+    if (contract.notes) {
+      markdown += `**Notes:** ${contract.notes}\n\n`;
+    }
+
+    if (contract.documentLink) {
+      markdown += `**Document Link:** ${contract.documentLink}\n\n`;
+    }
+
+    // Add price changes if they exist
+    if (contract.priceChanges && contract.priceChanges.length > 0) {
+      markdown += `**Price Changes:**\n\n`;
+      for (const change of contract.priceChanges) {
+        markdown += `- **${change.effectiveDate}**: ${contract.currency} ${change.previousAmount.toFixed(2)} → ${contract.currency} ${change.newAmount.toFixed(2)}\n`;
+        if (change.reason) {
+          markdown += `  - Reason: ${change.reason}\n`;
+        }
+        markdown += `\n`;
+      }
+    }
+
+    markdown += `**Created:** ${contract.createdAt}\n\n`;
+    markdown += `**Last Updated:** ${contract.updatedAt}\n\n`;
+
+    return markdown;
+  }
+
+  async createExportZip(exportResults: Array<{ filename: string; content: string }>): Promise<Buffer> {
+    const zip = new JSZip();
+    
+    // Add each contract as a separate markdown file
+    for (const result of exportResults) {
+      zip.file(result.filename, result.content);
+    }
+    
+    // Add a README file with export information
+    const readmeContent = `# Contracts Export
+
+**Generated:** ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+**Total Contracts:** ${exportResults.length}
+
+## Files Included
+
+${exportResults.map(result => `- \`${result.filename}\` - ${result.filename.replace('.md', '')}`).join('\n')}
+
+## Usage
+
+Each markdown file contains the complete information for one contract.
+Open any .md file in your preferred markdown viewer or editor.
+
+## Export Details
+
+- Export Date: ${new Date().toISOString().split('T')[0]}
+- Total Contracts: ${exportResults.length}
+- Format: Individual Markdown Files
+`;
+    
+    zip.file('README.md', readmeContent);
+    
+    // Generate the zip file as a buffer
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+    return zipBuffer;
   }
 }
 
