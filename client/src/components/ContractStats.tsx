@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { ContractFilters } from '@/components/ContractFilters';
 import { isValidCategory } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   TrendingUp, 
   Calendar, 
@@ -223,14 +224,14 @@ export const ContractStats = ({
     <div className="mb-6">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="filters">Filters</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+          <TabsTrigger value="categories" className="text-xs sm:text-sm">Categories</TabsTrigger>
+          <TabsTrigger value="filters" className="text-xs sm:text-sm">Filters</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-2">
           {/* Main Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
             {stats.filter(stat => stat.filterType !== 'category').map((stat, index) => 
               renderStatCard(stat, index)
             )}
@@ -239,7 +240,7 @@ export const ContractStats = ({
         
         <TabsContent value="categories" className="space-y-2">
           {/* Category Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
             {stats.filter(stat => stat.filterType === 'category')
               .filter(stat => typeof stat.value === 'number' && stat.value > 0)
               .sort((a, b) => (b.value as number) - (a.value as number))

@@ -82,7 +82,7 @@ const ContractDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -97,37 +97,16 @@ const ContractDetail = () => {
   if (!contract) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex items-center justify-center min-h-[400px]">
-            <Card className="max-w-md w-full">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  <FileX className="h-16 w-16 text-muted-foreground" />
-                </div>
-                <CardTitle className="text-xl">Contract Not Found</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center space-y-4">
-                <p className="text-muted-foreground">
-                  The contract with ID "{id}" could not be found.
-                </p>
-                <div className="flex gap-2 justify-center">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Go Back
-                  </Button>
-                  <Button 
-                    onClick={() => navigate('/')}
-                    className="flex items-center gap-2"
-                  >
-                    View All Contracts
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex flex-col items-center gap-4 text-center">
+              <FileX className="h-16 w-16 sm:h-24 sm:w-24 text-muted-foreground" />
+              <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Contract Not Found</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">The contract you're looking for doesn't exist or has been deleted.</p>
+              <Button asChild className="mt-4">
+                <Link to="/">Back to Contracts</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -136,92 +115,126 @@ const ContractDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header with navigation */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Contracts
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Contract Details</h1>
-              <p className="text-muted-foreground">ID: {contract.id}</p>
+      {/* Header */}
+      <div className="bg-primary text-primary-foreground border-b">
+        <div className="container mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="text-primary-foreground hover:bg-primary-foreground/10 p-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold">{contract.name}</h1>
+                <p className="text-primary-foreground/80 text-sm sm:text-base">{contract.company}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <ThemeToggle />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsEditFormOpen(true)}
+                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
+              >
+                <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setDeleteConfirmOpen(true)}
+                className="bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20"
+              >
+                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                Delete
+              </Button>
             </div>
           </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditFormOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setDeleteConfirmOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </Button>
-            <ThemeToggle />
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        {/* Contract Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Contract Info */}
+          <div className="lg:col-span-2">
+            <ContractCard
+              contract={contract}
+              onEdit={() => setIsEditFormOpen(true)}
+              onDelete={() => setDeleteConfirmOpen(true)}
+              onUpdate={updateContract}
+              onFilter={handleFilter}
+              defaultExpandCustomFields={true}
+              defaultExpandPriceChanges={true}
+              defaultExpandPayments={true}
+            />
           </div>
-        </div>
 
-        {/* Contract Card */}
-        <div className="max-w-4xl mx-auto">
-          <ContractCard
-            contract={contract}
-            onEdit={() => setIsEditFormOpen(true)}
-            onDelete={() => setDeleteConfirmOpen(true)}
-            onFilter={handleFilter}
-            defaultExpandCustomFields={true}
-            defaultExpandPriceChanges={true}
-            defaultExpandPayments={true}
-            onUpdate={updateContract}
-          />
-        </div>
-
-        {/* Share URL Card */}
-        <div className="max-w-4xl mx-auto mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Direct Link
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono">
-                  {window.location.href}
-                </code>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    // You could add a toast notification here
-                  }}
-                >
-                  Copy
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button asChild className="w-full" size="sm">
+                  <Link to={`/contract/${contract.id}`} className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Details
+                  </Link>
                 </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Share this link to give others direct access to this contract's details.
-              </p>
-            </CardContent>
-          </Card>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  size="sm"
+                  onClick={() => setIsEditFormOpen(true)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Contract
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  className="w-full" 
+                  size="sm"
+                  onClick={() => setDeleteConfirmOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Contract
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Contract Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Status:</span>
+                  <span className="text-sm font-medium">{contract.status}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Category:</span>
+                  <span className="text-sm font-medium">{contract.category}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Frequency:</span>
+                  <span className="text-sm font-medium">{contract.frequency}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Amount:</span>
+                  <span className="text-sm font-medium">{contract.amount} {contract.currency}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 

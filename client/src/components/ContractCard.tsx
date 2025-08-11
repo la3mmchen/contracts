@@ -39,6 +39,7 @@ import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
 import { isValidCategory, formatRelativeTime } from '@/lib/utils';
 import { useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ContractCardProps {
   contract: Contract;
@@ -78,6 +79,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
   const [editingAmount, setEditingAmount] = useState(contract.amount.toString());
   const [editingReason, setEditingReason] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const isMobile = useIsMobile();
   
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy');
@@ -168,9 +170,9 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
         isStale && !hasInvalidCategory ? 'border-red-200 bg-red-50/20' : ''
       } ${isOld && !isStale && !hasInvalidCategory ? 'border-yellow-200 bg-yellow-50/20' : ''}`}>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
               <Link 
                 to={`/contract/${contract.id}`}
                 className="hover:underline cursor-pointer"
@@ -188,26 +190,26 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
               Updated {formatRelativeTime(contract.updatedAt)}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className={`flex gap-1 sm:gap-2 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
             <Button
               variant="outline"
               size="sm"
               asChild
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="View details"
             >
               <Link to={`/contract/${contract.id}`}>
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
               </Link>
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => onEdit(contract)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="Edit contract"
             >
-              <Edit className="h-4 w-4" />
+              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
 
             {contract.status === 'expired' && (
@@ -220,26 +222,26 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
                     onUpdate(contract.id, { ...contract, status: 'closed' });
                   }
                 }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
+                className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-foreground"
                 title="Close contract"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             )}
             <Button
               variant="outline"
               size="sm"
               onClick={() => onDelete(contract.id)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-foreground"
               title="Delete contract"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4">
         {/* Status and Category Badges */}
         <div className="flex flex-wrap gap-2">
           <span 
@@ -252,23 +254,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
             {contract.status}
           </span>
           <span 
-            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-              isValidCategory(contract.category) 
-                ? categoryColors[contract.category] || 'bg-gray-100 text-gray-800 border-gray-200'
-                : 'bg-red-100 text-red-800 border-red-200'
-            } ${
-              onFilter && isValidCategory(contract.category) ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[contract.category as keyof typeof categoryColors] || categoryColors.other} ${
+              onFilter ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
             }`}
-            onClick={onFilter && isValidCategory(contract.category) ? () => onFilter('category', contract.category) : undefined}
-            title={onFilter && isValidCategory(contract.category) ? `Filter by category: ${contract.category}` : undefined}
+            onClick={onFilter ? () => onFilter('category', contract.category) : undefined}
+            title={onFilter ? `Filter by category: ${contract.category}` : undefined}
           >
-            {!isValidCategory(contract.category) && (
-              <AlertTriangle className="h-3 w-3 mr-1" />
-            )}
             {contract.category}
-            {!isValidCategory(contract.category) && (
-              <span className="ml-1 text-xs opacity-75">(invalid)</span>
-            )}
           </span>
           {contract.needsMoreInfo && (
             <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200">

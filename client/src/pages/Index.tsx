@@ -28,6 +28,7 @@ import {
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { isValidCategory } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -294,24 +295,26 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-primary text-primary-foreground border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">{appConfig.name}</h1>
-              <p className="text-primary-foreground/80 mt-1">Manage your contracts efficiently</p>
+              <h1 className="text-2xl sm:text-3xl font-bold">{appConfig.name}</h1>
+              <p className="text-primary-foreground/80 mt-1 text-sm sm:text-base">Manage your contracts efficiently</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <Button
                 variant="secondary"
                 onClick={exportContracts}
-                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
+                size="sm"
+                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20 text-xs sm:text-sm"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Export
               </Button>
               <Button 
                 variant="secondary" 
-                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/30 hover:border-primary-foreground/40 transition-colors"
+                size="sm"
+                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/30 hover:border-primary-foreground/40 transition-colors text-xs sm:text-sm"
                 onClick={() => document.getElementById('file-upload')?.click()}
               >
                 <input
@@ -321,14 +324,14 @@ const Index = () => {
                   className="hidden"
                   id="file-upload"
                 />
-                <Upload className="h-4 w-4 mr-2" />
+                <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Import
               </Button>
               <ThemeToggle />
               <Dialog open={isFormOpen} onOpenChange={handleDialogClose}>
                 <DialogTrigger asChild>
-                  <Button onClick={openAddForm} className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Button onClick={openAddForm} size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 text-xs sm:text-sm">
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Add Contract
                   </Button>
                 </DialogTrigger>
@@ -374,25 +377,25 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Connection Status with Search and Sort */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <ConnectionStatus onStatusChange={setApiConnected} />
           
           {/* Search and Sort Fields */}
-          <div className="flex items-center gap-3">
-            <div className="relative max-w-md">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-none sm:max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search contracts..."
                 value={filters.searchTerm || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                className="pl-10"
+                className="pl-10 w-full"
               />
             </div>
             
             <Select value={filters.sortBy || 'name'} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value as any }))}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-full sm:w-32">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -533,12 +536,12 @@ const Index = () => {
         {/* Contracts Grid */}
         <div className="mt-8">
           {filteredContracts.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="h-24 w-24 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+            <div className="text-center py-8 sm:py-12 px-4">
+              <FileText className="h-16 w-16 sm:h-24 sm:w-24 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
                 {contracts.length === 0 ? 'No contracts yet' : 'No contracts match your filters'}
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6 text-sm sm:text-base">
                 {contracts.length === 0 
                   ? 'Get started by adding your first contract'
                   : 'Try adjusting your search or filter criteria'
@@ -560,7 +563,7 @@ const Index = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredContracts.map((contract, index) => (
                 <div key={contract.id} style={{ animationDelay: `${index * 0.1}s` }}>
                   <ContractCard

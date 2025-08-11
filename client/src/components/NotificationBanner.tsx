@@ -45,16 +45,16 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
           <AlertTitle>Upcoming Payments</AlertTitle>
           <AlertDescription>
             You have {upcomingPayments.length} payment{upcomingPayments.length > 1 ? 's' : ''} due in the next 7 days:
-            <div className="mt-2 space-y-1">
+            <div className="mt-2 space-y-2">
               {upcomingPayments.map((contract) => (
-                <div key={`${contract.id}-${contract.paymentDate}`} className="flex items-center justify-between text-sm">
+                <div key={`${contract.id}-${contract.paymentDate}`} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 text-sm">
                   <span 
                     className={onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}
                     onClick={onEdit ? () => onEdit(contract) : undefined}
                   >
                     {contract.name}
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                     <span className="font-medium text-xs">
                       {formatCurrency(contract.amount, contract.currency)} - {contract.daysUntil === 0 ? 'Today' : 
                       contract.daysUntil === 1 ? 'Tomorrow' : `${contract.daysUntil} days`}
@@ -80,9 +80,9 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
           <AlertTitle>Expired Contracts</AlertTitle>
           <AlertDescription>
             You have {expiredContracts.length} expired contract{expiredContracts.length > 1 ? 's' : ''} that need attention:
-            <div className="mt-2 space-y-1">
+            <div className="mt-2 space-y-2">
               {expiredContracts.slice(0, 3).map((contract) => (
-                <div key={contract.id} className="flex items-center justify-between text-sm">
+                <div key={contract.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 text-sm">
                   <span 
                     className={onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}
                     onClick={onEdit ? () => onEdit(contract) : undefined}

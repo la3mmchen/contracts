@@ -115,6 +115,52 @@
 }
 
 @layer components {
+  /* Mobile-specific optimizations */
+  @media (max-width: 640px) {
+    /* Improve touch targets */
+    button, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better mobile spacing */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Optimize card spacing for mobile */
+    .card {
+      margin-bottom: 1rem;
+    }
+    
+    /* Better mobile form controls */
+    input, select, textarea {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Mobile-friendly button groups */
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    /* Mobile-optimized grids */
+    .mobile-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+  
+  /* Tablet optimizations */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
   .gradient-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   }
@@ -142,5 +188,33 @@
   /* Override for gradient buttons */
   .bg-gradient-primary.text-primary-foreground {
     color: white !important;
+  }
+}
+
+@layer utilities {
+  /* Mobile-first responsive utilities */
+  .mobile-padding {
+    padding: 1rem;
+  }
+  
+  .tablet-padding {
+    padding: 1.5rem;
+  }
+  
+  .desktop-padding {
+    padding: 2rem;
+  }
+  
+  /* Mobile-optimized text sizes */
+  .mobile-text-sm {
+    font-size: 0.875rem;
+  }
+  
+  .mobile-text-base {
+    font-size: 1rem;
+  }
+  
+  .mobile-text-lg {
+    font-size: 1.125rem;
   }
 }
