@@ -131,7 +131,13 @@ const Index = () => {
 
     // Apply needsMoreInfo filter
     if (filters.needsMoreInfo !== undefined) {
-      filtered = filtered.filter(contract => contract.needsMoreInfo === filters.needsMoreInfo);
+      if (filters.needsMoreInfo === false) {
+        // "Complete" should show contracts where needsMoreInfo is false OR null/undefined
+        filtered = filtered.filter(contract => !contract.needsMoreInfo);
+      } else {
+        // "Needs Info" should show contracts where needsMoreInfo is explicitly true
+        filtered = filtered.filter(contract => contract.needsMoreInfo === true);
+      }
     }
 
     // Apply sorting

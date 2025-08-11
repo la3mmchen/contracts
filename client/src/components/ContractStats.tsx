@@ -34,33 +34,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
   };
   const activeContracts = contracts.filter(c => c.status === 'active');
   
-  const totalMonthlySpend = contracts
-    .filter(c => c.status === 'active')
-    .reduce((sum, contract) => {
-      let monthlyAmount = 0;
-      switch (contract.frequency) {
-        case 'monthly':
-          monthlyAmount = contract.amount;
-          break;
-        case 'quarterly':
-          monthlyAmount = contract.amount / 3;
-          break;
-        case 'yearly':
-          monthlyAmount = contract.amount / 12;
-          break;
-        case 'weekly':
-          monthlyAmount = contract.amount * 4.33;
-          break;
-        case 'bi-weekly':
-          monthlyAmount = contract.amount * 2.17;
-          break;
-        default:
-          monthlyAmount = 0;
-      }
-      return sum + monthlyAmount;
-    }, 0);
 
-  const totalYearlySpend = totalMonthlySpend * 12;
 
   type StatItem = {
     title: string;
@@ -159,14 +133,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
       filterType: 'needsMoreInfo',
       filterValue: 'true',
     },
-    {
-      title: 'Monthly Spend',
-      value: `$${totalMonthlySpend.toFixed(2)}`,
-      icon: DollarSign,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
-      clickable: false,
-    },
+
     ...generateCategoryStats(),
   ];
 
@@ -197,14 +164,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
               <p className="text-xs font-medium text-muted-foreground leading-tight">
                 {stat.title}
               </p>
-              {(stat.title === 'Monthly Spend' || stat.title === 'Yearly Spend') && (
-                <div className="relative group">
-                  <Tag className="h-3 w-3 text-muted-foreground cursor-help" />
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Different currencies are not considered in this total
-                  </div>
-                </div>
-              )}
+
             </div>
             <p className="text-lg font-bold text-foreground leading-tight">
               {stat.value}
