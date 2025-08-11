@@ -1,0 +1,29 @@
+{
+  "contractId": "TEST-BIWEEKLY-001",
+  "name": "Bi-Weekly Test Contract - Edge Case",
+  "company": "Test Company Bi-Weekly",
+  "description": "Test contract for bi-weekly frequency with edge case dates",
+  "startDate": "2024-02-28",
+  "endDate": null,
+  "amount": 100.00,
+  "currency": "USD",
+  "frequency": "bi-weekly",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@biweeklycompany.com",
+    "phone": "+1-555-000-0002",
+    "website": "https://biweeklycompany.com"
+  },
+  "notes": "Test contract for bi-weekly payment frequency. Start date: February 28th (edge case)",
+  "tags": ["test", "bi-weekly", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "Bi-weekly frequency edge case testing",
+    "Start Date": "February 28th, 2024",
+    "Expected Next": "March 13th, 2024"
+  },
+  "createdAt": "2024-02-28T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

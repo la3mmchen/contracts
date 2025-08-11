@@ -1,0 +1,31 @@
+{
+  "contractId": "TEST-YEARLY-001",
+  "name": "Yearly Test Contract - Edge Case",
+  "company": "Test Company Yearly",
+  "description": "Test contract for yearly frequency with edge case dates",
+  "startDate": "2024-12-31",
+  "endDate": null,
+  "amount": 1200.00,
+  "currency": "USD",
+  "frequency": "yearly",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@yearlycompany.com",
+    "phone": "+1-555-000-0005",
+    "website": "https://yearlycompany.com"
+  },
+  "notes": "Test contract for yearly payment frequency. Start date: December 31st (edge case - should handle leap years correctly)",
+  "tags": ["test", "yearly", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "Yearly frequency edge case testing",
+    "Start Date": "December 31st, 2024",
+    "Expected Next": "December 31st, 2025",
+    "Expected 2026": "December 31st, 2026",
+    "Leap Year Test": "2028 is a leap year"
+  },
+  "createdAt": "2024-12-31T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

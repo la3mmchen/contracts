@@ -1,0 +1,31 @@
+{
+  "contractId": "TEST-QUARTERLY-001",
+  "name": "Quarterly Test Contract - Edge Case",
+  "company": "Test Company Quarterly",
+  "description": "Test contract for quarterly frequency with edge case dates",
+  "startDate": "2024-03-31",
+  "endDate": null,
+  "amount": 500.00,
+  "currency": "USD",
+  "frequency": "quarterly",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@quarterlycompany.com",
+    "phone": "+1-555-000-0004",
+    "website": "https://quarterlycompany.com"
+  },
+  "notes": "Test contract for quarterly payment frequency. Start date: March 31st (edge case - should handle June 30th, September 30th, December 31st correctly)",
+  "tags": ["test", "quarterly", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "Quarterly frequency edge case testing",
+    "Start Date": "March 31st, 2024",
+    "Expected Next": "June 30th, 2024",
+    "Expected Third": "September 30th, 2024",
+    "Expected Fourth": "December 31st, 2024"
+  },
+  "createdAt": "2024-03-31T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

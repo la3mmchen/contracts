@@ -1,0 +1,30 @@
+{
+  "contractId": "TEST-ONETIME-001",
+  "name": "One-Time Test Contract - Edge Case",
+  "company": "Test Company One-Time",
+  "description": "Test contract for one-time frequency with edge case dates",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "amount": 2500.00,
+  "currency": "USD",
+  "frequency": "one-time",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@onetimecompany.com",
+    "phone": "+1-555-000-0006",
+    "website": "https://onetimecompany.com"
+  },
+  "notes": "Test contract for one-time payment frequency. Start date: January 1st (edge case - should only have one payment)",
+  "tags": ["test", "one-time", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "One-time frequency edge case testing",
+    "Start Date": "January 1st, 2024",
+    "Expected Behavior": "Only one payment on start date",
+    "No Recurring": "Should not calculate future payments"
+  },
+  "createdAt": "2024-01-01T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

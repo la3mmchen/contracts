@@ -1,0 +1,32 @@
+{
+  "contractId": "TEST-LEAPYEAR-001",
+  "name": "Leap Year Test Contract - Edge Case",
+  "company": "Test Company Leap Year",
+  "description": "Test contract for monthly frequency with leap year edge case dates",
+  "startDate": "2024-02-29",
+  "endDate": null,
+  "amount": 150.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@leapyearcompany.com",
+    "phone": "+1-555-000-0007",
+    "website": "https://leapyearcompany.com"
+  },
+  "notes": "Test contract for monthly payment frequency. Start date: February 29th, 2024 (leap year - should handle non-leap years correctly)",
+  "tags": ["test", "monthly", "leap-year", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "Leap year edge case testing",
+    "Start Date": "February 29th, 2024 (leap year)",
+    "Expected March": "March 29th, 2024",
+    "Expected Feb 2025": "February 28th, 2025 (non-leap year)",
+    "Expected Feb 2026": "February 28th, 2026 (non-leap year)",
+    "Expected Feb 2028": "February 29th, 2028 (leap year)"
+  },
+  "createdAt": "2024-02-29T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

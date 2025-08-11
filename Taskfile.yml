@@ -92,7 +92,7 @@ tasks:
       - echo "🗑️ Removing test data contracts..."
       - |
         # Delete test data contracts directly by contractId (stable identifier)
-        for contractId in "SOFT-2024-006" "UTL-2024-003" "EXP-2024-009" "MAINT-2024-005" "INS-2024-002" "SERV-2024-008" "TERM-2024-010" "RENT-2024-007" "EXP-2024-001" "CANC-2024-001" "TERM-2024-001" "LEGACY-MIGRATION-001" "SPOT-2024-001" "NFLX-2024-002"; do
+        for contractId in "SOFT-2024-006" "UTL-2024-003" "EXP-2024-009" "MAINT-2024-005" "INS-2024-002" "SERV-2024-008" "TERM-2024-010" "RENT-2024-007" "EXP-2024-001" "CANC-2024-001" "TERM-2024-001" "LEGACY-MIGRATION-001" "SPOT-2024-001" "NFLX-2024-002" "TEST-WEEKLY-001" "TEST-BIWEEKLY-001" "TEST-MONTHLY-001" "TEST-QUARTERLY-001" "TEST-YEARLY-001" "TEST-ONETIME-001" "TEST-LEAPYEAR-001"; do
           echo "Checking for contract: $contractId"
           # Find the contract by contractId and get its current id
           contract_id=$(curl -s http://localhost:3001/api/contracts | jq -r ".[] | select(.contractId == \"$contractId\") | .id")

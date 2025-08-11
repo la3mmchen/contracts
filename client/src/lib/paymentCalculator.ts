@@ -178,9 +178,4 @@ export const formatPaymentDate = (date: string): string => {
   }
 };
 
-export const isPaymentDueSoon = (date: string, daysThreshold: number = 7): boolean => {
-  const paymentDate = new Date(date);
-  const today = new Date();
-  const daysUntilPayment = Math.ceil((paymentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  return daysUntilPayment >= 0 && daysUntilPayment <= daysThreshold;
-}; 
+ 

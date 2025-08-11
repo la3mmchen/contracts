@@ -47,6 +47,8 @@ interface ContractCardProps {
   onClose?: (contract: Contract) => void;
   onFilter?: (filterType: string, value: string) => void;
   defaultExpandCustomFields?: boolean;
+  defaultExpandPriceChanges?: boolean;
+  defaultExpandPayments?: boolean;
   onUpdate?: (id: string, updates: Partial<Contract>) => Promise<void>;
 }
 
@@ -68,8 +70,10 @@ const categoryColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, defaultExpandCustomFields = false, onUpdate }: ContractCardProps) => {
+export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate }: ContractCardProps) => {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
+  const [isPriceChangesOpen, setIsPriceChangesOpen] = useState(defaultExpandPriceChanges);
+  const [isPaymentsOpen, setIsPaymentsOpen] = useState(defaultExpandPayments);
   const [isEditingAmount, setIsEditingAmount] = useState(false);
   const [editingAmount, setEditingAmount] = useState(contract.amount.toString());
   const [editingReason, setEditingReason] = useState('');
@@ -359,71 +363,132 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
           </span>
         </div>
 
-        {/* Latest Price Changes Summary */}
+        {/* Price Changes - Collapsible */}
         {contract.priceChanges && contract.priceChanges.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Coins className="h-4 w-4 text-amber-600" />
-                <span>Recent price changes:</span>
-              </div>
-              {contract.priceChanges.length > 3 && (
-                <span className="text-xs text-muted-foreground">
-                  {contract.priceChanges.length} total
-                </span>
-              )}
-            </div>
-            <div className="space-y-1 pl-6">
-              {contract.priceChanges
-                .slice(-3) // Get the 3 most recent changes
-                .reverse() // Show newest first
-                .map((change, index) => (
-                  <div key={index} className="flex items-center justify-between text-xs bg-muted/30 px-2 py-1 rounded">
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">
-                        {formatDate(change.effectiveDate)}
-                      </span>
-                      <span className="text-muted-foreground">→</span>
-                      <span className="font-medium text-foreground">
-                        {formatCurrency(change.newAmount, contract.currency)}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground max-w-24 truncate" title={change.reason}>
-                      {change.reason}
-                    </span>
-                  </div>
-                ))}
-              {contract.priceChanges.length > 3 && (
-                <div className="text-xs text-muted-foreground italic">
-                  +{contract.priceChanges.length - 3} more changes
+          <Collapsible open={isPriceChangesOpen} onOpenChange={setIsPriceChangesOpen}>
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-between text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
+                <div className="flex items-center gap-2">
+                  <Coins className="h-4 w-4 text-amber-600" />
+                  <span>Price Changes:</span>
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                    {contract.priceChanges.length}
+                  </span>
                 </div>
-              )}
-            </div>
-          </div>
+                {isPriceChangesOpen ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="space-y-2 pl-6">
+                {/* Show only the last price change by default */}
+                {(() => {
+                  const mostRecentChange = contract.priceChanges
+                    .sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime())[0];
+                  return (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Latest:</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs bg-muted/30 px-2 py-1 rounded">
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">
+                            {formatDate(mostRecentChange.effectiveDate)}
+                          </span>
+                          <span className="text-muted-foreground">→</span>
+                          <span className="font-medium text-foreground">
+                            {formatCurrency(mostRecentChange.newAmount, contract.currency)}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground max-w-24 truncate" title={mostRecentChange.reason}>
+                          {mostRecentChange.reason}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+                
+                {/* Show all changes if there are more than 1 */}
+                {contract.priceChanges.length > 1 && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>All changes:</span>
+                    </div>
+                    <div className="space-y-1">
+                      {contract.priceChanges
+                        .sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime())
+                        .map((change, index) => (
+                          <div key={index} className="bg-muted/20 p-2 rounded text-xs">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-muted-foreground">
+                                {formatDate(change.effectiveDate)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <span className="line-through">{formatCurrency(change.previousAmount, contract.currency)}</span>
+                              <span className="text-foreground">→</span>
+                              <span className="font-medium text-foreground">{formatCurrency(change.newAmount, contract.currency)}</span>
+                            </div>
+                            {change.reason && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {change.reason}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
 
 
-        {/* Payment Schedule */}
+        {/* Payment Schedule - Collapsible */}
         {payments.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 text-info" />
-              <span>Next 3 payments:</span>
-            </div>
-            <div className="space-y-1 pl-6">
-              {payments.map((payment, index) => (
-                <div key={index} className="flex items-center justify-between text-xs">
-                  <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'}`}>
-                    {formatPaymentDate(payment.date)}
-                  </span>
-                  <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'}`}>
-                    {formatCurrency(payment.amount, payment.currency)}
+          <Collapsible open={isPaymentsOpen} onOpenChange={setIsPaymentsOpen}>
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-between text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-info" />
+                  <span>Next payments:</span>
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                    {payments.length}
                   </span>
                 </div>
-              ))}
-            </div>
-          </div>
+                {isPaymentsOpen ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="space-y-1 pl-6">
+                {payments.map((payment, index) => {
+                  const paymentDate = new Date(payment.date);
+                  const now = new Date();
+                  const isPastDue = paymentDate < now;
+                  
+                  return (
+                    <div key={index} className="flex items-center justify-between text-xs">
+                      <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'} ${isPastDue ? 'line-through text-muted-foreground/60' : ''}`}>
+                        {formatPaymentDate(payment.date)}
+                      </span>
+                      <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'} ${isPastDue ? 'line-through text-muted-foreground/60' : ''}`}>
+                        {formatCurrency(payment.amount, payment.currency)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {/* Contact Information */}
@@ -530,39 +595,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
           </div>
         )}
 
-        {/* Price Changes History */}
-        {contract.priceChanges && contract.priceChanges.length > 0 && (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Coins className="h-4 w-4" />
-              <span>Price Changes:</span>
-            </div>
-            <div className="space-y-2 pl-6">
-              {contract.priceChanges.map((change, index) => (
-                <div key={index} className="bg-muted/30 p-2 rounded text-sm">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-foreground">
-                      {formatDate(change.effectiveDate)}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(change.date)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <span className="line-through">${change.previousAmount.toFixed(2)}</span>
-                    <span className="text-foreground">→</span>
-                    <span className="font-medium text-foreground">${change.newAmount.toFixed(2)}</span>
-                  </div>
-                  {change.reason && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Reason: {change.reason}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* Custom Fields */}
         {contract.customFields && Object.keys(contract.customFields).length > 0 && (
@@ -571,15 +604,20 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
             onOpenChange={setIsCustomFieldsOpen}
           >
             <CollapsibleTrigger asChild>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 <span>Additional Info:</span>
-                {isCustomFieldsOpen ? (
-                  <ChevronDown className="h-4 w-4 ml-auto" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                )}
+                <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                  {Object.keys(contract.customFields).length}
+                </span>
               </div>
+              {isCustomFieldsOpen ? (
+                <ChevronDown className="h-4 w-4 ml-auto" />
+              ) : (
+                <ChevronRight className="h-4 w-4 ml-auto" />
+              )}
+            </div>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="space-y-2 pl-6">
@@ -614,8 +652,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
         {contract.tags && contract.tags.length > 0 && (
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Tag className="h-4 w-4" />
-              <span>Tags:</span>
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                <span>Tags:</span>
+                <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                  {contract.tags.length}
+                </span>
+              </div>
             </div>
             <div className="flex flex-wrap gap-1 pl-6">
               {contract.tags.map((tag, index) => (

@@ -1,0 +1,30 @@
+{
+  "contractId": "TEST-MONTHLY-001",
+  "name": "Monthly Test Contract - Edge Case",
+  "company": "Test Company Monthly",
+  "description": "Test contract for monthly frequency with edge case dates",
+  "startDate": "2024-01-31",
+  "endDate": null,
+  "amount": 200.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@monthlycompany.com",
+    "phone": "+1-555-000-0003",
+    "website": "https://monthlycompany.com"
+  },
+  "notes": "Test contract for monthly payment frequency. Start date: January 31st (edge case - should handle February 28th/29th correctly)",
+  "tags": ["test", "monthly", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "Monthly frequency edge case testing",
+    "Start Date": "January 31st, 2024",
+    "Expected Next": "February 29th, 2024 (leap year)",
+    "Expected March": "March 31st, 2024"
+  },
+  "createdAt": "2024-01-31T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

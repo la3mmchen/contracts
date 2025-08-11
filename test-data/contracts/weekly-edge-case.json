@@ -1,0 +1,29 @@
+{
+  "contractId": "TEST-WEEKLY-001",
+  "name": "Weekly Test Contract - Edge Case",
+  "company": "Test Company Weekly",
+  "description": "Test contract for weekly frequency with edge case dates",
+  "startDate": "2024-03-31",
+  "endDate": null,
+  "amount": 50.00,
+  "currency": "USD",
+  "frequency": "weekly",
+  "status": "active",
+  "category": "utilities",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@weeklycompany.com",
+    "phone": "+1-555-000-0001",
+    "website": "https://weeklycompany.com"
+  },
+  "notes": "Test contract for weekly payment frequency. Start date: March 31st (edge case)",
+  "tags": ["test", "weekly", "edge-case"],
+  "needsMoreInfo": false,
+  "customFields": {
+    "Test Purpose": "Weekly frequency edge case testing",
+    "Start Date": "March 31st, 2024",
+    "Expected Next": "April 7th, 2024"
+  },
+  "createdAt": "2024-03-31T08:00:00.000Z",
+  "updatedAt": "2024-09-15T10:00:00.000Z"
+}

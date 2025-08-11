@@ -1,8 +1,7 @@
 import { Contract } from '@/types/contract';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Calendar, AlertTriangle, Clock, Coins } from 'lucide-react';
-import { calculateNextThreePayments, isPaymentDueSoon } from '@/lib/paymentCalculator';
+import { Calendar, AlertTriangle } from 'lucide-react';
+import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 
 interface NotificationBannerProps {
@@ -32,25 +31,8 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
     .sort((a, b) => a.daysUntil - b.daysUntil);
 
   const expiredContracts = contracts.filter(c => c.status === 'expired');
-  const overdueContracts = contracts
-    .filter(c => c.status === 'active')
-    .flatMap(contract => {
-      const payments = calculateNextThreePayments(contract);
-      return payments
-        .filter(payment => {
-          const paymentDate = new Date(payment.date);
-          const daysOverdue = Math.ceil((now.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
-          return daysOverdue > 0;
-        })
-        .map(payment => ({
-          ...contract,
-          paymentDate: payment.date,
-          daysOverdue: Math.ceil((now.getTime() - new Date(payment.date).getTime()) / (1000 * 60 * 60 * 24)),
-        }));
-    })
-    .sort((a, b) => b.daysOverdue - a.daysOverdue);
 
-  if (upcomingPayments.length === 0 && expiredContracts.length === 0 && overdueContracts.length === 0) {
+  if (upcomingPayments.length === 0 && expiredContracts.length === 0) {
     return null;
   }
 
@@ -84,30 +66,6 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
                       {contract.contractId}
                     </span>
                   </div>
-                </div>
-              ))}
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Overdue Payments */}
-      {overdueContracts.length > 0 && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Overdue Payments</AlertTitle>
-          <AlertDescription>
-            You have {overdueContracts.length} overdue payment{overdueContracts.length > 1 ? 's' : ''}:
-            <div className="mt-2 space-y-1">
-              {overdueContracts.map((contract) => (
-                <div key={`${contract.id}-${contract.paymentDate}`} className="flex items-center justify-between text-sm">
-                  <span>{contract.name}</span>
-                  <span 
-                    className={`font-mono text-xs ${onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}`}
-                    onClick={onEdit ? () => onEdit(contract) : undefined}
-                  >
-                    {contract.contractId}
-                  </span>
                 </div>
               ))}
             </div>
