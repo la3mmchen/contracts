@@ -37,8 +37,8 @@ import { Link } from 'react-router-dom';
 import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
-import { isValidCategory, formatRelativeTime } from '@/lib/utils';
-import { useState } from 'react';
+import { isValidCategory, formatRelativeTime, getCategoryBadgeColor } from '@/lib/utils';
+import { useState, useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ContractCardProps {
@@ -61,16 +61,6 @@ const statusColors = {
   terminated: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-const categoryColors = {
-  subscription: 'bg-blue-100 text-blue-800 border-blue-200',
-  insurance: 'bg-orange-100 text-orange-800 border-orange-200',
-  utilities: 'bg-green-100 text-green-800 border-green-200',
-  rent: 'bg-purple-100 text-purple-800 border-purple-200',
-  services: 'bg-gray-100 text-gray-800 border-gray-200',
-  maintenance: 'bg-teal-100 text-teal-800 border-teal-200',
-  other: 'bg-gray-100 text-gray-800 border-gray-200',
-};
-
 export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate }: ContractCardProps) => {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
   const [isPriceChangesOpen, setIsPriceChangesOpen] = useState(defaultExpandPriceChanges);
@@ -80,6 +70,9 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
   const [editingReason, setEditingReason] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const isMobile = useIsMobile();
+  
+  // Get the category color using the shared utility function
+  const categoryColor = useMemo(() => getCategoryBadgeColor(contract.category), [contract.category]);
   
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy');
@@ -254,7 +247,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
             {contract.status}
           </span>
           <span 
-            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[contract.category as keyof typeof categoryColors] || categoryColors.other} ${
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColor} ${
               onFilter ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
             }`}
             onClick={onFilter ? () => onFilter('category', contract.category) : undefined}

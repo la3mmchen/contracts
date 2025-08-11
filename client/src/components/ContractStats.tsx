@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { ContractFilters } from '@/components/ContractFilters';
-import { isValidCategory } from '@/lib/utils';
+import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   TrendingUp, 
@@ -48,7 +48,6 @@ export const ContractStats = ({
   const activeContracts = contracts.filter(c => c.status === 'active');
   
 
-
   type StatItem = {
     title: string;
     value: string | number;
@@ -73,44 +72,21 @@ export const ContractStats = ({
       other: Tag,
       marketing: TrendingUp
     };
-    const categoryColors = {
-      subscription: 'text-blue-600',
-      insurance: 'text-green-600',
-      utilities: 'text-purple-600',
-      house: 'text-orange-600',
-      services: 'text-indigo-600',
-      software: 'text-pink-600',
-      maintenance: 'text-yellow-600',
-      other: 'text-gray-600',
-      marketing: 'text-red-600'
-    };
-    const categoryBgColors = {
-      subscription: 'bg-blue-100',
-      insurance: 'bg-green-100',
-      utilities: 'bg-purple-100',
-      house: 'bg-orange-100',
-      services: 'bg-indigo-100',
-      software: 'bg-pink-100',
-      maintenance: 'bg-yellow-100',
-      other: 'bg-gray-100',
-      marketing: 'bg-red-100'
-    };
 
     return categories.map(category => {
       const count = contracts.filter(c => c.category === category).length;
       const Icon = categoryIcons[category as keyof typeof categoryIcons] || Tag;
-      const color = categoryColors[category as keyof typeof categoryColors] || 'text-gray-600';
-      const bgColor = categoryBgColors[category as keyof typeof categoryBgColors] || 'bg-gray-100';
-
+      const { color, bgColor } = getCategoryStatsColor(category);
+      
       return {
         title: category.charAt(0).toUpperCase() + category.slice(1),
         value: count,
         icon: Icon,
         color,
         bgColor,
-        clickable: true,
+        clickable: count > 0,
         filterType: 'category',
-        filterValue: category,
+        filterValue: category
       };
     });
   };

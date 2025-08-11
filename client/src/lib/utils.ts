@@ -55,3 +55,107 @@ export function formatRelativeTime(dateString: string): string {
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears} year${diffInYears === 1 ? '' : 's'} ago`;
 }
+
+// Color palette for dynamic category colors (for badges)
+const badgeColorPalette = [
+  'bg-red-100 text-red-800 border-red-200',
+  'bg-pink-100 text-pink-800 border-pink-200',
+  'bg-purple-100 text-purple-800 border-purple-200',
+  'bg-indigo-100 text-indigo-800 border-indigo-200',
+  'bg-blue-100 text-blue-800 border-blue-200',
+  'bg-cyan-100 text-cyan-800 border-cyan-200',
+  'bg-teal-100 text-teal-800 border-teal-200',
+  'bg-emerald-100 text-emerald-800 border-emerald-200',
+  'bg-green-100 text-green-800 border-green-200',
+  'bg-lime-100 text-lime-800 border-lime-200',
+  'bg-yellow-100 text-yellow-800 border-yellow-200',
+  'bg-amber-100 text-amber-800 border-amber-200',
+  'bg-orange-100 text-orange-800 border-orange-200',
+  'bg-rose-100 text-rose-800 border-rose-200',
+  'bg-slate-100 text-slate-800 border-slate-200',
+  'bg-zinc-100 text-zinc-800 border-zinc-200',
+  'bg-stone-100 text-stone-800 border-stone-200',
+  'bg-violet-100 text-violet-800 border-violet-200',
+  'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
+  'bg-sky-100 text-sky-800 border-sky-200',
+];
+
+// Color palette for dynamic category colors (for stats)
+const statsColorPalette = [
+  'text-red-600',
+  'text-pink-600',
+  'text-purple-600',
+  'text-indigo-600',
+  'text-blue-600',
+  'text-cyan-600',
+  'text-teal-600',
+  'text-emerald-600',
+  'text-green-600',
+  'text-lime-600',
+  'text-yellow-600',
+  'text-amber-600',
+  'text-orange-600',
+  'text-rose-600',
+  'text-slate-600',
+  'text-zinc-600',
+  'text-stone-600',
+  'text-violet-600',
+  'text-fuchsia-600',
+  'text-sky-600',
+];
+
+const statsBgColorPalette = [
+  'bg-red-100',
+  'bg-pink-100',
+  'bg-purple-100',
+  'bg-indigo-100',
+  'bg-blue-100',
+  'bg-cyan-100',
+  'bg-teal-100',
+  'bg-emerald-100',
+  'bg-green-100',
+  'bg-lime-100',
+  'bg-yellow-100',
+  'bg-amber-100',
+  'bg-orange-100',
+  'bg-rose-100',
+  'bg-slate-100',
+  'bg-zinc-100',
+  'bg-stone-100',
+  'bg-violet-100',
+  'bg-fuchsia-100',
+  'bg-sky-100',
+];
+
+/**
+ * Generates a consistent color for any category
+ * @param category - The category name
+ * @returns A Tailwind CSS class string for the category color
+ */
+export const getCategoryBadgeColor = (category: string): string => {
+  // Generate a consistent color for all categories using hash
+  const hash = category.split('').reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  const colorIndex = Math.abs(hash) % badgeColorPalette.length;
+  return badgeColorPalette[colorIndex];
+};
+
+/**
+ * Generates consistent colors for category stats
+ * @param category - The category name
+ * @returns An object with color and bgColor Tailwind CSS classes
+ */
+export const getCategoryStatsColor = (category: string): { color: string; bgColor: string } => {
+  // Generate a consistent color for all categories using hash
+  const hash = category.split('').reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  const colorIndex = Math.abs(hash) % statsColorPalette.length;
+  return {
+    color: statsColorPalette[colorIndex],
+    bgColor: statsBgColorPalette[colorIndex]
+  };
+};
