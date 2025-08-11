@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ContractFilters as FilterType } from '@/types/contract';
 import { getCategories, getCategoryDisplayName } from '@/config/categories';
+import { getStatuses, getStatusDisplayName } from '@/config/statuses';
+import { getFrequencies, getFrequencyDisplayName } from '@/config/frequencies';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -70,10 +72,11 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
+                {getStatuses().map(status => (
+                  <SelectItem key={status} value={status}>
+                    {getStatusDisplayName(status)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -103,12 +106,11 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Frequencies</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="quarterly">Quarterly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="bi-weekly">Bi-Weekly</SelectItem>
-                <SelectItem value="one-time">One-Time</SelectItem>
+                {getFrequencies().map(frequency => (
+                  <SelectItem key={frequency} value={frequency}>
+                    {getFrequencyDisplayName(frequency)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

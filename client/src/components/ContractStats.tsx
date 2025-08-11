@@ -5,6 +5,7 @@ import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { ContractFilters } from '@/components/ContractFilters';
 import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { getCategories } from '@/config/categories';
 import { 
   TrendingUp, 
   Calendar, 
@@ -60,22 +61,38 @@ export const ContractStats = ({
   };
 
   const generateCategoryStats = (): StatItem[] => {
-    const categories = ['subscription', 'insurance', 'utilities', 'house', 'services', 'software', 'maintenance', 'other', 'marketing'];
-    const categoryIcons = {
+    // Use actual available categories from config instead of hardcoded list
+    // This fixes the issue where contracts with categories like 'rent' wouldn't show up
+    // in the dashboard because they weren't in the hardcoded category list
+    const categories = getCategories();
+    
+    // Map categories to appropriate icons
+    const categoryIcons: Record<string, React.ComponentType<any>> = {
       subscription: Coins,
       insurance: AlertTriangle,
       utilities: DollarSign,
+      rent: Building2,
       house: Building2,
       services: Tag,
       software: TrendingUp,
       maintenance: TrendingUp,
       other: Tag,
-      marketing: TrendingUp
+      marketing: TrendingUp,
+      internet: Building2,
+      phone: Building2,
+      gym: Building2,
+      streaming: Building2,
+      transportation: Building2,
+      food: Building2,
+      entertainment: Building2,
+      education: Building2,
+      healthcare: Building2,
+      legal: Building2,
     };
 
     return categories.map(category => {
       const count = contracts.filter(c => c.category === category).length;
-      const Icon = categoryIcons[category as keyof typeof categoryIcons] || Tag;
+      const Icon = categoryIcons[category] || Tag; // Default to Tag icon for unknown categories
       const { color, bgColor } = getCategoryStatsColor(category);
       
       return {

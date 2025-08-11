@@ -37,7 +37,14 @@ services:
     environment:
       API_URL: "https://contracts.yourdomain.com/api"
       APP_NAME: "contracts"
+      # Contract Categories (comma-separated)
       CONTRACTS_CATEGORIES: "subscription,insurance,utilities,rent,services,software,maintenance,other"
+      # Contract Statuses (comma-separated)
+      CONTRACTS_STATUSES: "active,expired,cancelled,terminated,closed"
+      # Contract Frequencies (comma-separated)
+      CONTRACTS_FREQUENCIES: "monthly,quarterly,yearly,weekly,bi-weekly,one-time"
+      # Supported Currencies (comma-separated)
+      CONTRACTS_CURRENCIES: "USD,EUR,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK"
     restart: unless-stopped
 
   backend:
@@ -48,6 +55,34 @@ services:
     volumes:
       - "/data/contracts:/data"
     restart: unless-stopped
+```
+
+### Environment Variables Reference
+
+The application supports the following environment variables for customization:
+
+| Variable | Description | Default Values |
+|----------|-------------|----------------|
+| `CONTRACTS_CATEGORIES` | Contract categories for organization | `subscription,insurance,utilities,rent,services,software,maintenance,other` |
+| `CONTRACTS_STATUSES` | Contract status options | `active,expired,cancelled,terminated,closed` |
+| `CONTRACTS_FREQUENCIES` | Payment frequency options | `monthly,quarterly,yearly,weekly,bi-weekly,one-time` |
+| `CONTRACTS_CURRENCIES` | Supported currencies | `USD,EUR,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK` |
+
+**Note:** All values are comma-separated strings. If an environment variable is not set, the application will use the default values listed above.
+
+**Example Custom Configuration:**
+```bash
+# Custom categories for a specific business
+CONTRACTS_CATEGORIES="software,cloud,consulting,training,hardware,maintenance"
+
+# Custom statuses for workflow management
+CONTRACTS_STATUSES="draft,pending,active,review,expired,archived"
+
+# Custom frequencies for different business models
+CONTRACTS_FREQUENCIES="daily,weekly,monthly,quarterly,annually"
+
+# Custom currencies for international business
+CONTRACTS_CURRENCIES="USD,EUR,GBP,JPY,CNY,INR,BRL"
 ```
 
 We don't bring any authentication in the app or api yet, so help yourself with basic auth if you want to use this over the internet.
@@ -150,7 +185,10 @@ The API provides endpoints for:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `APP_NAME` | `contracts` | Application title displayed in header |
-| `CATEGORIES` | `subscription,insurance,utilities,rent,services,software,maintenance,other` | Comma-separated list of contract categories |
+| `CONTRACTS_CATEGORIES` | `subscription,insurance,utilities,rent,services,software,maintenance,other` | Comma-separated list of contract categories |
+| `CONTRACTS_STATUSES` | `active,expired,cancelled,terminated,closed` | Comma-separated list of contract statuses |
+| `CONTRACTS_FREQUENCIES` | `monthly,quarterly,yearly,weekly,bi-weekly,one-time` | Comma-separated list of payment frequencies |
+| `CONTRACTS_CURRENCIES` | `USD,EUR,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK` | Comma-separated list of supported currencies |
 | `API_URL` | `http://localhost:3001/api` | Backend API endpoint |
 
 ### Backend (API)
@@ -164,7 +202,10 @@ The API provides endpoints for:
 # docker-compose.yml
 environment:
   - APP_NAME=My Contract App
-  - CATEGORIES=subscription,insurance,utilities,rent,services,marketing,legal
+  - CONTRACTS_CATEGORIES=subscription,insurance,utilities,rent,services,marketing,legal
+  - CONTRACTS_STATUSES=draft,pending,active,review,expired,archived
+  - CONTRACTS_FREQUENCIES=daily,weekly,monthly,quarterly,annually
+  - CONTRACTS_CURRENCIES=USD,EUR,GBP,JPY,CNY,INR,BRL
   - API_URL=https://contracts.yourdomain.com/api
   - CONTRACTS_DATA_DIR=/app/data
 ```

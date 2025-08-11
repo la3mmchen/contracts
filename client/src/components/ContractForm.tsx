@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Contract } from '@/types/contract';
 import { getCategories, getCategoryDisplayName } from '@/config/categories';
+import { getStatuses, getStatusDisplayName } from '@/config/statuses';
+import { getFrequencies, getFrequencyDisplayName } from '@/config/frequencies';
+import { getCurrencies, getCurrencyDisplayName } from '@/config/currencies';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +21,27 @@ interface ContractFormProps {
 }
 
 export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
+  // Get available options and determine smart defaults
+  const availableCategories = getCategories();
+  const availableStatuses = getStatuses();
+  const availableFrequencies = getFrequencies();
+  
+  // Smart defaults that ensure valid values
+  const smartDefaultCategory = availableCategories.length > 0 ? availableCategories[0] : 'other';
+  const smartDefaultStatus = availableStatuses.length > 0 ? availableStatuses[0] : 'active';
+  const smartDefaultFrequency = availableFrequencies.length > 0 ? availableFrequencies[0] : 'monthly';
+  
+  // Debug warnings if no options are available
+  if (availableCategories.length === 0) {
+    console.warn('ContractForm: No categories available, using fallback "other"');
+  }
+  if (availableStatuses.length === 0) {
+    console.warn('ContractForm: No statuses available, using fallback "active"');
+  }
+  if (availableFrequencies.length === 0) {
+    console.warn('ContractForm: No frequencies available, using fallback "monthly"');
+  }
+  
   const [formData, setFormData] = useState({
     contractId: contract?.contractId || '',
     name: contract?.name || '',
@@ -27,9 +51,9 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     endDate: contract?.endDate || '',
     amount: contract?.amount || '',
     currency: contract?.currency || 'USD',
-    frequency: contract?.frequency || 'monthly' as Contract['frequency'],
-    status: contract?.status || 'active' as Contract['status'],
-    category: contract?.category || 'other' as Contract['category'],
+    frequency: contract?.frequency || smartDefaultFrequency as Contract['frequency'],
+    status: contract?.status || smartDefaultStatus as Contract['status'],
+    category: contract?.category || smartDefaultCategory as Contract['category'],
     payDate: contract?.payDate || '',
     contactInfo: {
       email: contract?.contactInfo.email || '',
@@ -56,9 +80,9 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     endDate: contract?.endDate || '',
     amount: contract?.amount || '',
     currency: contract?.currency || 'USD',
-    frequency: contract?.frequency || 'monthly' as Contract['frequency'],
-    status: contract?.status || 'active' as Contract['status'],
-    category: contract?.category || 'other' as Contract['category'],
+    frequency: contract?.frequency || smartDefaultFrequency as Contract['frequency'],
+    status: contract?.status || smartDefaultStatus as Contract['status'],
+    category: contract?.category || smartDefaultCategory as Contract['category'],
     payDate: contract?.payDate || '',
     contactInfo: {
       email: contract?.contactInfo.email || '',
@@ -163,7 +187,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     onSubmit(contractData, formData.priceChangeReason);
   };
 
-  const currencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'SEK', 'NOK', 'DKK'];
+  // Get available options from config
+  const currencies = getCurrencies();
+  const statuses = getStatuses();
+  const frequencies = getFrequencies();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -272,7 +299,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                 <SelectContent>
                   {currencies.map((currency) => (
                     <SelectItem key={currency} value={currency}>
-                      {currency}
+                      {getCurrencyDisplayName(currency)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -288,12 +315,11 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="quarterly">Quarterly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
-                  <SelectItem value="one-time">One-time</SelectItem>
+                  {frequencies.map((frequency) => (
+                    <SelectItem key={frequency} value={frequency}>
+                      {getFrequencyDisplayName(frequency)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -327,11 +353,11 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                  <SelectItem value="terminated">Terminated</SelectItem>
-                  <SelectItem value="closed">Closed</SelectItem>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {getStatusDisplayName(status)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
