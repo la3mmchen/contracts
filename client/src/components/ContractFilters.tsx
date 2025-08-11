@@ -62,7 +62,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       {/* All Filter Options - Always Visible */}
       <div className="bg-muted/50 rounded-lg p-4 border w-full">
         <div className="w-full" style={{ whiteSpace: 'nowrap' }}>
-          <div className="inline-block w-[16.666%] pr-2">
+          <div className="inline-block w-[20%] pr-2">
             <Label htmlFor="status-filter" className="text-sm font-medium">Status</Label>
             <Select value={filters.status || 'all'} onValueChange={(value) => updateFilter('status', value === 'all' ? undefined : value)}>
               <SelectTrigger id="status-filter" className="w-full">
@@ -78,7 +78,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
             </Select>
           </div>
 
-          <div className="inline-block w-[16.666%] pr-2">
+          <div className="inline-block w-[20%] pr-2">
             <Label htmlFor="category-filter" className="text-sm font-medium">Category</Label>
             <Select value={filters.category || 'all'} onValueChange={(value) => updateFilter('category', value === 'all' ? undefined : value)}>
               <SelectTrigger id="category-filter" className="w-full">
@@ -95,7 +95,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
             </Select>
           </div>
 
-          <div className="inline-block w-[16.666%] pr-2">
+          <div className="inline-block w-[20%] pr-2">
             <Label htmlFor="frequency-filter" className="text-sm font-medium">Frequency</Label>
             <Select value={filters.frequency || 'all'} onValueChange={(value) => updateFilter('frequency', value === 'all' ? undefined : value)}>
               <SelectTrigger id="frequency-filter" className="w-full">
@@ -113,7 +113,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
             </Select>
           </div>
 
-          <div className="inline-block w-[16.666%] pr-2">
+          <div className="inline-block w-[20%] pr-2">
             <Label htmlFor="needs-info-filter" className="text-sm font-medium">Info Status</Label>
             <Select value={filters.needsMoreInfo === true ? 'yes' : filters.needsMoreInfo === false ? 'no' : 'all'} onValueChange={(value) => updateFilter('needsMoreInfo', value === 'all' ? undefined : value === 'yes')}>
               <SelectTrigger id="needs-info-filter" className="w-full">
@@ -127,7 +127,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
             </Select>
           </div>
 
-          <div className="inline-block w-[16.666%] pr-2">
+          <div className="inline-block w-[20%] pr-2">
             <Label htmlFor="tags-filter" className="text-sm font-medium">Tags</Label>
             <Select 
               value={filters.tags?.length ? filters.tags[0] : 'all'} 
@@ -153,21 +153,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
             </Select>
           </div>
 
-          <div className="inline-block w-[16.666%] pr-2">
-            <Label htmlFor="sort-filter" className="text-sm font-medium">Sort By</Label>
-            <Select value={filters.sortBy || 'name'} onValueChange={(value) => updateFilter('sortBy', value)}>
-              <SelectTrigger id="sort-filter" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="amount">Amount</SelectItem>
-                <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
-                <SelectItem value="createdAt">Created Date</SelectItem>
-                <SelectItem value="updatedAt">Last Updated</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
         </div>
       </div>
 

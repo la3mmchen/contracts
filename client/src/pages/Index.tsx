@@ -13,6 +13,7 @@ import { MigrationNotification } from '@/components/MigrationNotification';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -384,19 +385,34 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Connection Status with Search */}
+        {/* Connection Status with Search and Sort */}
         <div className="flex items-center justify-between mb-4">
           <ConnectionStatus onStatusChange={setApiConnected} />
           
-          {/* Search Field */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search contracts..."
-              value={filters.searchTerm || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-              className="pl-10"
-            />
+          {/* Search and Sort Fields */}
+          <div className="flex items-center gap-3">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search contracts..."
+                value={filters.searchTerm || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={filters.sortBy || 'name'} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value as any }))}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="amount">Amount</SelectItem>
+                <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
+                <SelectItem value="createdAt">Created Date</SelectItem>
+                <SelectItem value="updatedAt">Last Updated</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
