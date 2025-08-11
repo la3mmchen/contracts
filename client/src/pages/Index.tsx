@@ -6,27 +6,20 @@ import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
 
 import { ContractStats } from '@/components/ContractStats';
-import { ContractAnalytics } from '@/components/ContractAnalytics';
 import { NotificationBanner } from '@/components/NotificationBanner';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
-import { MigrationNotification } from '@/components/MigrationNotification';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   Plus, 
   Download, 
   Upload, 
-  Settings, 
-  BarChart3, 
-  Grid3X3, 
-  List,
   Loader2,
   FileText,
   AlertTriangle,
@@ -34,7 +27,6 @@ import {
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
-import { needsMigration } from '@/lib/contractMigration';
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,10 +45,7 @@ const Index = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [activeTab, setActiveTab] = useState('overview');
   const [apiConnected, setApiConnected] = useState<boolean | null>(null);
-  const [showMigrationNotification, setShowMigrationNotification] = useState(true);
   const [filters, setFilters] = useState<FilterType>({
     searchTerm: '',
     sortBy: 'createdAt',
@@ -81,10 +70,6 @@ const Index = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
-
-  // Migration notification is handled in the storage hook
-  // Only show for actual legacy imports, not regular updates
-  const migrationCount = 0;
 
   // Extract all available tags from contracts
   const availableTags = useMemo(() => {
@@ -170,7 +155,7 @@ const Index = () => {
     return filtered;
   }, [contracts, filters]);
 
-  const handleAddContract = async (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => {
+  const handleAddContract = async (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       const result = await addContract(contractData);
       // Only close the form if the contract was actually created
@@ -214,10 +199,6 @@ const Index = () => {
       setEditingContract(undefined);
       setIsFormOpen(false);
     }
-  };
-
-  const handleCloseContract = (contract: Contract) => {
-    updateContract(contract.id, { ...contract, status: 'closed' });
   };
 
   const handleDeleteContract = () => {
@@ -466,15 +447,6 @@ const Index = () => {
           availableTags={availableTags}
         />
 
-        {/* Migration Notification */}
-        {showMigrationNotification && migrationCount > 0 && (
-          <MigrationNotification
-            migratedCount={migrationCount}
-            totalCount={contracts.length}
-            onDismiss={() => setShowMigrationNotification(false)}
-          />
-        )}
-
         {/* Notifications */}
         <NotificationBanner contracts={contracts} onEdit={scrollToContract} />
 
@@ -531,7 +503,6 @@ const Index = () => {
                     contract={contract}
                     onEdit={openEditForm}
                     onDelete={(id) => setDeleteConfirmId(id)}
-                    onClose={handleCloseContract}
                     onUpdate={updateContract}
                     onFilter={(filterType, value) => {
                       if (filterType === 'status') {

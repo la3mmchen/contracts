@@ -44,7 +44,7 @@ interface ContractCardProps {
   contract: Contract;
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
-  onClose?: (contract: Contract) => void;
+
   onFilter?: (filterType: string, value: string) => void;
   defaultExpandCustomFields?: boolean;
   defaultExpandPriceChanges?: boolean;
@@ -70,7 +70,7 @@ const categoryColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate }: ContractCardProps) => {
+export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate }: ContractCardProps) => {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
   const [isPriceChangesOpen, setIsPriceChangesOpen] = useState(defaultExpandPriceChanges);
   const [isPaymentsOpen, setIsPaymentsOpen] = useState(defaultExpandPayments);
@@ -209,17 +209,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onClose, onFilter, de
             >
               <Edit className="h-4 w-4" />
             </Button>
-            {contract.status === 'expired' && onClose && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onClose(contract)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
-                title="Close contract"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
+
             <Button
               variant="outline"
               size="sm"
