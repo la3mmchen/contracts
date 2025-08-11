@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { ContractFilters } from '@/components/ContractFilters';
+import { isValidCategory } from '@/lib/utils';
 import { 
   TrendingUp, 
   Calendar, 

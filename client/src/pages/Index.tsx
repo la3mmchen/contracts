@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
+import { isValidCategory } from '@/lib/utils';
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -131,6 +132,14 @@ const Index = () => {
     // Apply sorting
     const direction = filters.sortOrder === 'asc' ? 1 : -1;
     filtered.sort((a, b) => {
+      // Always prioritize invalid categories first (regardless of sort order)
+      const aHasInvalidCategory = !isValidCategory(a.category);
+      const bHasInvalidCategory = !isValidCategory(b.category);
+      
+      if (aHasInvalidCategory && !bHasInvalidCategory) return -1;
+      if (!aHasInvalidCategory && bHasInvalidCategory) return 1;
+      
+      // If both have same validity status, apply normal sorting
       switch (filters.sortBy) {
         case 'name':
           return direction * a.name.localeCompare(b.name);
@@ -429,6 +438,21 @@ const Index = () => {
               } else {
                 setFilters(prev => ({ ...prev, needsMoreInfo: value === 'true' }));
               }
+            } else if (filterType === 'invalidCategories') {
+              // Filter to show only contracts with invalid categories
+              const invalidCategoryContracts = contracts.filter(contract => !isValidCategory(contract.category));
+              const invalidCategories = [...new Set(invalidCategoryContracts.map(c => c.category))];
+              setFilters(prev => ({
+                ...prev,
+                searchTerm: invalidCategories.join(' '),
+                status: undefined,
+                category: undefined,
+                frequency: undefined,
+                tags: undefined,
+                needsMoreInfo: undefined,
+                sortBy: 'createdAt',
+                sortOrder: 'desc'
+              }));
             } else if (filterType === 'reset') {
               setFilters({
                 searchTerm: '',
@@ -463,6 +487,46 @@ const Index = () => {
             </Alert>
           </div>
         )}
+
+        {/* Invalid Categories Warning */}
+        {(() => {
+          const invalidCategoryContracts = contracts.filter(contract => !isValidCategory(contract.category));
+          
+          if (invalidCategoryContracts.length > 0) {
+            return (
+              <div className="mb-6">
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Invalid Categories Detected</AlertTitle>
+                  <AlertDescription>
+                    You have {invalidCategoryContracts.length} contract{invalidCategoryContracts.length > 1 ? 's' : ''} with categories that are no longer available. These contracts are displayed at the top of the list and should be updated with valid categories:
+                    <div className="mt-2 space-y-1">
+                      {invalidCategoryContracts.slice(0, 3).map((contract) => (
+                        <div key={contract.id} className="flex items-center justify-between text-sm">
+                          <span 
+                            className="cursor-pointer hover:text-primary hover:underline"
+                            onClick={() => scrollToContract(contract)}
+                          >
+                            {contract.name}
+                          </span>
+                          <span className="font-mono text-xs">
+                            {contract.contractId}
+                          </span>
+                        </div>
+                      ))}
+                      {invalidCategoryContracts.length > 3 && (
+                        <div className="text-sm text-muted-foreground">
+                          ...and {invalidCategoryContracts.length - 3} more
+                        </div>
+                      )}
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              </div>
+            );
+          }
+          return null;
+        })()}
 
 
 

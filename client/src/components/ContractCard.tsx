@@ -175,7 +175,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
                 to={`/contract/${contract.id}`}
                 className="hover:underline cursor-pointer"
               >
-                {contract.name}
+                {!isValidCategory(contract.category) && '📌 '}{contract.name}
               </Link>
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-1">{contract.company}</p>
@@ -210,6 +210,22 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
               <Edit className="h-4 w-4" />
             </Button>
 
+            {contract.status === 'expired' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Update contract status to closed
+                  if (onUpdate) {
+                    onUpdate(contract.id, { ...contract, status: 'closed' });
+                  }
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
+                title="Close contract"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
