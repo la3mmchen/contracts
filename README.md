@@ -10,7 +10,7 @@ Organize contracts, maintain visibility, and track your spendings.
 - 📊 **Analytics Dashboard** - Visual spending & category breakdowns
 - 🔍 **Smart Search & Filters** - Find contracts instantly
 - 📱 **Mobile Responsive** - Works seamlessly on all devices
-- 📤 **Export to Markdown** - Backup & share your data
+- 📤 **Export to Markdown** - Bulk export (ZIP) or individual files with filtering
 - 🚫 **Data Loss Prevention** - Unsaved changes protection
 - ⚡ **Real-time Stats** - Live spending & payment tracking
 
@@ -71,7 +71,9 @@ task health
 
 Keep in mind: data is stored **Local**: `./data/contracts/` (relative to the path in which you clone the repo)
 
-## 🔧 Available Commands
+#### 🔧 Available Commands
+
+When running locally, you can levevarge [Taskfile](https://taskfile.dev/) to execute most of the necessary commands.
 
 ```bash
 # Docker workflows
@@ -86,47 +88,23 @@ task clear-test-data   # Remove test contracts only
 task data-info         # Storage information
 
 # Export functionality
-task test-export-markdown  # Test Markdown export feature
+task test-export-markdown  # Test Markdown export feature (ZIP and individual files)
 
 # Monitoring
 task logs          # View all logs
 task health        # Service health status
 ```
-
 **Configuration Changes:**
 To change configuration (app name, API URL, categories), simply update the environment variables in `docker-compose.yml` and restart the app container:
+
 ```bash
 docker compose restart app
-```
-
-### Production Commands
-
-```bash
-# Deploy to production
-docker compose up -d
-
-# Update configuration
-docker compose restart contracts_app
-
-# Check service status
-docker compose ps
-
-# View logs
-docker compose logs -f contracts_app
-docker compose logs -f contracts_api
-
-# Backup contracts
-cp -r /data/contracts /backup/contracts-$(date +%Y%m%d)
-
-# Restore contracts
-cp -r /backup/contracts-20241201/* /data/contracts/
 ```
 
 ## 🚀 CI/CD
 
 ### GitHub Actions
 - **Docker Build & Push**: Automatically builds and pushes Docker images to GitHub Container Registry
-- **Testing**: Runs tests and verifies Docker builds on every push/PR
 
 ### Docker Images
 Images are available at:
@@ -154,38 +132,17 @@ docker run -e APP_NAME="My Contracts" -e API_URL="http://api:3001/api" ghcr.io/l
 - **API**: https://contracts.yourdomain.com/api
 - **Health Check**: https://contracts.yourdomain.com/api/health
 
-## 📡 API Endpoints
+📡 **For complete API documentation, see [API Documentation](docs/api.md)**
 
-### Core Contract Operations
-- `GET /api/contracts` - Get all contracts
-- `GET /api/contracts/:id` - Get contract by ID
-- `POST /api/contracts` - Create new contract
-- `PUT /api/contracts/:id` - Update contract
-- `DELETE /api/contracts/:id` - Delete contract
+The API provides endpoints for:
+- **Core Operations**: CRUD operations for contracts
+- **Search & Filtering**: Find contracts by various criteria
+- **Export & Backup**: Markdown export with filtering options
+- **System Information**: Data storage and statistics
 
-### Search & Filtering
-- `GET /api/contracts?search=query` - Search contracts
-- `GET /api/contracts?status=active` - Filter by status
+## Export 
 
-### Export & Backup
-- `GET /api/contracts/export/markdown` - Export all contracts to Markdown
-- `GET /api/contracts/export/markdown?status=active` - Export filtered contracts
-
-### System Information
-- `GET /api/contracts/info/data` - Data storage information
-- `GET /api/contracts/info/stats` - File statistics
-
-**Example API usage:**
-```bash
-# Export all contracts to Markdown file
-curl -o contracts-backup.md http://localhost:3001/api/contracts/export/markdown
-
-# Export only active contracts
-curl -o active-contracts.md "http://localhost:3001/api/contracts/export/markdown?status=active"
-
-# Search and export matching contracts
-curl -o search-results.md "http://localhost:3001/api/contracts/export/markdown?search=netflix"
-```
+📤 **See [Export Documentation](docs/export.md) for detailed export functionality**
 
 ## 🔧 Environment Variables
 
@@ -243,6 +200,13 @@ contracts/
 ├── client/          # Frontend React application
 ├── api/            # Backend Express API
 ├── test-data/      # Sample contract data
+├── docs/           # Documentation
 ├── docker-compose.yml
 └── Taskfile.yml    # Development workflows
 ```
+
+### 📚 Documentation
+- **README.md** - Project overview and quick start
+- **[API Documentation](docs/api.md)** - Complete API reference and examples
+- **[Export Documentation](docs/export.md)** - Detailed export functionality guide
+- **[Example Configuration](docs/example/)** - Docker and nginx setup examples
