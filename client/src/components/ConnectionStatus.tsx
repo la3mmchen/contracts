@@ -101,7 +101,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
   // When connected, show minimal info
   if (status === 'connected') {
     return (
-      <div className="flex items-center justify-between mb-4 px-1">
+      <div className="flex items-center gap-4 px-1">
         <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800 border-green-200">
           <CheckCircle className="h-3 w-3 mr-1" />
           Connected

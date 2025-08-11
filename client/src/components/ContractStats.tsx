@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Contract } from '@/types/contract';
+import { Contract, ContractFilters as FilterType } from '@/types/contract';
+import { ContractFilters } from '@/components/ContractFilters';
 import { 
   TrendingUp, 
   Calendar, 
@@ -20,9 +21,19 @@ interface ContractStatsProps {
     category?: string;
     needsMoreInfo?: boolean;
   };
+  filters: FilterType;
+  onFiltersChange: (filters: FilterType) => void;
+  availableTags: string[];
 }
 
-export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractStatsProps) => {
+export const ContractStats = ({ 
+  contracts, 
+  onFilter, 
+  activeFilters, 
+  filters, 
+  onFiltersChange, 
+  availableTags 
+}: ContractStatsProps) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const handleTabChange = (newTab: string) => {
@@ -155,10 +166,10 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
         style={{ animationDelay: `${index * 0.1}s` }}
         onClick={stat.clickable && onFilter ? () => onFilter(stat.filterType!, stat.filterValue!) : undefined}
       >
-        <CardContent className="p-3">
+        <CardContent className="p-2">
           <div className="flex flex-col items-center text-center space-y-1">
-            <div className={`${stat.bgColor} p-2 rounded-lg mb-1`}>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            <div className={`${stat.bgColor} p-1.5 rounded-lg mb-1`}>
+              <stat.icon className={`h-3.5 w-3.5 ${stat.color}`} />
             </div>
             <div className="flex items-center gap-1">
               <p className="text-xs font-medium text-muted-foreground leading-tight">
@@ -166,7 +177,7 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
               </p>
 
             </div>
-            <p className="text-lg font-bold text-foreground leading-tight">
+            <p className="text-base font-bold text-foreground leading-tight">
               {stat.value}
             </p>
           </div>
@@ -210,14 +221,15 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
   return (
     <div className="mb-6">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+        <TabsList className="grid w-full grid-cols-3 mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="filters">Filters</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-2">
           {/* Main Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {stats.filter(stat => stat.filterType !== 'category').map((stat, index) => 
               renderStatCard(stat, index)
             )}
@@ -231,6 +243,17 @@ export const ContractStats = ({ contracts, onFilter, activeFilters }: ContractSt
               .filter(stat => typeof stat.value === 'number' && stat.value > 0)
               .sort((a, b) => (b.value as number) - (a.value as number))
               .map((stat, index) => renderCategoryCard(stat, index))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="filters" className="space-y-2">
+          {/* Filters Section */}
+          <div className="w-full">
+            <ContractFilters 
+              filters={filters} 
+              onFiltersChange={onFiltersChange} 
+              availableTags={availableTags}
+            />
           </div>
         </TabsContent>
       </Tabs>

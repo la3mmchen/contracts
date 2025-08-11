@@ -4,7 +4,7 @@ import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
-import { ContractFilters } from '@/components/ContractFilters';
+
 import { ContractStats } from '@/components/ContractStats';
 import { ContractAnalytics } from '@/components/ContractAnalytics';
 import { NotificationBanner } from '@/components/NotificationBanner';
@@ -12,6 +12,7 @@ import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { MigrationNotification } from '@/components/MigrationNotification';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +28,8 @@ import {
   List,
   Loader2,
   FileText,
-  AlertTriangle
+  AlertTriangle,
+  Search
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
@@ -382,8 +384,21 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Connection Status */}
-        <ConnectionStatus onStatusChange={setApiConnected} />
+        {/* Connection Status with Search */}
+        <div className="flex items-center justify-between mb-4">
+          <ConnectionStatus onStatusChange={setApiConnected} />
+          
+          {/* Search Field */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search contracts..."
+              value={filters.searchTerm || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+              className="pl-10"
+            />
+          </div>
+        </div>
 
         {/* Statistics */}
         <ContractStats 
@@ -430,6 +445,9 @@ const Index = () => {
             category: filters.category,
             needsMoreInfo: filters.needsMoreInfo
           }}
+          filters={filters}
+          onFiltersChange={setFilters}
+          availableTags={availableTags}
         />
 
         {/* Migration Notification */}
@@ -458,12 +476,7 @@ const Index = () => {
           </div>
         )}
 
-        {/* Filters */}
-        <ContractFilters 
-          filters={filters} 
-          onFiltersChange={(newFilters) => setFilters(newFilters)} 
-          availableTags={availableTags}
-        />
+
 
         {/* Contracts Grid */}
         <div className="mt-8">
