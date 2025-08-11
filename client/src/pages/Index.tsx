@@ -418,28 +418,48 @@ const Index = () => {
               if (filters.status === value) {
                 setFilters(prev => ({ ...prev, status: undefined }));
               } else {
-                setFilters(prev => ({ ...prev, status: value as Contract['status'] }));
+                // Clear search when applying a status filter
+                setFilters(prev => ({ 
+                  ...prev, 
+                  status: value as Contract['status'],
+                  searchTerm: '' // Clear search when filtering
+                }));
               }
             } else if (filterType === 'category') {
               // If clicking the same category filter, reset it
               if (filters.category === value) {
                 setFilters(prev => ({ ...prev, category: undefined }));
               } else {
-                setFilters(prev => ({ ...prev, category: value as Contract['category'] }));
+                // Clear search when applying a category filter
+                setFilters(prev => ({ 
+                  ...prev, 
+                  category: value as Contract['category'],
+                  searchTerm: '' // Clear search when filtering
+                }));
               }
             } else if (filterType === 'tags') {
               // If clicking the same tag filter, reset it
               if (filters.tags?.includes(value)) {
                 setFilters(prev => ({ ...prev, tags: undefined }));
               } else {
-                setFilters(prev => ({ ...prev, tags: [value] }));
+                // Clear search when applying a tag filter
+                setFilters(prev => ({ 
+                  ...prev, 
+                  tags: [value],
+                  searchTerm: '' // Clear search when filtering
+                }));
               }
             } else if (filterType === 'needsMoreInfo') {
               // If clicking the same needsMoreInfo filter, reset it
               if (filters.needsMoreInfo === (value === 'true')) {
                 setFilters(prev => ({ ...prev, needsMoreInfo: undefined }));
               } else {
-                setFilters(prev => ({ ...prev, needsMoreInfo: value === 'true' }));
+                // Clear search when applying a needsMoreInfo filter
+                setFilters(prev => ({ 
+                  ...prev, 
+                  needsMoreInfo: value === 'true',
+                  searchTerm: '' // Clear search when filtering
+                }));
               }
             } else if (filterType === 'invalidCategories') {
               // Filter to show only contracts with invalid categories
@@ -470,7 +490,21 @@ const Index = () => {
             needsMoreInfo: filters.needsMoreInfo
           }}
           filters={filters}
-          onFiltersChange={setFilters}
+          onFiltersChange={(newFilters) => {
+            // Clear search when any filter is applied through ContractFilters
+            const hasFilterChanges = 
+              newFilters.status !== filters.status ||
+              newFilters.category !== filters.category ||
+              newFilters.frequency !== filters.frequency ||
+              newFilters.tags !== filters.tags ||
+              newFilters.needsMoreInfo !== filters.needsMoreInfo;
+            
+            if (hasFilterChanges) {
+              setFilters({ ...newFilters, searchTerm: '' });
+            } else {
+              setFilters(newFilters);
+            }
+          }}
           availableTags={availableTags}
         />
 
@@ -577,21 +611,33 @@ const Index = () => {
                         if (filters.status === value) {
                           setFilters(prev => ({ ...prev, status: undefined }));
                         } else {
-                          setFilters(prev => ({ ...prev, status: value as Contract['status'] }));
+                          setFilters(prev => ({ 
+                            ...prev, 
+                            status: value as Contract['status'],
+                            searchTerm: '' // Clear search when filtering
+                          }));
                         }
                       } else if (filterType === 'category') {
                         // If clicking the same category filter, reset it
                         if (filters.category === value) {
                           setFilters(prev => ({ ...prev, category: undefined }));
                         } else {
-                          setFilters(prev => ({ ...prev, category: value as Contract['category'] }));
+                          setFilters(prev => ({ 
+                            ...prev, 
+                            category: value as Contract['category'],
+                            searchTerm: '' // Clear search when filtering
+                          }));
                         }
                       } else if (filterType === 'tags') {
                         // If clicking the same tag filter, reset it
                         if (filters.tags?.includes(value)) {
                           setFilters(prev => ({ ...prev, tags: undefined }));
                         } else {
-                          setFilters(prev => ({ ...prev, tags: [value] }));
+                          setFilters(prev => ({ 
+                            ...prev, 
+                            tags: [value],
+                            searchTerm: '' // Clear search when filtering
+                          }));
                         }
                       }
                     }}
