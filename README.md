@@ -249,5 +249,6 @@ contracts/
 ### 📚 Documentation
 - **README.md** - Project overview and quick start
 - **[API Documentation](docs/api.md)** - Complete API reference and examples
+- **[API Schema](docs/api-schema.md)** - Comprehensive API schema and data types
 - **[Export Documentation](docs/export.md)** - Detailed export functionality guide
 - **[Example Configuration](docs/example/)** - Docker and nginx setup examples
