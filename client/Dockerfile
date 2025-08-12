@@ -1,5 +1,5 @@
 # Multi-stage build for optimized image size
-FROM node:18-alpine AS base
+FROM node:20.11-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -14,7 +14,7 @@ RUN rm -rf node_modules package-lock.json && \
     npm cache clean --force
 
 # Build the application - use regular node image for build to avoid Alpine Rollup issues
-FROM node:18 AS builder
+FROM node:20.11 AS builder
 WORKDIR /app
 
 # Copy package files
