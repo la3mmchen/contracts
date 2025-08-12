@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, FileEdit } from 'lucide-react';
 
 interface ContractFormProps {
   contract?: Contract;
@@ -21,6 +21,8 @@ interface ContractFormProps {
 }
 
 export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
+  const isEditing = !!contract;
+  
   // Get available options and determine smart defaults
   const availableCategories = getCategories();
   const availableStatuses = getStatuses();
@@ -204,6 +206,28 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Smart Header */}
+      {isEditing && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <FileEdit className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-amber-800 dark:text-amber-200">
+              <p className="font-medium mb-1">Full Form Edit Mode</p>
+              <p>You're editing all fields at once. This is perfect for:</p>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
+                <li>Changing multiple fields simultaneously</li>
+                <li>Major contract updates or corrections</li>
+                <li>Mobile users (better on small screens)</li>
+                <li>Complex validation and error checking</li>
+              </ul>
+              <p className="text-amber-600 dark:text-amber-400 mt-2 text-xs">
+                💡 For quick single-field updates, close this and use inline editing instead!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <Card>
         <CardHeader>
           <CardTitle>Basic Information</CardTitle>

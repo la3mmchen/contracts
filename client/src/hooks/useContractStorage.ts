@@ -99,7 +99,7 @@ export const useContractStorage = () => {
     }
   };
 
-      const updateContract = async (id: string, updates: Partial<Contract>) => {
+  const updateContract = async (id: string, updates: Partial<Contract>) => {
       try {
         const updatedContract = await api.updateContract(id, updates);
 
