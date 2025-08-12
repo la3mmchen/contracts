@@ -33,6 +33,7 @@ export interface Contract {
   tags?: string[];
   needsMoreInfo?: boolean; // Flag to indicate contract needs more information
   pinned?: boolean; // Flag to pin contract to the top of the list
+  draft?: boolean; // Flag to indicate contract is in draft state
   priceChanges?: PriceChange[]; // Array of amount changes over time
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
@@ -84,21 +85,22 @@ export interface ContractStats {
 export interface CreateContractRequest {
   contractId: string;
   name: string;
-  company: string;
+  company?: string; // Made optional for draft contracts
   description?: string;
-  startDate: string;
+  startDate?: string; // Made optional for draft contracts
   endDate?: string;
-  amount: number;
-  currency: string;
-  frequency: Contract['frequency'];
-  status: Contract['status'];
-  category: Contract['category'];
+  amount?: number; // Made optional for draft contracts
+  currency?: string; // Made optional for draft contracts
+  frequency?: Contract['frequency']; // Made optional for draft contracts
+  status?: Contract['status']; // Made optional for draft contracts
+  category?: Contract['category']; // Made optional for draft contracts
   payDate?: string;
-  contactInfo: Contract['contactInfo'];
+  contactInfo?: Contract['contactInfo']; // Made optional for draft contracts
   notes?: string;
   tags?: string[];
   needsMoreInfo?: boolean;
   pinned?: boolean;
+  draft?: boolean; // Flag to indicate contract is in draft state
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
 }

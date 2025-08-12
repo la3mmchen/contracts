@@ -66,6 +66,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     tags: contract?.tags?.join(', ') || '',
     needsMoreInfo: contract?.needsMoreInfo || false,
     pinned: contract?.pinned || false,
+    draft: contract?.draft || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -194,6 +195,13 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
   const statuses = getStatuses();
   const frequencies = getFrequencies();
 
+  // Helper function to show required indicator
+  const showRequired = (fieldName: string) => {
+    if (formData.draft) return false;
+    const requiredFields = ['company', 'startDate', 'amount', 'currency', 'frequency', 'status', 'category'];
+    return requiredFields.includes(fieldName);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
@@ -224,16 +232,19 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="company">Company</Label>
-            <Input
-              id="company"
-              value={formData.company}
-              onChange={(e) => updateFormData({ company: e.target.value })}
-              placeholder="e.g., Netflix Inc."
-              required
-            />
-          </div>
+            <div>
+              <Label htmlFor="company">
+                Company
+                {showRequired('company') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
+              <Input
+                id="company"
+                value={formData.company}
+                onChange={(e) => updateFormData({ company: e.target.value })}
+                placeholder="e.g., Netflix Inc."
+                required={!formData.draft}
+              />
+            </div>
 
           <div>
             <Label htmlFor="description">Description</Label>
@@ -245,6 +256,22 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
               rows={3}
             />
           </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              id="draft"
+              type="checkbox"
+              checked={formData.draft}
+              onChange={(e) => updateFormData({ draft: e.target.checked })}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="draft" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Draft Contract
+            </Label>
+          </div>
+          <p className="text-sm text-muted-foreground -mt-2">
+            Draft contracts only require a name and ID. Other fields can be filled in later.
+          </p>
         </CardContent>
       </Card>
 
@@ -255,13 +282,16 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="startDate">Start Date</Label>
+              <Label htmlFor="startDate">
+                Start Date
+                {showRequired('startDate') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
               <Input
                 id="startDate"
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => updateFormData({ startDate: e.target.value })}
-                required
+                required={!formData.draft}
               />
             </div>
             <div>
@@ -277,7 +307,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">
+                Amount
+                {showRequired('amount') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
               <Input
                 id="amount"
                 type="number"
@@ -286,11 +319,14 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
                 value={formData.amount}
                 onChange={(e) => updateFormData({ amount: e.target.value || '' })}
                 placeholder="0.00"
-                required
+                required={!formData.draft}
               />
             </div>
             <div>
-              <Label htmlFor="currency">Currency</Label>
+              <Label htmlFor="currency">
+                Currency
+                {showRequired('currency') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
               <Select
                 value={formData.currency}
                 onValueChange={(value) => updateFormData({ currency: value })}
@@ -308,7 +344,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
               </Select>
             </div>
             <div>
-              <Label htmlFor="frequency">Frequency</Label>
+              <Label htmlFor="frequency">
+                Frequency
+                {showRequired('frequency') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
               <Select
                 value={formData.frequency}
                 onValueChange={(value) => updateFormData({ frequency: value as Contract['frequency'] })}
@@ -346,7 +385,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">
+                Status
+                {showRequired('status') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
               <Select
                 value={formData.status}
                 onValueChange={(value) => updateFormData({ status: value as Contract['status'] })}
@@ -364,7 +406,10 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
               </Select>
             </div>
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">
+                Category
+                {showRequired('category') && <span className="text-red-500 ml-1">*</span>}
+              </Label>
               <Select
                 value={formData.category}
                 onValueChange={(value) => updateFormData({ category: value as Contract['category'] })}
@@ -637,7 +682,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
             color: 'white'
           }}
         >
-          {contract ? 'Update Contract' : 'Add Contract'}
+          {contract ? 'Update Contract' : formData.draft ? 'Create Draft' : 'Add Contract'}
         </Button>
       </div>
     </form>

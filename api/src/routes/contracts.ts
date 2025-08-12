@@ -49,8 +49,36 @@ contractRoutes.post('/', async (req: Request, res: Response) => {
     const contractData: CreateContractRequest = req.body;
     
     // Basic validation
-    if (!contractData.name || !contractData.company || !contractData.contractId) {
-      return res.status(400).json({ error: 'Name, company, and contract ID are required' });
+    if (!contractData.name || !contractData.contractId) {
+      return res.status(400).json({ error: 'Name and contract ID are required' });
+    }
+    
+    // For non-draft contracts, require additional fields
+    if (!contractData.draft) {
+      if (!contractData.company) {
+        return res.status(400).json({ error: 'Company is required for non-draft contracts' });
+      }
+      if (!contractData.startDate) {
+        return res.status(400).json({ error: 'Start date is required for non-draft contracts' });
+      }
+      if (contractData.amount === undefined || contractData.amount === null) {
+        return res.status(400).json({ error: 'Amount is required for non-draft contracts' });
+      }
+      if (!contractData.currency) {
+        return res.status(400).json({ error: 'Currency is required for non-draft contracts' });
+      }
+      if (!contractData.frequency) {
+        return res.status(400).json({ error: 'Frequency is required for non-draft contracts' });
+      }
+      if (!contractData.status) {
+        return res.status(400).json({ error: 'Status is required for non-draft contracts' });
+      }
+      if (!contractData.category) {
+        return res.status(400).json({ error: 'Category is required for non-draft contracts' });
+      }
+      if (!contractData.contactInfo) {
+        return res.status(400).json({ error: 'Contact info is required for non-draft contracts' });
+      }
     }
     
     const result = await contractService.createContract(contractData);

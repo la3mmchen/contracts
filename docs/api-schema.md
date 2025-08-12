@@ -32,6 +32,7 @@ interface Contract {
   tags?: string[];               // Optional tags for categorization
   needsMoreInfo?: boolean;       // Flag indicating incomplete information
   pinned?: boolean;              // Flag to pin contract to top of list
+  draft?: boolean;               // Flag indicating contract is in draft state
   priceChanges?: PriceChange[];  // History of price changes
   attachments?: ContractAttachment[]; // Associated files
   documentLink?: string;         // Link to contract document
@@ -135,6 +136,7 @@ interface CreateContractRequest {
   tags?: string[];       // Optional tags
   needsMoreInfo?: boolean;
   pinned?: boolean;
+  draft?: boolean;               // Flag to indicate contract is in draft state
   priceChanges?: PriceChange[];
 }
 ```
@@ -263,8 +265,11 @@ Creates a new contract.
 
 #### Required Fields
 
+**For all contracts:**
 - `contractId`
 - `name`
+
+**For non-draft contracts (when `draft` is false or undefined):**
 - `company`
 - `startDate`
 - `amount`
@@ -457,8 +462,11 @@ Returns metadata about individual markdown exports without downloading files.
 
 ### Required Fields for Contract Creation
 
+**For all contracts:**
 - `contractId`: Must be unique business identifier
 - `name`: Non-empty string
+
+**For non-draft contracts (when `draft` is false or undefined):**
 - `company`: Non-empty string
 - `startDate`: Valid ISO 8601 date string
 - `amount`: Positive number
@@ -467,6 +475,15 @@ Returns metadata about individual markdown exports without downloading files.
 - `status`: Must be one of the defined status values
 - `category`: Must be one of the defined category values
 - `contactInfo`: Object with at least one contact method
+
+### Draft Contracts
+
+Draft contracts allow you to create contracts with minimal information and fill in the details later. When `draft: true` is set:
+
+- Only `contractId` and `name` are required
+- All other fields are optional
+- Duplicate checking by name + company is still enforced when company is provided
+- The contract can be updated later to remove the draft status
 
 ### Date Format
 
@@ -477,6 +494,18 @@ All dates should be in ISO 8601 format: `YYYY-MM-DDTHH:mm:ss.sssZ`
 Currency should be a 3-letter ISO currency code (e.g., "USD", "EUR", "GBP")
 
 ## Usage Examples
+
+### Creating a Draft Contract
+
+```bash
+curl -X POST http://localhost:3000/api/contracts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contractId": "DRAFT-001",
+    "name": "New Service Contract",
+    "draft": true
+  }'
+```
 
 ### Creating a Monthly Subscription
 
@@ -518,6 +547,27 @@ curl -X PUT http://localhost:3000/api/contracts/uuid-here \
   }'
 ```
 
+### Completing a Draft Contract
+
+```bash
+curl -X PUT http://localhost:3000/api/contracts/uuid-here \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company": "Acme Corp",
+    "startDate": "2024-01-01T00:00:00.000Z",
+    "amount": 99.99,
+    "currency": "USD",
+    "frequency": "monthly",
+    "status": "active",
+    "category": "services",
+    "contactInfo": {
+      "email": "contact@acme.com",
+      "website": "https://acme.com"
+    },
+    "draft": false
+  }'
+```
+
 ### Exporting Contracts
 
 ```bash
@@ -537,3 +587,5 @@ curl "http://localhost:3000/api/contracts/export/markdown/individual"
 - Search is case-insensitive and matches against name, company, and description
 - Export functionality creates individual markdown files for each contract
 - File attachments are stored as metadata; actual file storage is handled separately
+- Draft contracts allow minimal information and can be completed later
+- Duplicate checking by name + company is enforced for all contracts when company is provided

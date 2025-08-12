@@ -102,18 +102,8 @@ class ContractService {
   }
 
   async createContract(data: CreateContractRequest): Promise<{ contract: Contract; created: boolean }> {
-    // Check for existing contract with same name and company
-    const existingContracts = await this.getAllContracts();
-    const existingContract = existingContracts.find(
-      contract => contract.name === data.name && contract.company === data.company
-    );
-
-    if (existingContract) {
-      console.log(`Contract already exists: ${data.name} (${existingContract.id})`);
-      return { contract: existingContract, created: false };
-    }
-
     // Check for existing contract with same contract ID
+    const existingContracts = await this.getAllContracts();
     const existingContractById = existingContracts.find(
       contract => contract.contractId === data.contractId
     );
@@ -123,10 +113,44 @@ class ContractService {
       return { contract: existingContractById, created: false };
     }
 
+    // Check for duplicate name + company combination (for all contracts)
+    if (data.company) {
+      const existingContract = existingContracts.find(
+        contract => contract.name === data.name && contract.company === data.company
+      );
+
+      if (existingContract) {
+        console.log(`Contract already exists: ${data.name} (${existingContract.id})`);
+        return { contract: existingContract, created: false };
+      }
+    }
+
     const now = new Date().toISOString();
+    
+    // Provide default values for required fields if they're missing
     const contract: Contract = {
       id: uuidv4(),
-      ...data,
+      contractId: data.contractId,
+      name: data.name,
+      company: data.company || 'Unknown Company',
+      description: data.description,
+      startDate: data.startDate || now,
+      endDate: data.endDate,
+      amount: data.amount || 0,
+      currency: data.currency || 'USD',
+      frequency: data.frequency || 'monthly',
+      status: data.status || 'active',
+      category: data.category || 'other',
+      payDate: data.payDate,
+      contactInfo: data.contactInfo || {},
+      notes: data.notes,
+      tags: data.tags,
+      needsMoreInfo: data.needsMoreInfo,
+      pinned: data.pinned,
+      draft: data.draft,
+      priceChanges: data.priceChanges,
+      attachments: [],
+      documentLink: undefined,
       createdAt: now,
       updatedAt: now,
     };
@@ -178,10 +202,10 @@ class ContractService {
     const searchTerm = query.toLowerCase();
     return contracts.filter(contract => 
       contract.name.toLowerCase().includes(searchTerm) ||
-      contract.company.toLowerCase().includes(searchTerm) ||
+      (contract.company && contract.company.toLowerCase().includes(searchTerm)) ||
       contract.contractId.toLowerCase().includes(searchTerm) ||
-      contract.description?.toLowerCase().includes(searchTerm) ||
-      contract.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+      (contract.description && contract.description.toLowerCase().includes(searchTerm)) ||
+      (contract.tags && contract.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
     );
   }
 
