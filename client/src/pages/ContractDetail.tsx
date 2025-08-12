@@ -135,24 +135,6 @@ const ContractDetail = () => {
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <ThemeToggle />
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsEditFormOpen(true)}
-                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
-              >
-                <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setDeleteConfirmOpen(true)}
-                className="bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20"
-              >
-                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Delete
-              </Button>
             </div>
           </div>
         </div>
@@ -183,12 +165,6 @@ const ContractDetail = () => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button asChild className="w-full" size="sm">
-                  <Link to={`/contract/${contract.id}`} className="flex items-center gap-2">
-                    <ExternalLink className="h-4 w-4" />
-                    View Details
-                  </Link>
-                </Button>
                 <Button 
                   variant="outline" 
                   className="w-full" 
@@ -210,28 +186,42 @@ const ContractDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Contract Summary */}
+            {/* Contract Overview */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Summary</CardTitle>
+                <CardTitle className="text-lg">Overview</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Status:</span>
-                  <span className="text-sm font-medium">{contract.status}</span>
+                  <span className="text-sm text-muted-foreground">Contract ID:</span>
+                  <span className="text-sm font-mono font-medium">{contract.contractId}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Category:</span>
-                  <span className="text-sm font-medium">{contract.category}</span>
+                  <span className="text-sm text-muted-foreground">Start Date:</span>
+                  <span className="text-sm font-medium">{new Date(contract.startDate).toLocaleDateString()}</span>
                 </div>
+                {contract.endDate && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">End Date:</span>
+                    <span className="text-sm font-medium">{new Date(contract.endDate).toLocaleDateString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Frequency:</span>
-                  <span className="text-sm font-medium">{contract.frequency}</span>
+                  <span className="text-sm text-muted-foreground">Last Updated:</span>
+                  <span className="text-sm font-medium">{new Date(contract.updatedAt).toLocaleDateString()}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Amount:</span>
-                  <span className="text-sm font-medium">{contract.amount} {contract.currency}</span>
-                </div>
+                {contract.pinned && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Pinned:</span>
+                    <span className="text-sm font-medium text-yellow-600">✓ Yes</span>
+                  </div>
+                )}
+                {contract.draft && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Draft:</span>
+                    <span className="text-sm font-medium text-blue-600">✓ Yes</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -318,3 +308,4 @@ const ContractDetail = () => {
 };
 
 export default ContractDetail;
+
