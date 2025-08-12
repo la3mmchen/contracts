@@ -82,10 +82,15 @@ class ContractService {
         }
       }
 
-      // Sort by creation date (newest first)
-      return contracts.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      // Sort by pinned status first, then by creation date (newest first)
+      return contracts.sort((a, b) => {
+        // Pinned contracts always come first
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        
+        // If both have same pinned status, sort by creation date
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
     } catch (error) {
       console.error('Error loading contracts:', error);
       return [];

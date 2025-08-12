@@ -19,6 +19,7 @@
   },
   "notes": "Premium plan with 4K Ultra HD quality and 4 simultaneous streams. Shared account with family.",
   "tags": ["streaming", "entertainment", "4K"],
+  "pinned": true,
   "priceChanges": [
     {
       "date": "2024-07-01",

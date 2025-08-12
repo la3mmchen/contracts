@@ -65,6 +65,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
     needsMoreInfo: contract?.needsMoreInfo || false,
+    pinned: contract?.pinned || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -94,6 +95,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
     notes: contract?.notes || '',
     tags: contract?.tags?.join(', ') || '',
     needsMoreInfo: contract?.needsMoreInfo || false,
+    pinned: contract?.pinned || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -517,6 +519,22 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
           </div>
           <p className="text-sm text-muted-foreground -mt-2">
             Check this box if you need to gather more details about this contract
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <input
+              id="pinned"
+              type="checkbox"
+              checked={formData.pinned}
+              onChange={(e) => updateFormData({ pinned: e.target.checked })}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="pinned" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Pin Contract
+            </Label>
+          </div>
+          <p className="text-sm text-muted-foreground -mt-2">
+            Pinned contracts will appear at the top of your contract list
           </p>
           <div>
             <div className="flex items-center justify-between mb-2">

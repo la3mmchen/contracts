@@ -30,6 +30,7 @@ export interface Contract {
   notes?: string;
   tags?: string[];
   needsMoreInfo?: boolean; // Flag to indicate contract needs more information
+  pinned?: boolean; // Flag to pin contract to the top of the list
   priceChanges?: PriceChange[]; // Array of amount changes over time
   attachments?: ContractAttachment[];
   documentLink?: string;
@@ -63,6 +64,7 @@ export interface CreateContractRequest {
   notes?: string;
   tags?: string[];
   needsMoreInfo?: boolean;
+  pinned?: boolean;
   priceChanges?: PriceChange[];
 }
 

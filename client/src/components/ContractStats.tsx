@@ -7,13 +7,13 @@ import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { getCategories } from '@/config/categories';
 import { 
-  TrendingUp, 
   Calendar, 
+  TrendingUp, 
   AlertTriangle, 
   DollarSign, 
   Tag, 
   Coins, 
-  Building2 
+  Building2
 } from 'lucide-react';
 
 interface ContractStatsProps {
@@ -23,6 +23,7 @@ interface ContractStatsProps {
     status?: string;
     category?: string;
     needsMoreInfo?: boolean;
+    pinned?: boolean;
   };
   filters: FilterType;
   onFiltersChange: (filters: FilterType) => void;
@@ -147,9 +148,10 @@ export const ContractStats = ({
   const renderStatCard = (stat: StatItem, index: number) => {
     const isActive = activeFilters && (
       (stat.filterType === 'status' && activeFilters.status === stat.filterValue) ||
-      (stat.filterType === 'reset' && !activeFilters.status && !activeFilters.category) ||
+      (stat.filterType === 'reset' && !activeFilters.status && !activeFilters.category && !activeFilters.pinned) ||
       (stat.filterType === 'category' && activeFilters.category === stat.filterValue) ||
-      (stat.filterType === 'needsMoreInfo' && activeFilters.needsMoreInfo === (stat.filterValue === 'true'))
+      (stat.filterType === 'needsMoreInfo' && activeFilters.needsMoreInfo === (stat.filterValue === 'true')) ||
+      (stat.filterType === 'pinned' && activeFilters.pinned === (stat.filterValue === 'true'))
     );
     
     return (

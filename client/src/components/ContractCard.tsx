@@ -30,7 +30,9 @@ import {
   ChevronRight,
   Tag,
   Save,
-  Check
+  Check,
+  Pin,
+  Star
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -170,7 +172,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
                 to={`/contract/${contract.id}`}
                 className="hover:underline cursor-pointer"
               >
-                {!isValidCategory(contract.category) && '📌 '}{contract.name}
+                {!isValidCategory(contract.category) && <Pin className="h-4 w-4 inline mr-2 text-red-600" />}
+                {contract.name}
               </Link>
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-1">{contract.company}</p>
@@ -183,7 +186,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
               Updated {formatRelativeTime(contract.updatedAt)}
             </p>
           </div>
-          <div className={`flex gap-1 sm:gap-2 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+          <div className={`flex gap-1 sm:gap-2 ${isMobile ? 'opacity-100' : (contract.pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100')} transition-opacity`}>
             <Button
               variant="outline"
               size="sm"
@@ -194,6 +197,23 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
               <Link to={`/contract/${contract.id}`}>
                 <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
               </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (onUpdate) {
+                  onUpdate(contract.id, { pinned: !contract.pinned });
+                }
+              }}
+              className={`h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors ${
+                contract.pinned 
+                  ? 'bg-yellow-100 border-yellow-300 text-yellow-700 hover:bg-yellow-200' 
+                  : 'hover:bg-yellow-50 hover:border-yellow-200'
+              }`}
+              title={contract.pinned ? 'Unpin contract' : 'Pin contract'}
+            >
+              <Star className={`h-3 w-3 sm:h-4 sm:w-4 ${contract.pinned ? 'fill-current' : ''}`} />
             </Button>
             <Button
               variant="outline"

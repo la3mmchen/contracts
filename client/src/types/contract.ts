@@ -32,6 +32,7 @@ export interface Contract {
   notes?: string;
   tags?: string[];
   needsMoreInfo?: boolean; // Flag to indicate contract needs more information
+  pinned?: boolean; // Flag to pin contract to the top of the list
   priceChanges?: PriceChange[]; // Array of amount changes over time
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
@@ -56,6 +57,7 @@ export interface ContractFilters {
   searchTerm?: string;
   tags?: string[];
   needsMoreInfo?: boolean;
+  pinned?: boolean;
   sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {
@@ -96,6 +98,7 @@ export interface CreateContractRequest {
   notes?: string;
   tags?: string[];
   needsMoreInfo?: boolean;
+  pinned?: boolean;
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
 }

@@ -32,6 +32,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       frequency: undefined,
       tags: undefined,
       needsMoreInfo: undefined,
+      pinned: undefined,
       sortBy: 'name'
     });
   };
@@ -44,6 +45,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
     if (filters.frequency) count++;
     if (filters.tags && filters.tags.length > 0) count++;
     if (filters.needsMoreInfo !== undefined) count++;
+    if (filters.pinned !== undefined) count++;
     return count;
   };
 
@@ -63,7 +65,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
 
       {/* All Filter Options - Responsive Layout */}
       <div className="bg-muted/50 rounded-lg p-4 border w-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <div>
             <Label htmlFor="status-filter" className="text-sm font-medium">Status</Label>
             <Select value={filters.status || 'all'} onValueChange={(value) => updateFilter('status', value === 'all' ? undefined : value)}>
@@ -130,6 +132,20 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
           </div>
 
           <div>
+            <Label htmlFor="pinned-filter" className="text-sm font-medium">Pinned</Label>
+            <Select value={filters.pinned === undefined ? 'all' : filters.pinned.toString()} onValueChange={(value) => updateFilter('pinned', value === 'all' ? undefined : value === 'true')}>
+              <SelectTrigger id="pinned-filter" className="w-full">
+                <SelectValue placeholder="All Contracts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Contracts</SelectItem>
+                <SelectItem value="true">Pinned Only</SelectItem>
+                <SelectItem value="false">Not Pinned</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <Label htmlFor="tags-filter" className="text-sm font-medium">Tags</Label>
             <Select value={filters.tags?.[0] || 'all'} onValueChange={(value) => updateFilter('tags', value === 'all' ? undefined : [value])}>
               <SelectTrigger id="tags-filter" className="w-full">
@@ -172,6 +188,12 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
           {filters.needsMoreInfo !== undefined && (
             <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('needsMoreInfo')}>
               Needs More Info: {filters.needsMoreInfo ? 'Yes' : 'No'}
+              <X className="h-3 w-3 ml-1" />
+            </Badge>
+          )}
+          {filters.pinned !== undefined && (
+            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('pinned')}>
+              Pinned: {filters.pinned ? 'Yes' : 'No'}
               <X className="h-3 w-3 ml-1" />
             </Badge>
           )}

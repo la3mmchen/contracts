@@ -130,10 +130,19 @@ const Index = () => {
       }
     }
 
+    // Apply pinned filter
+    if (filters.pinned !== undefined) {
+      filtered = filtered.filter(contract => contract.pinned === filters.pinned);
+    }
+
     // Apply sorting
     const direction = filters.sortOrder === 'asc' ? 1 : -1;
     filtered.sort((a, b) => {
-      // Always prioritize invalid categories first (regardless of sort order)
+      // Always prioritize pinned contracts first
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      
+      // Then prioritize invalid categories (regardless of sort order)
       const aHasInvalidCategory = !isValidCategory(a.category);
       const bHasInvalidCategory = !isValidCategory(b.category);
       
@@ -461,6 +470,18 @@ const Index = () => {
                   searchTerm: '' // Clear search when filtering
                 }));
               }
+            } else if (filterType === 'pinned') {
+              // If clicking the same pinned filter, reset it
+              if (filters.pinned === (value === 'true')) {
+                setFilters(prev => ({ ...prev, pinned: undefined }));
+              } else {
+                // Clear search when applying a pinned filter
+                setFilters(prev => ({ 
+                  ...prev, 
+                  pinned: value === 'true',
+                  searchTerm: '' // Clear search when filtering
+                }));
+              }
             } else if (filterType === 'invalidCategories') {
               // Filter to show only contracts with invalid categories
               const invalidCategoryContracts = contracts.filter(contract => !isValidCategory(contract.category));
@@ -473,6 +494,7 @@ const Index = () => {
                 frequency: undefined,
                 tags: undefined,
                 needsMoreInfo: undefined,
+                pinned: undefined,
                 sortBy: 'createdAt',
                 sortOrder: 'desc'
               }));
@@ -487,7 +509,8 @@ const Index = () => {
           activeFilters={{
             status: filters.status,
             category: filters.category,
-            needsMoreInfo: filters.needsMoreInfo
+            needsMoreInfo: filters.needsMoreInfo,
+            pinned: filters.pinned
           }}
           filters={filters}
           onFiltersChange={(newFilters) => {
@@ -497,7 +520,8 @@ const Index = () => {
               newFilters.category !== filters.category ||
               newFilters.frequency !== filters.frequency ||
               newFilters.tags !== filters.tags ||
-              newFilters.needsMoreInfo !== filters.needsMoreInfo;
+              newFilters.needsMoreInfo !== filters.needsMoreInfo ||
+              newFilters.pinned !== filters.pinned;
             
             if (hasFilterChanges) {
               setFilters({ ...newFilters, searchTerm: '' });
@@ -636,6 +660,28 @@ const Index = () => {
                           setFilters(prev => ({ 
                             ...prev, 
                             tags: [value],
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
+                      } else if (filterType === 'needsMoreInfo') {
+                        // If clicking the same needsMoreInfo filter, reset it
+                        if (filters.needsMoreInfo === (value === 'true')) {
+                          setFilters(prev => ({ ...prev, needsMoreInfo: undefined }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev, 
+                            needsMoreInfo: value === 'true',
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
+                      } else if (filterType === 'pinned') {
+                        // If clicking the same pinned filter, reset it
+                        if (filters.pinned === (value === 'true')) {
+                          setFilters(prev => ({ ...prev, pinned: undefined }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev, 
+                            pinned: value === 'true',
                             searchTerm: '' // Clear search when filtering
                           }));
                         }
