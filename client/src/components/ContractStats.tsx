@@ -131,8 +131,8 @@ export const ContractStats = ({
       filterValue: 'active',
     },
     {
-      title: 'Needs More Info',
-      value: contracts.filter(c => c.needsMoreInfo).length,
+                      title: 'Needs Attention',
+        value: contracts.filter(c => c.needsMoreInfo || c.draft).length,
       icon: AlertTriangle,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100',

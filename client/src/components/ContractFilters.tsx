@@ -118,14 +118,14 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
           </div>
 
           <div>
-            <Label htmlFor="needs-more-info-filter" className="text-sm font-medium">Needs More Info</Label>
+            <Label htmlFor="needs-more-info-filter" className="text-sm font-medium">Contract Status</Label>
             <Select value={filters.needsMoreInfo === undefined ? 'all' : filters.needsMoreInfo.toString()} onValueChange={(value) => updateFilter('needsMoreInfo', value === 'all' ? undefined : value === 'true')}>
               <SelectTrigger id="needs-more-info-filter" className="w-full">
                 <SelectValue placeholder="All Contracts" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Contracts</SelectItem>
-                <SelectItem value="true">Needs More Info</SelectItem>
+                <SelectItem value="true">Needs Attention</SelectItem>
                 <SelectItem value="false">Complete</SelectItem>
               </SelectContent>
             </Select>
@@ -187,7 +187,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
           )}
           {filters.needsMoreInfo !== undefined && (
             <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('needsMoreInfo')}>
-              Needs More Info: {filters.needsMoreInfo ? 'Yes' : 'No'}
+              Contract Status: {filters.needsMoreInfo ? 'Needs Attention' : 'Complete'}
               <X className="h-3 w-3 ml-1" />
             </Badge>
           )}

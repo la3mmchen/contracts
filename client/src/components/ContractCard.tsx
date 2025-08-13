@@ -644,9 +644,11 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
       id={`contract-${contract.id}`}
       className={`group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in ${
         hasInvalidCategory ? 'border-red-300 bg-red-50/30' : ''
-      } ${isRecentlyUpdated && !hasInvalidCategory ? 'border-blue-300 bg-blue-50/30' : ''} ${
-        isStale && !hasInvalidCategory ? 'border-red-200 bg-red-50/20' : ''
-      } ${isOld && !isStale && !hasInvalidCategory ? 'border-yellow-200 bg-yellow-50/20' : ''}`}>
+      } ${contract.draft ? 'border-blue-300 bg-blue-50/30' : ''} ${
+        isRecentlyUpdated && !hasInvalidCategory && !contract.draft ? 'border-blue-300 bg-blue-50/30' : ''
+      } ${isStale && !hasInvalidCategory && !contract.draft ? 'border-red-200 bg-red-50/20' : ''} ${
+        isOld && !isStale && !hasInvalidCategory && !contract.draft ? 'border-yellow-200 bg-yellow-50/20' : ''
+      }`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -700,6 +702,17 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
                 </Link>
               )}
             </CardTitle>
+            
+            {/* Draft indicator - show prominently for draft contracts */}
+            {contract.draft && (
+              <div className="flex items-center gap-1 mt-1">
+                <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200">
+                  <FileText className="h-3 w-3 mr-1" />
+                  Draft Contract
+                </span>
+              </div>
+            )}
+            
             {isDetailPage && isEditingCompany ? (
               <div className="flex items-center gap-2 mt-1" data-editable="true">
                 <Input
@@ -945,6 +958,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
             <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200">
               <AlertTriangle className="h-3 w-3 mr-1" />
               Needs Info
+            </span>
+          )}
+          
+          {contract.draft && (
+            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200">
+              <FileText className="h-3 w-3 mr-1" />
+              Draft
             </span>
           )}
         </div>

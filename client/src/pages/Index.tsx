@@ -83,6 +83,8 @@ const Index = () => {
     return Array.from(tagsSet).sort();
   }, [contracts]);
 
+
+
   const filteredContracts = useMemo(() => {
     let filtered = contracts;
 
@@ -120,14 +122,14 @@ const Index = () => {
       );
     }
 
-    // Apply needsMoreInfo filter
+    // Apply needsMoreInfo filter (now includes draft contracts)
     if (filters.needsMoreInfo !== undefined) {
       if (filters.needsMoreInfo === false) {
-        // "Complete" should show contracts where needsMoreInfo is false OR null/undefined
-        filtered = filtered.filter(contract => !contract.needsMoreInfo);
+        // "Complete" should show contracts where needsMoreInfo is false OR null/undefined AND not draft
+        filtered = filtered.filter(contract => !contract.needsMoreInfo && !contract.draft);
       } else {
-        // "Needs Info" should show contracts where needsMoreInfo is explicitly true
-        filtered = filtered.filter(contract => contract.needsMoreInfo === true);
+        // "Needs Attention" should show contracts where needsMoreInfo is true OR draft is true
+        filtered = filtered.filter(contract => contract.needsMoreInfo === true || contract.draft === true);
       }
     }
 
@@ -459,11 +461,11 @@ const Index = () => {
             if (filterType === 'status') {
               // If clicking the same status filter, reset it
               if (filters.status === value) {
-                setFilters(prev => ({ ...prev, status: undefined }));
+                setFilters(prev => ({ ...prev, status: undefined, searchTerm: '' }));
               } else {
                 // Clear search when applying a status filter
                 setFilters(prev => ({ 
-                  ...prev, 
+                  ...prev,
                   status: value as Contract['status'],
                   searchTerm: '' // Clear search when filtering
                 }));
@@ -471,11 +473,11 @@ const Index = () => {
             } else if (filterType === 'category') {
               // If clicking the same category filter, reset it
               if (filters.category === value) {
-                setFilters(prev => ({ ...prev, category: undefined }));
+                setFilters(prev => ({ ...prev, category: undefined, searchTerm: '' }));
               } else {
                 // Clear search when applying a category filter
                 setFilters(prev => ({ 
-                  ...prev, 
+                  ...prev,
                   category: value as Contract['category'],
                   searchTerm: '' // Clear search when filtering
                 }));
@@ -483,11 +485,11 @@ const Index = () => {
             } else if (filterType === 'tags') {
               // If clicking the same tag filter, reset it
               if (filters.tags?.includes(value)) {
-                setFilters(prev => ({ ...prev, tags: undefined }));
+                setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }));
               } else {
                 // Clear search when applying a tag filter
                 setFilters(prev => ({ 
-                  ...prev, 
+                  ...prev,
                   tags: [value],
                   searchTerm: '' // Clear search when filtering
                 }));
@@ -495,11 +497,11 @@ const Index = () => {
             } else if (filterType === 'needsMoreInfo') {
               // If clicking the same needsMoreInfo filter, reset it
               if (filters.needsMoreInfo === (value === 'true')) {
-                setFilters(prev => ({ ...prev, needsMoreInfo: undefined }));
+                setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
               } else {
                 // Clear search when applying a needsMoreInfo filter
                 setFilters(prev => ({ 
-                  ...prev, 
+                  ...prev,
                   needsMoreInfo: value === 'true',
                   searchTerm: '' // Clear search when filtering
                 }));
@@ -507,11 +509,11 @@ const Index = () => {
             } else if (filterType === 'pinned') {
               // If clicking the same pinned filter, reset it
               if (filters.pinned === (value === 'true')) {
-                setFilters(prev => ({ ...prev, pinned: undefined }));
+                setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }));
               } else {
                 // Clear search when applying a pinned filter
                 setFilters(prev => ({ 
-                  ...prev, 
+                  ...prev,
                   pinned: value === 'true',
                   searchTerm: '' // Clear search when filtering
                 }));
@@ -533,11 +535,12 @@ const Index = () => {
                 sortOrder: 'desc'
               }));
             } else if (filterType === 'reset') {
-              setFilters({
+              setFilters(prev => ({
+                ...prev,
                 searchTerm: '',
                 sortBy: 'createdAt',
                 sortOrder: 'desc'
-              });
+              }));
             }
           }}
           activeFilters={{
@@ -668,10 +671,10 @@ const Index = () => {
                       if (filterType === 'status') {
                         // If clicking the same status filter, reset it
                         if (filters.status === value) {
-                          setFilters(prev => ({ ...prev, status: undefined }));
+                          setFilters(prev => ({ ...prev, status: undefined, searchTerm: '' }));
                         } else {
                           setFilters(prev => ({ 
-                            ...prev, 
+                            ...prev,
                             status: value as Contract['status'],
                             searchTerm: '' // Clear search when filtering
                           }));
@@ -679,10 +682,10 @@ const Index = () => {
                       } else if (filterType === 'category') {
                         // If clicking the same category filter, reset it
                         if (filters.category === value) {
-                          setFilters(prev => ({ ...prev, category: undefined }));
+                          setFilters(prev => ({ ...prev, category: undefined, searchTerm: '' }));
                         } else {
                           setFilters(prev => ({ 
-                            ...prev, 
+                            ...prev,
                             category: value as Contract['category'],
                             searchTerm: '' // Clear search when filtering
                           }));
@@ -690,10 +693,10 @@ const Index = () => {
                       } else if (filterType === 'tags') {
                         // If clicking the same tag filter, reset it
                         if (filters.tags?.includes(value)) {
-                          setFilters(prev => ({ ...prev, tags: undefined }));
+                          setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }));
                         } else {
                           setFilters(prev => ({ 
-                            ...prev, 
+                            ...prev,
                             tags: [value],
                             searchTerm: '' // Clear search when filtering
                           }));
@@ -701,10 +704,10 @@ const Index = () => {
                       } else if (filterType === 'needsMoreInfo') {
                         // If clicking the same needsMoreInfo filter, reset it
                         if (filters.needsMoreInfo === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, needsMoreInfo: undefined }));
+                          setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
                         } else {
                           setFilters(prev => ({ 
-                            ...prev, 
+                            ...prev,
                             needsMoreInfo: value === 'true',
                             searchTerm: '' // Clear search when filtering
                           }));
@@ -712,10 +715,10 @@ const Index = () => {
                       } else if (filterType === 'pinned') {
                         // If clicking the same pinned filter, reset it
                         if (filters.pinned === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, pinned: undefined }));
+                          setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }));
                         } else {
                           setFilters(prev => ({ 
-                            ...prev, 
+                            ...prev,
                             pinned: value === 'true',
                             searchTerm: '' // Clear search when filtering
                           }));
