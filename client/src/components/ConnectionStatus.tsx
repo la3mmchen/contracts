@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RefreshCw, Wifi, WifiOff, AlertTriangle, CheckCircle } from 'lucide-react';
+import { RefreshCw, Wifi, WifiOff, AlertTriangle, CheckCircle, Loader2, XCircle } from 'lucide-react';
 
 interface ConnectionStatusProps {
   onStatusChange?: (isConnected: boolean) => void;
@@ -76,25 +76,29 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const getStatusIcon = () => {
+  const getStatusIcon = (status: 'checking' | 'connected' | 'error') => {
     switch (status) {
       case 'checking':
-        return <RefreshCw className="h-4 w-4 animate-spin" />;
+        return <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />;
       case 'connected':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />;
       case 'error':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
+      default:
+        return <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />;
     }
   };
 
-  const getStatusColor = () => {
+  const getStatusClasses = (status: 'checking' | 'connected' | 'error') => {
     switch (status) {
       case 'checking':
-        return 'bg-blue-50 border-blue-200 text-blue-800';
+        return 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-200';
       case 'connected':
-        return 'bg-green-50 border-green-200 text-green-800';
+        return 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/30 dark:border-green-800 dark:text-green-200';
       case 'error':
-        return 'bg-red-50 border-red-200 text-red-800';
+        return 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-200';
+      default:
+        return 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-200';
     }
   };
 
@@ -138,7 +142,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
         <div className="space-y-4">
           {/* Status Badge */}
           <div className="flex items-center gap-2">
-            {getStatusIcon()}
+            {getStatusIcon(status)}
             <Badge variant={status === 'checking' ? 'default' : 'destructive'}>
               {status === 'checking' && 'Checking...'}
               {status === 'error' && 'Connection Error'}
@@ -147,7 +151,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
 
           {/* Status Message - Only show when there's an error */}
           {status === 'error' && details && (
-            <Alert className={getStatusColor()}>
+            <Alert className={getStatusClasses(status)}>
               <AlertTitle>Connection Issue</AlertTitle>
               <AlertDescription>
                 {details.message}
@@ -181,9 +185,9 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
 
           {/* Troubleshooting Tips */}
           {status === 'error' && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <h4 className="font-medium text-yellow-800 mb-2">Troubleshooting Tips:</h4>
-              <ul className="text-sm text-yellow-700 space-y-1">
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/30 dark:border-yellow-800">
+              <h4 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">Troubleshooting Tips:</h4>
+              <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
                 <li>• Check if the API server is running</li>
                 <li>• Verify the API URL configuration</li>
                 <li>• Check network connectivity</li>

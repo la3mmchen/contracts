@@ -97,6 +97,155 @@
     --input: 0 0% 90%;
     --ring: 0 0% 0%;
   }
+
+  /* Black and white theme overrides for colored components */
+  .black-and-white .bg-green-100,
+  .black-and-white .bg-green-50,
+  .black-and-white .bg-blue-100,
+  .black-and-white .bg-blue-50,
+  .black-and-white .bg-yellow-100,
+  .black-and-white .bg-yellow-50,
+  .black-and-white .bg-red-100,
+  .black-and-white .bg-red-50,
+  .black-and-white .bg-gray-100,
+  .black-and-white .bg-gray-50 {
+    background-color: hsl(var(--muted)) !important;
+  }
+
+  .black-and-white .text-green-800,
+  .black-and-white .text-green-600,
+  .black-and-white .text-blue-800,
+  .black-and-white .text-blue-600,
+  .black-and-white .text-yellow-800,
+  .black-and-white .text-yellow-600,
+  .black-and-white .text-red-800,
+  .black-and-white .text-red-600,
+  .black-and-white .text-gray-800,
+  .black-and-white .text-gray-600 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .black-and-white .border-green-200,
+  .black-and-white .border-blue-200,
+  .black-and-white .border-yellow-200,
+  .black-and-white .border-red-200,
+  .black-and-white .border-gray-200 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  .black-and-white .dark\:bg-green-900\/30,
+  .black-and-white .dark\:bg-blue-900\/30,
+  .black-and-white .dark\:bg-yellow-900\/30,
+  .black-and-white .dark\:bg-red-900\/30,
+  .black-and-white .dark\:bg-gray-900\/30 {
+    background-color: hsl(var(--muted)) !important;
+  }
+
+  .black-and-white .dark\:text-green-200,
+  .black-and-white .dark\:text-blue-200,
+  .black-and-white .dark\:text-yellow-200,
+  .black-and-white .dark\:text-red-200,
+  .black-and-white .dark\:text-gray-200 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .black-and-white .dark\:border-green-800,
+  .black-and-white .dark\:border-blue-800,
+  .black-and-white .dark\:border-yellow-800,
+  .black-and-white .dark\:border-red-800,
+  .black-and-white .dark\:border-gray-800 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Category color overrides for black-and-white theme */
+  .black-and-white .bg-red-100,
+  .black-and-white .bg-pink-100,
+  .black-and-white .bg-purple-100,
+  .black-and-white .bg-indigo-100,
+  .black-and-white .bg-cyan-100,
+  .black-and-white .bg-teal-100,
+  .black-and-white .bg-emerald-100,
+  .black-and-white .bg-lime-100,
+  .black-and-white .bg-amber-100,
+  .black-and-white .bg-orange-100,
+  .black-and-white .bg-rose-100,
+  .black-and-white .bg-slate-100,
+  .black-and-white .bg-zinc-100,
+  .black-and-white .bg-stone-100,
+  .black-and-white .bg-violet-100,
+  .black-and-white .bg-fuchsia-100,
+  .black-and-white .bg-sky-100 {
+    background-color: hsl(var(--muted)) !important;
+  }
+
+  .black-and-white .text-red-600,
+  .black-and-white .text-pink-600,
+  .black-and-white .text-purple-600,
+  .black-and-white .text-indigo-600,
+  .black-and-white .text-cyan-600,
+  .black-and-white .text-teal-600,
+  .black-and-white .text-emerald-600,
+  .black-and-white .text-lime-600,
+  .black-and-white .text-amber-600,
+  .black-and-white .text-orange-600,
+  .black-and-white .text-rose-600,
+  .black-and-white .text-slate-600,
+  .black-and-white .text-zinc-600,
+  .black-and-white .text-stone-600,
+  .black-and-white .text-violet-600,
+  .black-and-white .text-fuchsia-600,
+  .black-and-white .text-sky-600 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .black-and-white .border-red-200,
+  .black-and-white .border-pink-200,
+  .black-and-white .border-purple-200,
+  .black-and-white .border-indigo-200,
+  .black-and-white .border-cyan-200,
+  .black-and-white .border-teal-200,
+  .black-and-white .border-emerald-200,
+  .black-and-white .border-lime-200,
+  .black-and-white .border-amber-200,
+  .black-and-white .border-orange-200,
+  .black-and-white .border-rose-200,
+  .black-and-white .border-slate-200,
+  .black-and-white .border-zinc-200,
+  .black-and-white .border-stone-200,
+  .black-and-white .border-violet-200,
+  .black-and-white .border-fuchsia-200,
+  .black-and-white .border-sky-200 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Header overrides for black-and-white theme */
+  .black-and-white .bg-primary {
+    background-color: hsl(0 0% 0%) !important; /* Pure black */
+  }
+
+  .black-and-white .text-primary-foreground {
+    color: hsl(0 0% 100%) !important; /* Pure white */
+  }
+
+  .black-and-white .border-primary-foreground\/20,
+  .black-and-white .border-primary-foreground\/40 {
+    border-color: hsl(0 0% 100% / 0.2) !important; /* White with opacity */
+  }
+
+  .black-and-white .bg-primary-foreground\/10,
+  .black-and-white .bg-primary-foreground\/20,
+  .black-and-white .bg-primary-foreground\/30 {
+    background-color: hsl(0 0% 100% / 0.1) !important; /* White with opacity */
+  }
+
+  .black-and-white .hover\:bg-primary-foreground\/20:hover,
+  .black-and-white .hover\:bg-primary-foreground\/30:hover {
+    background-color: hsl(0 0% 100% / 0.2) !important; /* White with opacity on hover */
+  }
+
+  .black-and-white .hover\:border-primary-foreground\/40:hover {
+    border-color: hsl(0 0% 100% / 0.4) !important; /* White with opacity on hover */
+  }
 }
 
 @layer base {

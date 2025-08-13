@@ -61,11 +61,11 @@ interface ContractCardProps {
 }
 
 const statusColors = {
-  active: 'bg-green-100 text-green-800 border-green-200',
-  expired: 'bg-red-100 text-red-800 border-red-200',
-  cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
-  closed: 'bg-gray-100 text-gray-800 border-gray-200',
-  terminated: 'bg-gray-100 text-gray-800 border-gray-200',
+  active: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800',
+  expired: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800',
+  cancelled: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
+  closed: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
+  terminated: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
 };
 
 export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate, isDetailPage = false, onInlineEditingChange }: ContractCardProps) => {
@@ -642,13 +642,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   return (
     <Card 
       id={`contract-${contract.id}`}
-      className={`group hover:shadow-card transition-all duration-300 bg-gradient-card border-border/50 animate-fade-in ${
-        hasInvalidCategory ? 'border-red-300 bg-red-50/30' : ''
-      } ${contract.draft ? 'border-blue-300 bg-blue-50/30' : ''} ${
-        isRecentlyUpdated && !hasInvalidCategory && !contract.draft ? 'border-blue-300 bg-blue-50/30' : ''
-      } ${isStale && !hasInvalidCategory && !contract.draft ? 'border-red-200 bg-red-50/20' : ''} ${
-        isOld && !isStale && !hasInvalidCategory && !contract.draft ? 'border-yellow-200 bg-yellow-50/20' : ''
-      }`}>
+      className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
+        contract.draft ? 'border-border bg-muted/30' : ''
+      } ${
+        isRecentlyUpdated && !hasInvalidCategory && !contract.draft ? 'border-border bg-muted/30' : ''
+      } ${
+        isOld && !isStale && !hasInvalidCategory && !contract.draft ? 'border-border bg-muted/20' : ''
+      } ${isStale && !hasInvalidCategory ? 'border-destructive bg-destructive/10' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -707,13 +707,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
             {(contract.draft || contract.needsMoreInfo) && (
               <div className="flex items-center gap-2 mt-1">
                 {contract.draft && (
-                  <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200">
+                  <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800">
                     <FileText className="h-3 w-3 mr-1" />
                     Draft
                   </span>
                 )}
                 {contract.needsMoreInfo && (
-                  <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200">
+                  <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-800">
                     <AlertTriangle className="h-3 w-3 mr-1" />
                     Needs Info
                   </span>
@@ -767,8 +767,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               ID: {contract.contractId}
             </p>
             <p className={`text-xs text-muted-foreground mt-1 flex items-center gap-1 ${isOld || isStale ? 'font-semibold' : ''}`}>
-              {isStale && <AlertTriangle className="h-3 w-3 text-red-600" />}
-              {isOld && !isStale && <Clock3 className="h-3 w-3 text-yellow-600" />}
+              {isStale && <AlertTriangle className="h-3 w-3 text-destructive" />}
+              {isOld && !isStale && <Clock3 className="h-3 w-3 text-muted-foreground" />}
               Updated {formatRelativeTime(contract.updatedAt)}
             </p>
           </div>
@@ -798,7 +798,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               variant="outline"
               size="sm"
               onClick={handleCopyContract}
-              className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-blue-50 hover:border-blue-200"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors hover:bg-muted hover:border-border"
               title="Copy contract"
             >
               <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -807,7 +807,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               variant="outline"
               size="sm"
               onClick={() => onDelete(contract.id)}
-              className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-foreground"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors hover:bg-muted hover:border-border"
               title="Delete contract"
             >
               <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
