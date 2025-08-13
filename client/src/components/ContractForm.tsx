@@ -15,13 +15,14 @@ import { Plus, X, FileEdit } from 'lucide-react';
 
 interface ContractFormProps {
   contract?: Contract;
+  isCopying?: boolean; // New prop to indicate if we're copying a contract
   onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => void;
   onCancel: () => void;
   onDirtyStateChange?: (isDirty: boolean) => void;
 }
 
-export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
-  const isEditing = !!contract;
+export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
+  const isEditing = !!contract && !isCopying;
   
   // Get available options and determine smart defaults
   const availableCategories = getCategories();
@@ -706,7 +707,7 @@ export const ContractForm = ({ contract, onSubmit, onCancel, onDirtyStateChange 
             color: 'white'
           }}
         >
-          {contract ? 'Update Contract' : formData.draft ? 'Create Draft' : 'Add Contract'}
+          {isCopying ? 'Create Copy' : contract ? 'Update Contract' : formData.draft ? 'Create Draft' : 'Add Contract'}
         </Button>
       </div>
     </form>

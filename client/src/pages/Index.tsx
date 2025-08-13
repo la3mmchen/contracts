@@ -44,6 +44,7 @@ const Index = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | undefined>();
+  const [isCopying, setIsCopying] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
@@ -220,6 +221,37 @@ const Index = () => {
     }
   };
 
+  const handleCopyContract = (contract: Contract) => {
+    // Create a copy of the contract with modified fields
+    const contractCopy = {
+      ...contract,
+      contractId: `${contract.contractId}-copy`,
+      name: `${contract.name} (Copy)`,
+      startDate: new Date().toISOString().split('T')[0], // Today's date
+      status: 'active' as const,
+      pinned: false,
+      draft: false,
+      needsMoreInfo: false,
+      // Remove fields that shouldn't be copied
+      id: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+      priceChanges: [], // Start fresh with no price changes
+    };
+    
+    // Remove the fields we don't want to copy
+    const { id, createdAt, updatedAt, priceChanges, ...copyData } = contractCopy;
+    
+    // Open the form with the copied data
+    setEditingContract(undefined); // Clear any existing edit
+    setIsFormOpen(true);
+    setIsFormDirty(false);
+    setIsCopying(true);
+    
+    // Set the form data to the copied contract
+    setEditingContract(copyData as any);
+  };
+
   const handleDeleteContract = () => {
     if (deleteConfirmId) {
       deleteContract(deleteConfirmId);
@@ -257,6 +289,7 @@ const Index = () => {
       if (!open) {
         setEditingContract(undefined);
         setIsFormDirty(false);
+        setIsCopying(false);
       }
     }
   };
@@ -347,12 +380,13 @@ const Index = () => {
                 <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>
-                      {editingContract ? 'Edit Contract' : 'Add New Contract'}
+                      {editingContract && editingContract.id ? 'Edit Contract' : editingContract ? 'Copy Contract' : 'Add New Contract'}
                     </DialogTitle>
                   </DialogHeader>
                   <ContractForm
                     contract={editingContract}
-                    onSubmit={editingContract ? handleEditContract : handleAddContract}
+                    isCopying={isCopying}
+                    onSubmit={editingContract && editingContract.id ? handleEditContract : handleAddContract}
                     onCancel={() => handleDialogClose(false)}
                     onDirtyStateChange={setIsFormDirty}
                   />
@@ -628,6 +662,7 @@ const Index = () => {
                     contract={contract}
                     onEdit={openEditForm}
                     onDelete={(id) => setDeleteConfirmId(id)}
+                    onCopy={handleCopyContract}
                     onUpdate={updateContract}
                     onFilter={(filterType, value) => {
                       if (filterType === 'status') {

@@ -33,7 +33,8 @@ import {
   Save,
   Check,
   Pin,
-  Star
+  Star,
+  Copy
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -48,6 +49,7 @@ interface ContractCardProps {
   contract: Contract;
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
+  onCopy?: (contract: Contract) => void; // New prop for copying contracts
 
   onFilter?: (filterType: string, value: string) => void;
   defaultExpandCustomFields?: boolean;
@@ -66,7 +68,7 @@ const statusColors = {
   terminated: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate, isDetailPage = false, onInlineEditingChange }: ContractCardProps) => {
+export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate, isDetailPage = false, onInlineEditingChange }: ContractCardProps) => {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
   const [isPriceChangesOpen, setIsPriceChangesOpen] = useState(defaultExpandPriceChanges);
   const [isPaymentsOpen, setIsPaymentsOpen] = useState(defaultExpandPayments);
@@ -205,6 +207,12 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
       handleAmountSave();
     } else if (e.key === 'Escape') {
       handleAmountCancel();
+    }
+  };
+
+  const handleCopyContract = () => {
+    if (onCopy) {
+      onCopy(contract);
     }
   };
 
@@ -743,7 +751,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
               Updated {formatRelativeTime(contract.updatedAt)}
             </p>
           </div>
-          <div className={`flex gap-1 sm:gap-2 ${isMobile ? 'opacity-100' : (contract.pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100')} transition-opacity`}>
+          {/* Action buttons - only visible on hover for all contracts */}
+          <div className={`flex gap-1 sm:gap-2 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
             <Button
               variant="outline"
               size="sm"
@@ -758,30 +767,49 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                if (onUpdate) {
-                  onUpdate(contract.id, { pinned: !contract.pinned });
-                }
-              }}
-              className={`h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors ${
-                contract.pinned 
-                  ? 'bg-yellow-100 border-yellow-300 text-yellow-700 hover:bg-yellow-200' 
-                  : 'hover:bg-yellow-50 hover:border-yellow-200'
-              }`}
-              title={contract.pinned ? 'Unpin contract' : 'Pin contract'}
-            >
-              <Star className={`h-3 w-3 sm:h-4 sm:w-4 ${contract.pinned ? 'fill-current' : ''}`} />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={() => onEdit(contract)}
               className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="Edit contract"
             >
               <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
-
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopyContract}
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-blue-50 hover:border-blue-200"
+              title="Copy contract"
+            >
+              <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(contract.id)}
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-foreground"
+              title="Delete contract"
+            >
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            
+            {/* Star button for non-starred contracts - only visible on hover */}
+            {!contract.pinned && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (onUpdate) {
+                    onUpdate(contract.id, { pinned: !contract.pinned });
+                  }
+                }}
+                className="h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors hover:bg-yellow-50 hover:border-yellow-200"
+                title="Pin contract"
+              >
+                <Star className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            )}
+            
+            {/* Close button for expired contracts - positioned after star */}
             {contract.status === 'expired' && (
               <Button
                 variant="outline"
@@ -792,22 +820,30 @@ export const ContractCard = ({ contract, onEdit, onDelete, onFilter, defaultExpa
                     onUpdate(contract.id, { ...contract, status: 'closed' });
                   }
                 }}
-                className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-foreground"
+                className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-200"
                 title="Close contract"
               >
                 <X className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             )}
+          </div>
+          
+          {/* Star button for starred contracts - always visible, positioned on the far right */}
+          {contract.pinned && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onDelete(contract.id)}
-              className="h-8 w-8 p-0 sm:h-9 sm:w-9 hover:bg-destructive hover:text-destructive-foreground"
-              title="Delete contract"
+              onClick={() => {
+                if (onUpdate) {
+                  onUpdate(contract.id, { pinned: !contract.pinned });
+                }
+              }}
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors bg-yellow-100 border-yellow-300 text-yellow-700 hover:bg-yellow-200"
+              title="Unpin contract"
             >
-              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current" />
             </Button>
-          </div>
+          )}
         </div>
       </CardHeader>
 
