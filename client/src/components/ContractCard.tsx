@@ -703,13 +703,21 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               )}
             </CardTitle>
             
-            {/* Draft indicator - show prominently for draft contracts */}
-            {contract.draft && (
-              <div className="flex items-center gap-1 mt-1">
-                <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200">
-                  <FileText className="h-3 w-3 mr-1" />
-                  Draft Contract
-                </span>
+            {/* Draft and Needs Info indicators - show prominently below contract name */}
+            {(contract.draft || contract.needsMoreInfo) && (
+              <div className="flex items-center gap-2 mt-1">
+                {contract.draft && (
+                  <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200">
+                    <FileText className="h-3 w-3 mr-1" />
+                    Draft
+                  </span>
+                )}
+                {contract.needsMoreInfo && (
+                  <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Needs Info
+                  </span>
+                )}
               </div>
             )}
             
@@ -954,19 +962,9 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
             </span>
           )}
           
-          {contract.needsMoreInfo && (
-            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200">
-              <AlertTriangle className="h-3 w-3 mr-1" />
-              Needs Info
-            </span>
-          )}
+
           
-          {contract.draft && (
-            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 border-blue-200">
-              <FileText className="h-3 w-3 mr-1" />
-              Draft
-            </span>
-          )}
+
         </div>
 
         {/* Invalid Category Warning */}

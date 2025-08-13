@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { ContractFilters } from '@/components/ContractFilters';
 import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
@@ -59,6 +60,7 @@ export const ContractStats = ({
     clickable: boolean;
     filterType?: string;
     filterValue?: string;
+    tooltip?: string;
   };
 
   const generateCategoryStats = (): StatItem[] => {
@@ -131,14 +133,43 @@ export const ContractStats = ({
       filterValue: 'active',
     },
     {
-                      title: 'Needs Attention',
-        value: contracts.filter(c => c.needsMoreInfo || c.draft).length,
+      title: 'Needs Attention',
+      value: contracts.filter(c => c.needsMoreInfo || c.draft).length,
       icon: AlertTriangle,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100',
       clickable: true,
       filterType: 'needsMoreInfo',
       filterValue: 'true',
+    },
+    {
+      title: 'Monthly Spend',
+      value: `$${contracts
+        .filter(c => c.status === 'active')
+        .reduce((total, contract) => {
+          switch (contract.frequency) {
+            case 'monthly':
+              return total + contract.amount;
+            case 'quarterly':
+              return total + (contract.amount / 3);
+            case 'yearly':
+              return total + (contract.amount / 12);
+            case 'weekly':
+              return total + (contract.amount * 4.33);
+            case 'bi-weekly':
+              return total + (contract.amount * 2.17);
+            case 'one-time':
+              return total + (contract.amount / 12); // Spread over a year
+            default:
+              return total;
+          }
+        }, 0)
+        .toFixed(0)}`,
+      icon: Coins,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+      clickable: false,
+      tooltip: 'Rough estimate • Based on active contracts only • For planning purposes',
     },
 
     ...generateCategoryStats(),
@@ -154,7 +185,7 @@ export const ContractStats = ({
       (stat.filterType === 'pinned' && activeFilters.pinned === (stat.filterValue === 'true'))
     );
     
-    return (
+    const cardContent = (
       <Card 
         key={`${stat.filterType}-${index}`}
         className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
@@ -181,6 +212,24 @@ export const ContractStats = ({
         </CardContent>
       </Card>
     );
+
+    // If the stat has a tooltip, wrap it with a tooltip
+    if (stat.tooltip) {
+      return (
+        <TooltipProvider key={`${stat.filterType}-${index}`}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {cardContent}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{stat.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+
+    return cardContent;
   };
 
   // Helper function to render compact category cards
@@ -226,7 +275,7 @@ export const ContractStats = ({
         
         <TabsContent value="overview" className="space-y-2">
           {/* Main Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
             {stats.filter(stat => stat.filterType !== 'category').map((stat, index) => 
               renderStatCard(stat, index)
             )}

@@ -555,24 +555,14 @@ const Index = () => {
               // Filter to show only contracts with invalid categories
               const invalidCategoryContracts = contracts.filter(contract => !isValidCategory(contract.category));
               const invalidCategories = [...new Set(invalidCategoryContracts.map(c => c.category))];
-              setFilters(prev => ({
+              setFilters(prev => ({ 
                 ...prev,
                 searchTerm: invalidCategories.join(' '),
-                status: undefined,
                 category: undefined,
-                frequency: undefined,
+                status: undefined,
                 tags: undefined,
                 needsMoreInfo: undefined,
-                pinned: undefined,
-                sortBy: 'createdAt',
-                sortOrder: 'desc'
-              }));
-            } else if (filterType === 'reset') {
-              setFilters(prev => ({
-                ...prev,
-                searchTerm: '',
-                sortBy: 'createdAt',
-                sortOrder: 'desc'
+                pinned: undefined
               }));
             }
           }}
@@ -583,22 +573,7 @@ const Index = () => {
             pinned: filters.pinned
           }}
           filters={filters}
-          onFiltersChange={(newFilters) => {
-            // Clear search when any filter is applied through ContractFilters
-            const hasFilterChanges = 
-              newFilters.status !== filters.status ||
-              newFilters.category !== filters.category ||
-              newFilters.frequency !== filters.frequency ||
-              newFilters.tags !== filters.tags ||
-              newFilters.needsMoreInfo !== filters.needsMoreInfo ||
-              newFilters.pinned !== filters.pinned;
-            
-            if (hasFilterChanges) {
-              setFilters({ ...newFilters, searchTerm: '' });
-            } else {
-              setFilters(newFilters);
-            }
-          }}
+          onFiltersChange={setFilters}
           availableTags={availableTags}
         />
 
