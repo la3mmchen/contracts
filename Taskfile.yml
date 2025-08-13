@@ -145,3 +145,54 @@ tasks:
       - echo ""
       - echo "💡 Each contract is now exported as a separate .md file in the ZIP"
       - echo "📁 Individual files use contractId as filename (e.g., UTL-2024-003.md)"
+
+  test-backup:
+    desc: Test JSON backup functionality for creating comprehensive backups
+    cmds:
+      - echo "🧪 Testing JSON Backup Functionality..."
+      - echo "📊 Current contract count $(curl -s http://localhost:3001/api/contracts | jq length)"
+      - echo ""
+      - echo "💾 Creating full system backup..."
+      - curl -s http://localhost:3001/api/contracts/export/json -o test-data/exports/full-backup.json
+      - echo "✅ Full backup completed! File full-backup.json"
+      - echo "📊 File size $(wc -c < test-data/exports/full-backup.json | tr -d ' ') bytes"
+      - echo ""
+      - echo "🔍 Testing backup metadata..."
+      - echo "📅 Export date $(curl -s http://localhost:3001/api/contracts/export/json | jq -r '.metadata.exportDate')"
+      - echo "📋 Total contracts $(curl -s http://localhost:3001/api/contracts/export/json | jq -r '.metadata.totalContracts')"
+      - echo "🏷️  Export type $(curl -s http://localhost:3001/api/contracts/export/json | jq -r '.metadata.exportType')"
+      - echo ""
+      - echo "📦 Creating filtered backups..."
+      - echo "   Active contracts only..."
+      - curl -s "http://localhost:3001/api/contracts/export/json?status=active" -o test-data/exports/active-backup.json
+      - echo "   ✅ Active contracts backup active-backup.json"
+      - echo "   📊 File size $(wc -c < test-data/exports/active-backup.json | tr -d ' ') bytes"
+      - echo ""
+      - echo "   Subscription contracts only..."
+      - curl -s "http://localhost:3001/api/contracts/export/json?category=subscription" -o test-data/exports/subscription-backup.json
+      - echo "   ✅ Subscription backup subscription-backup.json"
+      - echo "   📊 File size $(wc -c < test-data/exports/subscription-backup.json | tr -d ' ') bytes"
+      - echo ""
+      - echo "   Monthly contracts only..."
+      - curl -s "http://localhost:3001/api/contracts/export/json?frequency=monthly" -o test-data/exports/monthly-backup.json
+      - echo "   ✅ Monthly contracts backup monthly-backup.json"
+      - echo "   📊 File size $(wc -c < test-data/exports/monthly-backup.json | tr -d ' ') bytes"
+      - echo ""
+      - echo "🔍 Testing combined filters..."
+      - echo "   Active subscription contracts..."
+      - curl -s "http://localhost:3001/api/contracts/export/json?status=active&category=subscription" -o test-data/exports/active-subscription-backup.json
+      - echo "   ✅ Active subscription backup active-subscription-backup.json"
+      - echo "   📊 File size $(wc -c < test-data/exports/active-subscription-backup.json | tr -d ' ') bytes"
+      - echo ""
+      - echo "📋 Available backup files"
+      - ls -la test-data/exports/*backup*.json
+      - echo ""
+      - echo "🔍 Validating backup file integrity..."
+      - echo "   Full backup validation:"
+      - jq '.metadata.exportType' test-data/exports/full-backup.json
+      - jq '.metadata.totalContracts' test-data/exports/full-backup.json
+      - jq '.contracts[0].contractId' test-data/exports/full-backup.json
+      - echo ""
+      - echo "💡 Backup files include complete contract data with metadata"
+      - echo "📁 Use these files for system restoration and data migration"
+      - echo "🔒 Backup files contain all contract fields including custom data"

@@ -18,10 +18,73 @@ The contracts application provides a comprehensive REST API for managing contrac
 ### Export & Backup
 - `GET /api/contracts/export/markdown` - Export all contracts to Markdown (ZIP with individual files)
 - `GET /api/contracts/export/markdown/individual` - Export contracts as individual markdown files (JSON response)
+- `GET /api/contracts/export/json` - Export contracts as JSON backup with metadata
 - `GET /api/contracts/export/markdown?status=active` - Export filtered contracts to Markdown
 - `GET /api/contracts/export/markdown?search=query` - Export search results to Markdown
 
 📤 **See [Export Documentation](export.md) for detailed usage examples and best practices**
+
+### **JSON Backup Format**
+
+The JSON export endpoint (`/api/contracts/export/json`) creates a comprehensive backup file with the following structure:
+
+```json
+{
+  "metadata": {
+    "exportType": "json-backup",
+    "exportDate": "2024-01-15T10:30:00.000Z",
+    "totalContracts": 25,
+    "filters": {
+      "search": null,
+      "status": null,
+      "category": null,
+      "frequency": null
+    },
+    "version": "1.0.0",
+    "description": "Contracts backup for restoration purposes"
+  },
+  "contracts": [
+    {
+      "id": "contract-123",
+      "contractId": "NETFLIX-001",
+      "name": "Netflix Premium",
+      "company": "Netflix Inc.",
+      "status": "active",
+      "category": "subscription",
+      "amount": 15.99,
+      "currency": "USD",
+      "frequency": "monthly",
+      "startDate": "2024-01-01",
+      // ... full contract data
+    }
+    // ... more contracts
+  ]
+}
+```
+
+### **Backup & Restoration**
+
+**Creating Backups:**
+```bash
+# Full system backup
+curl -o full-backup-$(date +%Y%m%d).json http://localhost:3001/api/contracts/export/json
+
+# Active contracts only
+curl -o active-backup-$(date +%Y%m%d).json "http://localhost:3001/api/contracts/export/json?status=active"
+
+# Category-specific backup
+curl -o utilities-backup-$(date +%Y%m%d).json "http://localhost:3001/api/contracts/export/json?category=utilities"
+```
+
+**Restoring from Backup:**
+```bash
+# Upload backup file to restore contracts
+curl -X POST http://localhost:3001/api/contracts/import \
+  -H "Content-Type: application/json" \
+  -d @full-backup-20240115.json
+```
+
+**Note:** The import endpoint for restoration is planned for future implementation.
 
 ### System Information
 - `GET /api/contracts/info/data` - Data storage information
@@ -87,7 +150,22 @@ curl -o contracts-backup.zip http://localhost:3001/api/contracts/export/markdown
 # Export contracts as individual markdown files (JSON response)
 curl -s "http://localhost:3001/api/contracts/export/markdown/individual" | jq .
 
-# Export only active contracts
+# Export all contracts as JSON backup
+curl -o contracts-backup.json http://localhost:3001/api/contracts/export/json
+
+# Export only active contracts as JSON backup
+curl -o active-contracts-backup.json \
+  "http://localhost:3001/api/contracts/export/json?status=active"
+
+# Export contracts by category as JSON backup
+curl -o subscription-contracts-backup.json \
+  "http://localhost:3001/api/contracts/export/json?category=subscription"
+
+# Export contracts by frequency as JSON backup
+curl -o monthly-contracts-backup.json \
+  "http://localhost:3001/api/contracts/export/json?frequency=monthly"
+
+# Export only active contracts to Markdown file
 curl -o active-contracts.zip \
   "http://localhost:3001/api/contracts/export/markdown?status=active"
 

@@ -11,6 +11,7 @@ Organize contracts, maintain visibility, and track your spendings.
 - 🔍 **Smart Search & Filters** - Find contracts instantly
 - 📱 **Mobile Responsive** - Works seamlessly on all devices
 - 📤 **Export to Markdown** - Bulk export (ZIP) or individual files with filtering
+- 📤 **Backup** - Backup your data
 - 🚫 **Data Loss Prevention** - Unsaved changes protection
 - ⚡ **Real-time Stats** - Live spending & payment tracking
 
@@ -124,6 +125,7 @@ task data-info         # Storage information
 
 # Export functionality
 task test-export-markdown  # Test Markdown export feature (ZIP and individual files)
+task test-backup           # Test backup feature
 
 # Monitoring
 task logs          # View all logs
@@ -178,6 +180,10 @@ The API provides endpoints for:
 ## Export 
 
 📤 **See [Export Documentation](docs/export.md) for detailed export functionality**
+
+## Export 
+
+📤 **See [Backup Documentation](docs/backup.md) for detailed backup functionality**
 
 ## 🔧 Environment Variables
 
@@ -251,4 +257,5 @@ contracts/
 - **[API Documentation](docs/api.md)** - Complete API reference and examples
 - **[API Schema](docs/api-schema.md)** - Comprehensive API schema and data types
 - **[Export Documentation](docs/export.md)** - Detailed export functionality guide
+- **[Backup Documentation](docs/backup.md)** - Backup functionality guide
 - **[Example Configuration](docs/example/)** - Docker and nginx setup examples

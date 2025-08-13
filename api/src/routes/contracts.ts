@@ -217,4 +217,59 @@ contractRoutes.get('/export/markdown/individual', async (req: Request, res: Resp
   }
 });
 
+// GET /api/contracts/export/json - Export contracts as JSON backup
+contractRoutes.get('/export/json', async (req: Request, res: Response) => {
+  try {
+    const { search, status, category, frequency } = req.query;
+    
+    let contracts;
+    if (search && typeof search === 'string') {
+      contracts = await contractService.searchContracts(search);
+    } else if (status && typeof status === 'string') {
+      contracts = await contractService.getContractsByStatus(status as any);
+    } else {
+      contracts = await contractService.getAllContracts();
+    }
+    
+    // Additional filtering if provided
+    if (category && typeof category === 'string') {
+      contracts = contracts.filter(c => c.category === category);
+    }
+    
+    if (frequency && typeof frequency === 'string') {
+      contracts = contracts.filter(c => c.frequency === frequency);
+    }
+    
+    // Create backup metadata
+    const backupData = {
+      metadata: {
+        exportType: 'json-backup',
+        exportDate: new Date().toISOString(),
+        totalContracts: contracts.length,
+        filters: {
+          search: search || null,
+          status: status || null,
+          category: category || null,
+          frequency: frequency || null
+        },
+        version: '1.0.0',
+        description: 'Contracts backup for restoration purposes'
+      },
+      contracts: contracts
+    };
+    
+    // Set headers for JSON file download
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
+    const filename = `contracts-backup-${timestamp}.json`;
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    res.json(backupData);
+  } catch (error) {
+    console.error('Error exporting contracts to JSON:', error);
+    res.status(500).json({ error: 'Failed to export contracts to JSON' });
+  }
+});
+
  
