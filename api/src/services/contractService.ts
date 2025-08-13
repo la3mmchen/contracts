@@ -205,7 +205,12 @@ class ContractService {
       (contract.company && contract.company.toLowerCase().includes(searchTerm)) ||
       contract.contractId.toLowerCase().includes(searchTerm) ||
       (contract.description && contract.description.toLowerCase().includes(searchTerm)) ||
-      (contract.tags && contract.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+      (contract.tags && contract.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+      (contract.notes && contract.notes.toLowerCase().includes(searchTerm)) ||
+      (contract.customFields && Object.values(contract.customFields).some(value => 
+        typeof value === 'string' && value.toLowerCase().includes(searchTerm)
+      )) ||
+      (contract.documentLink && contract.documentLink.toLowerCase().includes(searchTerm))
     );
   }
 

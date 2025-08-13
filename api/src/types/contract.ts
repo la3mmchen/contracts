@@ -33,6 +33,7 @@ export interface Contract {
   pinned?: boolean; // Flag to pin contract to the top of the list
   draft?: boolean; // Flag to indicate contract is in draft state
   priceChanges?: PriceChange[]; // Array of amount changes over time
+  customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
   createdAt: string;
@@ -68,6 +69,7 @@ export interface CreateContractRequest {
   pinned?: boolean;
   draft?: boolean; // Flag to indicate contract is in draft state
   priceChanges?: PriceChange[];
+  customFields?: Record<string, string>;
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

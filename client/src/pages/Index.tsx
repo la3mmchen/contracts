@@ -96,7 +96,12 @@ const Index = () => {
         contract.company.toLowerCase().includes(searchLower) ||
         contract.contractId.toLowerCase().includes(searchLower) ||
         contract.description?.toLowerCase().includes(searchLower) ||
-        contract.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+        contract.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
+        contract.notes?.toLowerCase().includes(searchLower) ||
+        (contract.customFields && Object.values(contract.customFields).some(value => 
+          value.toLowerCase().includes(searchLower)
+        )) ||
+        contract.documentLink?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -429,6 +434,23 @@ const Index = () => {
           
           {/* Search and Sort Fields */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            {/* Searchable fields info - only show when searching */}
+            {filters.searchTerm && (
+              <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="font-medium">Searching in:</span>
+                <div className="flex gap-1">
+                  <span className="px-2 py-1 bg-muted rounded-md">name</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">company</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">ID</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">description</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">tags</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">notes</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">custom fields</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">document links</span>
+                </div>
+              </div>
+            )}
+            
             <div className="relative flex-1 sm:flex-none sm:max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -437,6 +459,17 @@ const Index = () => {
                 onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
                 className="pl-10 w-full"
               />
+              {filters.searchTerm && (
+                <button
+                  onClick={() => setFilters(prev => ({ ...prev, searchTerm: '' }))}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+                  title="Clear search"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
             
             <Select value={filters.sortBy || 'name'} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value as any }))}>

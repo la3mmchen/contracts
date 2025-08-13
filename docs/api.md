@@ -189,6 +189,9 @@ The search functionality searches across multiple fields:
 - Contract ID
 - Description
 - Tags
+- Notes
+- Custom fields (all values)
+- Document link
 
 ### **Filter Parameters**
 
