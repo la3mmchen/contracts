@@ -1,0 +1,5 @@
+{
+  "API_URL": "http://localhost:3001/api",
+  "APP_NAME": "Contract Manager",
+  "CATEGORIES": "subscription,insurance,utilities,rent,services,software,maintenance,other"
+}

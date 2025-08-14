@@ -378,7 +378,7 @@ class ContractService {
     return exportResults;
   }
 
-  private generateSingleContractMarkdown(contract: Contract): string {
+  public generateSingleContractMarkdown(contract: Contract): string {
     const now = new Date();
     const date = now.toLocaleDateString();
     const time = now.toLocaleTimeString();

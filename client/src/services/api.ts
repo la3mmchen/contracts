@@ -138,6 +138,25 @@ export const api = {
     return await this.getContracts();
   },
 
+  async exportContractToMarkdown(id: string): Promise<void> {
+    await ensureConfigLoaded();
+    const response = await fetch(`${API_BASE}/contracts/${id}/export/markdown`);
+    if (!response.ok) throw new Error('Failed to export contract to markdown');
+    
+    // Create a blob and download it
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'contract.md';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
+
+
+
   async importContracts(contracts: Contract[]): Promise<void> {
     // For import, we'll need to create each contract individually
     for (const contract of contracts) {

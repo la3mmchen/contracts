@@ -20,12 +20,15 @@ import {
   ExternalLink,
   Settings,
   PenTool,
-  FileEdit
+  Download
 } from 'lucide-react';
+import { api } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 const ContractDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { 
     contracts, 
     loading, 
@@ -241,8 +244,8 @@ const ContractDetail = () => {
                       onClick={() => setIsEditFormOpen(true)}
                       className="cursor-pointer"
                     >
-                      <FileEdit className="h-4 w-4 mr-2" />
-                      Full Form Edit
+                                          <Edit className="h-4 w-4 mr-2" />
+                    Full Form Edit
                       <span className="ml-auto text-xs text-muted-foreground">All fields</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
@@ -274,8 +277,45 @@ const ContractDetail = () => {
                       <Settings className="h-4 w-4 mr-2" />
                       Editing Help
                     </DropdownMenuItem>
+                    
                   </DropdownMenuContent>
                 </DropdownMenu>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  size="sm"
+                  onClick={async () => {
+                    if (contract) {
+                      try {
+                        toast({
+                          title: "Generating Markdown...",
+                          description: "Please wait while we generate your markdown document.",
+                        });
+                        
+                        await api.exportContractToMarkdown(contract.id);
+                        
+                        toast({
+                          title: "Markdown Generated Successfully!",
+                          description: "Your contract markdown has been downloaded.",
+                          variant: "default",
+                        });
+                      } catch (error) {
+                        console.error('Failed to export contract:', error);
+                        
+                        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+                        toast({
+                          title: "Markdown Generation Failed",
+                          description: errorMessage,
+                          variant: "destructive",
+                        });
+                      }
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export to Markdown
+                </Button>
+
                 <Button 
                   variant="destructive" 
                   className="w-full" 
@@ -296,7 +336,6 @@ const ContractDetail = () => {
                   <Edit 
                     className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" 
                     onClick={() => setIsEditFormOpen(true)}
-                    title="Click to edit contract"
                   />
                 </CardTitle>
               </CardHeader>

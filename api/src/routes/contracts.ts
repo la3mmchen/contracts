@@ -272,4 +272,31 @@ contractRoutes.get('/export/json', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/contracts/:id/export/markdown - Export single contract to Markdown
+contractRoutes.get('/:id/export/markdown', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const contract = await contractService.getContractById(id);
+    
+    if (!contract) {
+      return res.status(404).json({ error: 'Contract not found' });
+    }
+    
+    // Generate markdown for the single contract
+    const markdown = contractService.generateSingleContractMarkdown(contract);
+    
+    // Set headers for markdown file download
+    const filename = `${contract.contractId}.md`;
+    res.setHeader('Content-Type', 'text/markdown');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    res.send(markdown);
+  } catch (error) {
+    console.error('Error exporting contract to markdown:', error);
+    res.status(500).json({ error: 'Failed to export contract' });
+  }
+});
+
+
+
  
