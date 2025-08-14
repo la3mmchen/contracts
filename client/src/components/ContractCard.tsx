@@ -642,7 +642,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   return (
     <Card 
       id={`contract-${contract.id}`}
-      className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
+      className={`group bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
         contract.draft ? 'border-border bg-muted/30' : ''
       } ${
         isRecentlyUpdated && !hasInvalidCategory && !contract.draft ? 'border-border bg-muted/30' : ''
@@ -859,10 +859,10 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
                   onUpdate(contract.id, { pinned: !contract.pinned });
                 }
               }}
-              className="h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors bg-yellow-100 border-yellow-300 text-yellow-700 hover:bg-yellow-200"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 transition-colors"
               title="Unpin contract"
             >
-              <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current" />
+              <Star className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           )}
         </div>
@@ -1885,17 +1885,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
 
 
         {/* Custom Fields */}
-        {isDetailPage || (contract.customFields && Object.keys(contract.customFields).length > 0) ? (
+        {contract.customFields && Object.keys(contract.customFields).length > 0 ? (
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <FileText className="h-4 w-4" />
-              <span>Additional Info:</span>
-              {contract.customFields && Object.keys(contract.customFields).length > 0 && (
-                <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                  {Object.keys(contract.customFields).length}
-                </span>
-              )}
-            </div>
             {isDetailPage && isEditingCustomFields ? (
               <div className="pl-6 space-y-3">
                 {/* Existing custom fields */}
@@ -2027,17 +2018,18 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
                 onOpenChange={setIsCustomFieldsOpen}
               >
                 <CollapsibleTrigger asChild>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
                     <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
                       <span>Additional Info:</span>
                       <span className="text-xs bg-muted px-2 py-0.5 rounded">
                         {Object.keys(contract.customFields).length}
                       </span>
                     </div>
                     {isCustomFieldsOpen ? (
-                      <ChevronDown className="h-4 w-4 ml-auto" />
+                      <ChevronDown className="h-4 w-4" />
                     ) : (
-                      <ChevronRight className="h-4 w-4 ml-auto" />
+                      <ChevronRight className="h-4 w-4" />
                     )}
                   </div>
                 </CollapsibleTrigger>

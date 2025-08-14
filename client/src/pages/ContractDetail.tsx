@@ -20,7 +20,10 @@ import {
   ExternalLink,
   Settings,
   PenTool,
-  Download
+  Download,
+  Copy,
+  Star,
+  X
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
@@ -314,6 +317,105 @@ const ContractDetail = () => {
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Export to Markdown
+                </Button>
+
+                {/* Copy Contract Button */}
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  size="sm"
+                  onClick={() => {
+                    toast({
+                      title: "Copy Contract",
+                      description: "Use the copy button on the main contracts page to duplicate this contract.",
+                      variant: "default",
+                    });
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Contract
+                </Button>
+
+                {/* Pin/Unpin Contract Button */}
+                <Button 
+                  variant={contract.pinned ? "default" : "outline"}
+                  className="w-full"
+                  size="sm"
+                  onClick={() => {
+                    if (contract) {
+                      updateContract(contract.id, { pinned: !contract.pinned });
+                      toast({
+                        title: contract.pinned ? "Contract Unpinned!" : "Contract Pinned!",
+                        description: contract.pinned ? "Contract has been unpinned." : "Contract has been pinned to the top.",
+                        variant: "default",
+                      });
+                    }
+                  }}
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  {contract.pinned ? 'Unpin Contract' : 'Pin Contract'}
+                </Button>
+
+                {/* Close Contract Button - Only show for expired contracts */}
+                {contract.status === 'expired' && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full hover:bg-destructive hover:text-destructive-foreground" 
+                    size="sm"
+                    onClick={() => {
+                      if (contract) {
+                        updateContract(contract.id, { status: 'closed' });
+                        toast({
+                          title: "Contract Closed!",
+                          description: "Expired contract has been marked as closed.",
+                          variant: "default",
+                        });
+                      }
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Close Contract
+                  </Button>
+                )}
+
+                {/* Draft Toggle Button - Always show, toggle between draft/non-draft */}
+                <Button 
+                  variant={contract.draft ? "default" : "outline"}
+                  className="w-full"
+                  size="sm"
+                  onClick={() => {
+                    if (contract) {
+                      updateContract(contract.id, { draft: !contract.draft });
+                      toast({
+                        title: contract.draft ? "Draft Removed!" : "Contract Converted to Draft!",
+                        description: contract.draft ? "Contract is no longer a draft." : "Contract has been marked as a draft.",
+                        variant: "default",
+                      });
+                    }
+                  }}
+                >
+                  <PenTool className="h-4 w-4 mr-2" />
+                  {contract.draft ? 'Remove Draft' : 'Convert to Draft'}
+                </Button>
+
+                {/* Need More Info Button - Always show, toggle the needsMoreInfo flag */}
+                <Button 
+                  variant={contract.needsMoreInfo ? "default" : "outline"}
+                  className="w-full"
+                  size="sm"
+                  onClick={() => {
+                    if (contract) {
+                      updateContract(contract.id, { needsMoreInfo: !contract.needsMoreInfo });
+                      toast({
+                        title: contract.needsMoreInfo ? "Info Flag Removed!" : "Contract Flagged for More Info!",
+                        description: contract.needsMoreInfo ? "Contract no longer needs more information." : "Contract has been marked as needing more information.",
+                        variant: "default",
+                      });
+                    }
+                  }}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  {contract.needsMoreInfo ? 'Remove Info Flag' : 'Need More Info'}
                 </Button>
 
                 <Button 
