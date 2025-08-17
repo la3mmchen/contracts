@@ -87,10 +87,9 @@ const Index = () => {
     if (filters.sortBy) params.set('sortBy', filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
     
-    // Update URL without triggering navigation
-    const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
-    window.history.replaceState({}, '', newUrl);
-  }, [filters]);
+    // Update search params using React Router (this will update window.location.search)
+    setSearchParams(params);
+  }, [filters, setSearchParams]);
 
   // Extract all available tags from contracts
   const availableTags = useMemo(() => {
@@ -693,6 +692,7 @@ const Index = () => {
                     onDelete={(id) => setDeleteConfirmId(id)}
                     onCopy={handleCopyContract}
                     onUpdate={updateContract}
+                    currentSearchParams={searchParams.toString()}
                     onFilter={(filterType, value) => {
                       if (filterType === 'status') {
                         // If clicking the same status filter, reset it

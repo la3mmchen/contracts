@@ -58,6 +58,7 @@ interface ContractCardProps {
   onUpdate?: (id: string, updates: Partial<Contract>) => Promise<void>;
   isDetailPage?: boolean; // New prop to determine if we're on detail page
   onInlineEditingChange?: (isEditing: boolean) => void; // New prop to track inline editing state
+  currentSearchParams?: string; // Current search params for preserving filter context
 }
 
 const statusColors = {
@@ -68,7 +69,7 @@ const statusColors = {
   terminated: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
 };
 
-export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate, isDetailPage = false, onInlineEditingChange }: ContractCardProps) => {
+export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, defaultExpandCustomFields = false, defaultExpandPriceChanges = false, defaultExpandPayments = false, onUpdate, isDetailPage = false, onInlineEditingChange, currentSearchParams }: ContractCardProps) => {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
   const [isPriceChangesOpen, setIsPriceChangesOpen] = useState(defaultExpandPriceChanges);
   const [isPaymentsOpen, setIsPaymentsOpen] = useState(defaultExpandPayments);
@@ -694,7 +695,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
                 </div>
               ) : (
                 <Link 
-                  to={`/contract/${contract.id}`}
+                  to={`/contract/${contract.id}${currentSearchParams ? `?${currentSearchParams}` : ''}`}
                   className="hover:underline cursor-pointer"
                 >
                   {!isValidCategory(contract.category) && <Pin className="h-4 w-4 inline mr-2 text-red-600" />}

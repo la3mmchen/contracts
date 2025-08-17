@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   ArrowLeft, 
@@ -146,17 +147,7 @@ const ContractDetail = () => {
     currentContractId: id
   });
 
-  // Debug logging
-  console.log('ContractDetail: Navigation state:', {
-    filteredContractsLength: filteredContracts.length,
-    currentContractId: id,
-    navigation: navigation ? {
-      currentIndex: navigation.currentIndex,
-      totalContracts: navigation.totalContracts,
-      hasNext: navigation.hasNext,
-      hasPrevious: navigation.hasPrevious
-    } : null
-  });
+
   
 
 
@@ -168,10 +159,7 @@ const ContractDetail = () => {
     }
   }, [contracts, id, loading]);
 
-  // Debug: Log when contract changes
-  useEffect(() => {
-    console.log('Contract state updated:', contract);
-  }, [contract]);
+
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -338,15 +326,37 @@ const ContractDetail = () => {
           <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-muted-foreground">
-                  Navigating through {filteredContracts.length} filtered contracts
-                </span>
+                {/* Position Indicator - Moved to front */}
+                {navigation.currentIndex > 0 && navigation.totalContracts > 1 && (
+                  <Badge variant="secondary" className="px-3 py-1 font-medium">
+                    {navigation.currentIndex} of {navigation.totalContracts}
+                  </Badge>
+                )}
+
                 {/* Show current filter context */}
                 <div className="flex items-center gap-2 text-xs">
                   {location.search && (
-                    <span className="text-muted-foreground">
-                      Filters: {location.search.replace(/[?&]/g, ' ').replace(/=/g, ': ')}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground font-medium">Active Filters:</span>
+                      {(() => {
+                        const params = new URLSearchParams(location.search);
+                        const activeFilters = [];
+                        
+                        if (params.get('status')) activeFilters.push(`Status: ${params.get('status')}`);
+                        if (params.get('category')) activeFilters.push(`Category: ${params.get('category')}`);
+                        if (params.get('frequency')) activeFilters.push(`Frequency: ${params.get('frequency')}`);
+                        if (params.get('tags')) activeFilters.push(`Tags: ${params.get('tags')}`);
+                        if (params.get('search')) activeFilters.push(`Search: "${params.get('search')}"`);
+                        if (params.get('needsMoreInfo')) activeFilters.push(`Needs Info: ${params.get('needsMoreInfo') === 'true' ? 'Yes' : 'No'}`);
+                        if (params.get('pinned')) activeFilters.push(`Pinned: ${params.get('pinned') === 'true' ? 'Yes' : 'No'}`);
+                        
+                        return activeFilters.map((filter, index) => (
+                          <Badge key={index} variant="outline" className="text-xs px-2 py-1">
+                            {filter}
+                          </Badge>
+                        ));
+                      })()}
+                    </div>
                   )}
                 </div>
               </div>
@@ -360,7 +370,7 @@ const ContractDetail = () => {
                   onPrevious={navigation.goToPrevious}
                   onFirst={navigation.goToFirst}
                   onLast={navigation.goToLast}
-                  onShowList={() => navigate('/')}
+                  onShowList={() => navigate(`/${location.search}`)}
                   previousContract={navigation.previousContract}
                   nextContract={navigation.nextContract}
                 />

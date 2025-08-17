@@ -46,46 +46,47 @@ export const ContractNavigation: React.FC<ContractNavigationProps> = ({
 }) => {
   // Comprehensive safety check: ensure all required props are present and valid
   if (!currentIndex || !totalContracts || totalContracts <= 1) {
-    console.log('ContractNavigation: Invalid state - currentIndex:', currentIndex, 'totalContracts:', totalContracts);
     return null; // Don't show navigation for invalid state
   }
 
   // Additional safety check for navigation functions
   if (!onNext || !onPrevious || !onFirst || !onLast || !onShowList) {
-    console.log('ContractNavigation: Missing navigation functions');
     return null; // Don't show navigation if functions are missing
   }
 
   // Safety check for contract objects
   if (hasPrevious && !previousContract) {
-    console.log('ContractNavigation: hasPrevious is true but previousContract is missing');
     return null;
   }
 
   if (hasNext && !nextContract) {
-    console.log('ContractNavigation: hasNext is true but nextContract is missing');
     return null;
   }
 
   return (
     <TooltipProvider>
       <div className={`flex items-center gap-2 ${className}`}>
-        {/* Position indicator */}
-        <Badge variant="secondary" className="px-3 py-1">
-          {currentIndex} of {totalContracts}
-        </Badge>
-        
-        {/* Contract preview */}
-        <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+        {/* Compact Contract Previews */}
+        <div className="hidden lg:flex items-center gap-2">
           {hasPrevious && previousContract && (
-            <span className="truncate max-w-24" title="Previous contract">
-              ← {previousContract.name}
-            </span>
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-muted/30 rounded border border-border/50 hover:bg-muted/50 transition-colors cursor-pointer group" onClick={onPrevious}>
+              <div className="flex flex-col items-end text-xs leading-tight">
+                <span className="text-muted-foreground text-[10px]">←</span>
+                <span className="font-medium text-foreground truncate max-w-28" title={previousContract.name}>
+                  {previousContract.name}
+                </span>
+              </div>
+            </div>
           )}
           {hasNext && nextContract && (
-            <span className="truncate max-w-24" title="Next contract">
-              {nextContract.name} →
-            </span>
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-muted/30 rounded border border-border/50 hover:bg-muted/50 transition-colors cursor-pointer group" onClick={onNext}>
+              <div className="flex flex-col items-start text-xs leading-tight">
+                <span className="text-muted-foreground text-[10px]">→</span>
+                <span className="font-medium text-foreground truncate max-w-28" title={nextContract.name}>
+                  {nextContract.name}
+                </span>
+              </div>
+            </div>
           )}
         </div>
 
@@ -170,19 +171,13 @@ export const ContractNavigation: React.FC<ContractNavigationProps> = ({
               className="h-8 px-2 text-xs"
             >
               <List className="h-4 w-4 mr-1" />
-              List
+              Return to Filtered List
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Show all contracts</p>
+            <p>Return to filtered contracts list</p>
           </TooltipContent>
         </Tooltip>
-        
-        {/* Keyboard shortcuts hint */}
-        <div className="hidden lg:flex items-center gap-1 text-xs text-muted-foreground">
-          <span>← →</span>
-          <span>Home End</span>
-        </div>
       </div>
     </TooltipProvider>
   );
