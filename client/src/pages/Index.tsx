@@ -65,7 +65,7 @@ const Index = () => {
       setFilters(prev => ({
         ...prev,
         ...(statusParam && { status: statusParam as Contract['status'] }),
-        ...(categoryParam && { category: categoryParam as Contract['category'] }),
+        ...(categoryParam && { category: categoryParam as Contract['status'] }),
         ...(tagsParam && { tags: [tagsParam] })
       }));
       
@@ -73,6 +73,24 @@ const Index = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
+
+  // Store current filter state in URL for navigation context
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.status) params.set('status', filters.status);
+    if (filters.category) params.set('category', filters.category);
+    if (filters.frequency) params.set('frequency', filters.frequency);
+    if (filters.tags && filters.tags.length > 0) params.set('tags', filters.tags.join(','));
+    if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
+    if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
+    if (filters.searchTerm) params.set('search', filters.searchTerm);
+    if (filters.sortBy) params.set('sortBy', filters.sortBy);
+    if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
+    
+    // Update URL without triggering navigation
+    const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+    window.history.replaceState({}, '', newUrl);
+  }, [filters]);
 
   // Extract all available tags from contracts
   const availableTags = useMemo(() => {

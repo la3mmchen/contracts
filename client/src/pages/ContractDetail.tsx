@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Contract } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { ContractNavigation } from '@/components/ContractNavigation';
+import { useContractNavigation } from '@/hooks/useContractNavigation';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -27,6 +29,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 
 const ContractDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +49,114 @@ const ContractDetail = () => {
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isInlineEditing, setIsInlineEditing] = useState(false);
   const [showInlineEditingWarning, setShowInlineEditingWarning] = useState(false);
+
+  // Get filtered contracts based on URL parameters for navigation context
+  const location = useLocation();
+  const filteredContracts = React.useMemo(() => {
+    const searchParams = new URLSearchParams(location.search);
+    let filtered = contracts;
+
+    // Apply filters based on URL parameters
+    const status = searchParams.get('status');
+    const category = searchParams.get('category');
+    const frequency = searchParams.get('frequency');
+    const tags = searchParams.get('tags');
+    const needsMoreInfo = searchParams.get('needsMoreInfo');
+    const pinned = searchParams.get('pinned');
+    const search = searchParams.get('search');
+    const sortBy = searchParams.get('sortBy') || 'name';
+    const sortOrder = searchParams.get('sortOrder') || 'asc';
+
+    if (status && status !== 'all') {
+      filtered = filtered.filter(c => c.status === status);
+    }
+    if (category && category !== 'all') {
+      filtered = filtered.filter(c => c.category === category);
+    }
+    if (frequency && frequency !== 'all') {
+      filtered = filtered.filter(c => c.frequency === frequency);
+    }
+    if (tags) {
+      const tagArray = tags.split(',');
+      filtered = filtered.filter(c => c.tags?.some(tag => tagArray.includes(tag)));
+    }
+    if (needsMoreInfo !== null) {
+      filtered = filtered.filter(c => c.needsMoreInfo === (needsMoreInfo === 'true'));
+    }
+    if (pinned !== null) {
+      filtered = filtered.filter(c => c.pinned === (pinned === 'true'));
+    }
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(c =>
+        c.name.toLowerCase().includes(searchLower) ||
+        c.company.toLowerCase().includes(searchLower) ||
+        c.contractId.toLowerCase().includes(searchLower) ||
+        c.description?.toLowerCase().includes(searchLower) ||
+        c.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
+        c.notes?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Sort contracts
+    filtered.sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      switch (sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'amount':
+          aValue = a.amount;
+          bValue = b.amount;
+          break;
+        case 'nextPaymentDate': {
+          const aPayments = calculateNextThreePayments(a);
+          const bPayments = calculateNextThreePayments(b);
+          aValue = aPayments[0] ? new Date(aPayments[0].date).getTime() : 0;
+          bValue = bPayments[0] ? new Date(bPayments[0].date).getTime() : 0;
+          break;
+        }
+        case 'createdAt':
+          aValue = a.createdAt;
+          bValue = b.createdAt;
+          break;
+        case 'updatedAt':
+          aValue = a.updatedAt;
+          bValue = b.updatedAt;
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      if (sortOrder === 'desc') {
+        return bValue > aValue ? 1 : -1;
+      }
+      return aValue > bValue ? 1 : -1;
+    });
+
+    return filtered;
+  }, [contracts, location.search]);
+
+  // Use navigation hook
+  const navigation = useContractNavigation({
+    contracts: filteredContracts,
+    currentContractId: id
+  });
+
+  // Debug logging
+  console.log('ContractDetail: Navigation state:', {
+    filteredContractsLength: filteredContracts.length,
+    currentContractId: id,
+    navigation: navigation ? {
+      currentIndex: navigation.currentIndex,
+      totalContracts: navigation.totalContracts,
+      hasNext: navigation.hasNext,
+      hasPrevious: navigation.hasPrevious
+    } : null
+  });
   
 
 
@@ -62,7 +173,7 @@ const ContractDetail = () => {
     console.log('Contract state updated:', contract);
   }, [contract]);
 
-  // Handle ESC key to go back to main view
+  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !isEditFormOpen) {
@@ -72,11 +183,28 @@ const ContractDetail = () => {
           navigate('/');
         }
       }
+      
+      // Arrow key navigation (only when not editing and navigation is ready)
+      if (!isEditFormOpen && !isInlineEditing && navigation && filteredContracts.length > 1) {
+        if (event.key === 'ArrowRight' && navigation.hasNext) {
+          event.preventDefault();
+          navigation.goToNext();
+        } else if (event.key === 'ArrowLeft' && navigation.hasPrevious) {
+          event.preventDefault();
+          navigation.goToPrevious();
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          navigation.goToFirst();
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          navigation.goToLast();
+        }
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, isEditFormOpen, isInlineEditing]);
+  }, [navigate, isEditFormOpen, isInlineEditing, navigation, filteredContracts.length]);
 
   // Navigation protection when inline editing is active
   useEffect(() => {
@@ -203,6 +331,44 @@ const ContractDetail = () => {
           </div>
         </div>
       </div>
+
+              {/* Navigation Bar */}
+      {filteredContracts.length > 1 && navigation && navigation.currentIndex > 0 && (
+        <div className="bg-muted/50 border-b">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Navigating through {filteredContracts.length} filtered contracts
+                </span>
+                {/* Show current filter context */}
+                <div className="flex items-center gap-2 text-xs">
+                  {location.search && (
+                    <span className="text-muted-foreground">
+                      Filters: {location.search.replace(/[?&]/g, ' ').replace(/=/g, ': ')}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {navigation.currentIndex > 0 && navigation.totalContracts > 1 && (
+                <ContractNavigation
+                  currentIndex={navigation.currentIndex}
+                  totalContracts={navigation.totalContracts}
+                  hasNext={navigation.hasNext}
+                  hasPrevious={navigation.hasPrevious}
+                  onNext={navigation.goToNext}
+                  onPrevious={navigation.goToPrevious}
+                  onFirst={navigation.goToFirst}
+                  onLast={navigation.goToLast}
+                  onShowList={() => navigate('/')}
+                  previousContract={navigation.previousContract}
+                  nextContract={navigation.nextContract}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Contract Details */}
