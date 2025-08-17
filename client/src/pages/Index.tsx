@@ -51,8 +51,8 @@ const Index = () => {
   const [apiConnected, setApiConnected] = useState<boolean | null>(null);
   const [filters, setFilters] = useState<FilterType>({
     searchTerm: '',
-    sortBy: 'createdAt',
-    sortOrder: 'asc'
+    sortBy: 'updatedAt',
+    sortOrder: 'desc'
   });
 
   // Apply URL parameters to filters on component mount
@@ -489,7 +489,12 @@ const Index = () => {
               )}
             </div>
             
-            <Select value={filters.sortBy || 'name'} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value as any }))}>
+            <Select value={filters.sortBy || 'name'} onValueChange={(value) => {
+              const newSortBy = value as any;
+              // Automatically set sort order: desc for dates, asc for others
+              const newSortOrder = (newSortBy === 'updatedAt' || newSortBy === 'createdAt' || newSortBy === 'nextPaymentDate') ? 'desc' : 'asc';
+              setFilters(prev => ({ ...prev, sortBy: newSortBy, sortOrder: newSortOrder }));
+            }}>
               <SelectTrigger className="w-full sm:w-32">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
