@@ -82,7 +82,13 @@ const ContractDetail = () => {
       filtered = filtered.filter(c => c.tags?.some(tag => tagArray.includes(tag)));
     }
     if (needsMoreInfo !== null) {
-      filtered = filtered.filter(c => c.needsMoreInfo === (needsMoreInfo === 'true'));
+      if (needsMoreInfo === 'false') {
+        // "Complete" should show contracts where needsMoreInfo is false OR null/undefined AND not draft
+        filtered = filtered.filter(c => !c.needsMoreInfo && !c.draft);
+      } else {
+        // "Needs Attention" should show contracts where needsMoreInfo is true OR draft is true
+        filtered = filtered.filter(c => c.needsMoreInfo === true || c.draft === true);
+      }
     }
     if (pinned !== null) {
       filtered = filtered.filter(c => c.pinned === (pinned === 'true'));
@@ -347,7 +353,14 @@ const ContractDetail = () => {
                         if (params.get('frequency')) activeFilters.push(`Frequency: ${params.get('frequency')}`);
                         if (params.get('tags')) activeFilters.push(`Tags: ${params.get('tags')}`);
                         if (params.get('search')) activeFilters.push(`Search: "${params.get('search')}"`);
-                        if (params.get('needsMoreInfo')) activeFilters.push(`Needs Info: ${params.get('needsMoreInfo') === 'true' ? 'Yes' : 'No'}`);
+                        if (params.get('needsMoreInfo')) {
+                          const needsInfoValue = params.get('needsMoreInfo');
+                          if (needsInfoValue === 'true') {
+                            activeFilters.push('Needs Info: Yes');
+                          } else if (needsInfoValue === 'false') {
+                            activeFilters.push('Needs Info: No');
+                          }
+                        }
                         if (params.get('pinned')) activeFilters.push(`Pinned: ${params.get('pinned') === 'true' ? 'Yes' : 'No'}`);
                         
                         return activeFilters.map((filter, index) => (
