@@ -6,7 +6,6 @@ import { getFrequencies, getFrequencyDisplayName } from '@/config/frequencies';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 
 interface ContractFiltersProps {
@@ -164,47 +163,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
         </div>
       </div>
 
-      {/* Active Filters Display */}
-      {activeFilterCount > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {filters.status && (
-            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('status')}>
-              Status: {filters.status}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          )}
-          {filters.category && (
-            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('category')}>
-              Category: {filters.category}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          )}
-          {filters.frequency && (
-            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('frequency')}>
-              Frequency: {filters.frequency}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          )}
-          {filters.needsMoreInfo !== undefined && (
-            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('needsMoreInfo')}>
-              Contract Status: {filters.needsMoreInfo ? 'Needs Attention' : 'Complete'}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          )}
-          {filters.pinned !== undefined && (
-            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('pinned')}>
-              Pinned: {filters.pinned ? 'Yes' : 'No'}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          )}
-          {filters.tags && filters.tags.length > 0 && (
-            <Badge variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => clearFilter('tags')}>
-              Tags: {filters.tags.join(', ')}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          )}
-        </div>
-      )}
+      {/* Active Filters display removed (redundant with header badges) */}
     </div>
   );
 };

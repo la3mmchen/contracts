@@ -450,6 +450,87 @@ const Index = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <ConnectionStatus onStatusChange={setApiConnected} />
           
+          {/* Active Filters Display */}
+          {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined) && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground font-medium">Active Filters:</span>
+              <div className="flex flex-wrap items-center gap-2">
+                {filters.status && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Status: {filters.status}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, status: undefined }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove status filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                {filters.category && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Category: {filters.category}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, category: undefined }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove category filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                {filters.frequency && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Frequency: {filters.frequency}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, frequency: undefined }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove frequency filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                {filters.tags && filters.tags.length > 0 && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Tags: {filters.tags.join(', ')}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, tags: undefined }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove tags filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                {filters.needsMoreInfo !== undefined && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Needs Info: {filters.needsMoreInfo ? 'Yes' : 'No'}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, needsMoreInfo: undefined }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove needs info filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                {filters.pinned !== undefined && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, pinned: undefined }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove pinned filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           {/* Search and Sort Fields */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             {/* Searchable fields info - only show when searching */}
@@ -615,6 +696,7 @@ const Index = () => {
           filters={filters}
           onFiltersChange={setFilters}
           availableTags={availableTags}
+          filteredContracts={filteredContracts}
         />
 
         {/* Notifications */}

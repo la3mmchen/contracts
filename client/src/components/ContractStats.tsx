@@ -29,6 +29,7 @@ interface ContractStatsProps {
   filters: FilterType;
   onFiltersChange: (filters: FilterType) => void;
   availableTags: string[];
+  filteredContracts?: Contract[];
 }
 
 export const ContractStats = ({ 
@@ -37,7 +38,8 @@ export const ContractStats = ({
   activeFilters, 
   filters, 
   onFiltersChange, 
-  availableTags 
+  availableTags,
+  filteredContracts
 }: ContractStatsProps) => {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -142,9 +144,9 @@ export const ContractStats = ({
       filterType: 'needsMoreInfo',
       filterValue: 'true',
     },
-    {
-      title: 'Monthly Spend',
-      value: `$${contracts
+         {
+       title: filteredContracts ? 'Filtered Monthly Spend' : 'Total Monthly Spend',
+       value: `$${(filteredContracts ?? contracts)
         .filter(c => c.status === 'active')
         .reduce((total, contract) => {
           switch (contract.frequency) {
@@ -168,8 +170,7 @@ export const ContractStats = ({
       icon: Coins,
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-100 dark:bg-green-900/30',
-      clickable: false,
-      tooltip: 'Rough estimate • Based on active contracts only • For planning purposes',
+             clickable: false,
     },
 
     ...generateCategoryStats(),
