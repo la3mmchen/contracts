@@ -23,7 +23,8 @@ import {
   Loader2,
   FileText,
   AlertTriangle,
-  Search
+  Search,
+  X
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
@@ -488,6 +489,23 @@ const Index = () => {
                 </button>
               )}
             </div>
+            
+            {/* Clear All Filters Button */}
+            {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.searchTerm) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFilters({
+                  searchTerm: '',
+                  sortBy: 'updatedAt',
+                  sortOrder: 'desc'
+                })}
+                className="whitespace-nowrap"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Clear All
+              </Button>
+            )}
             
             <Select value={filters.sortBy || 'name'} onValueChange={(value) => {
               const newSortBy = value as any;
