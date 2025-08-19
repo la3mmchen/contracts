@@ -137,11 +137,7 @@ export class SmartApiService {
     }
   }
 
-  // Data info method for ConnectionStatus component
-  async getDataInfo(): Promise<{ dataDir: string; contractsDir: string; contractCount: number; fileStructure: string }> {
-    const activeApi = await this.getActiveApi();
-    return activeApi.getDataInfo();
-  }
+
 }
 
 // Export singleton instance
