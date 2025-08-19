@@ -138,7 +138,7 @@ class ContractService {
       startDate: data.startDate || now,
       endDate: data.endDate,
       amount: data.amount || 0,
-      currency: data.currency || 'USD',
+      currency: data.currency || 'EUR',
       frequency: data.frequency || 'monthly',
       status: data.status || 'active',
       category: data.category || 'other',
