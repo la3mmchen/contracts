@@ -1,5 +1,6 @@
 {
   "contractId": "NFLX-2024-002",
+  "reference": "PO-2024-001",
   "name": "Netflix Premium",
   "company": "Netflix, Inc.",
   "description": "Premium streaming plan with 4K Ultra HD and 4 simultaneous streams",

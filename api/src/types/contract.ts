@@ -9,6 +9,7 @@ export interface PriceChange {
 export interface Contract {
   id: string;
   contractId: string;
+  reference?: string; // Reference number for the contract
   name: string;
   company: string;
   description?: string;
@@ -51,6 +52,7 @@ export interface ContractAttachment {
 
 export interface CreateContractRequest {
   contractId: string;
+  reference?: string; // Reference number for the contract
   name: string;
   company?: string; // Made optional for draft contracts
   description?: string;

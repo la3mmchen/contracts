@@ -131,6 +131,7 @@ class ContractService {
     const contract: Contract = {
       id: uuidv4(),
       contractId: data.contractId,
+      reference: data.reference,
       name: data.name,
       company: data.company || 'Unknown Company',
       description: data.description,
@@ -204,6 +205,7 @@ class ContractService {
       contract.name.toLowerCase().includes(searchTerm) ||
       (contract.company && contract.company.toLowerCase().includes(searchTerm)) ||
       contract.contractId.toLowerCase().includes(searchTerm) ||
+      (contract.reference && contract.reference.toLowerCase().includes(searchTerm)) ||
       (contract.description && contract.description.toLowerCase().includes(searchTerm)) ||
       (contract.tags && contract.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
       (contract.notes && contract.notes.toLowerCase().includes(searchTerm)) ||
@@ -293,6 +295,9 @@ class ContractService {
       for (const contract of statusContracts) {
         markdown += `### ${contract.name}\n\n`;
         markdown += `**Contract ID:** ${contract.contractId}\n\n`;
+        if (contract.reference) {
+          markdown += `**Reference:** ${contract.reference}\n\n`;
+        }
         markdown += `**Company:** ${contract.company}\n\n`;
         markdown += `**Status:** ${contract.status}\n\n`;
         markdown += `**Category:** ${contract.category}\n\n`;
@@ -388,6 +393,9 @@ class ContractService {
     markdown += `---\n\n`;
     
     markdown += `**Contract ID:** ${contract.contractId}\n\n`;
+    if (contract.reference) {
+      markdown += `**Reference:** ${contract.reference}\n\n`;
+    }
     markdown += `**Company:** ${contract.company}\n\n`;
     markdown += `**Status:** ${contract.status}\n\n`;
     markdown += `**Category:** ${contract.category}\n\n`;

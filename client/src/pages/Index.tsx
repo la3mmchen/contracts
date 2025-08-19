@@ -138,6 +138,7 @@ const Index = () => {
         contract.name.toLowerCase().includes(searchLower) ||
         contract.company.toLowerCase().includes(searchLower) ||
         contract.contractId.toLowerCase().includes(searchLower) ||
+        contract.reference?.toLowerCase().includes(searchLower) ||
         contract.description?.toLowerCase().includes(searchLower) ||
         contract.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
         contract.notes?.toLowerCase().includes(searchLower) ||
@@ -217,6 +218,12 @@ const Index = () => {
           return direction * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         case 'updatedAt':
           return direction * (new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+        case 'company':
+          return direction * (a.company || '').localeCompare(b.company || '');
+        case 'endDate':
+          return direction * ((a.endDate ? new Date(a.endDate).getTime() : 0) - (b.endDate ? new Date(b.endDate).getTime() : 0));
+        case 'reference':
+          return direction * ((a.reference || '').localeCompare(b.reference || ''));
         default:
           return 0;
       }
@@ -277,6 +284,7 @@ const Index = () => {
       ...contract,
       contractId: `${contract.contractId}-copy`,
       name: `${contract.name} (Copy)`,
+      reference: contract.reference ? `${contract.reference}-copy` : undefined,
       startDate: new Date().toISOString().split('T')[0], // Today's date
       status: 'active' as const,
       pinned: false,
@@ -520,7 +528,7 @@ const Index = () => {
                   <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
                     <span className="text-xs font-medium">Tags: {filters.tags.join(', ')}</span>
                     <button
-                      onClick={() => setFilters(prev => ({ ...prev, tags: undefined }))}
+                      onClick={() => setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }))}
                       className="ml-1 text-primary/70 hover:text-primary transition-colors"
                       title="Remove tags filter"
                     >
@@ -532,7 +540,7 @@ const Index = () => {
                   <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
                     <span className="text-xs font-medium">Needs Info: {filters.needsMoreInfo ? 'Yes' : 'No'}</span>
                     <button
-                      onClick={() => setFilters(prev => ({ ...prev, needsMoreInfo: undefined }))}
+                      onClick={() => setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }))}
                       className="ml-1 text-primary/70 hover:text-primary transition-colors"
                       title="Remove needs info filter"
                     >
@@ -544,7 +552,7 @@ const Index = () => {
                   <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
                     <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
                     <button
-                      onClick={() => setFilters(prev => ({ ...prev, pinned: undefined }))}
+                      onClick={() => setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }))}
                       className="ml-1 text-primary/70 hover:text-primary transition-colors"
                       title="Remove pinned filter"
                     >

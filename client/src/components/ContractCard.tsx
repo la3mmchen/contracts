@@ -81,6 +81,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   // Inline editing states for other fields
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(contract.name || '');
+  const [isEditingReference, setIsEditingReference] = useState(false);
+  const [editingReference, setEditingReference] = useState(contract.reference || '');
   const [isEditingCompany, setIsEditingCompany] = useState(false);
   const [editingCompany, setEditingCompany] = useState(contract.company || '');
   const [isEditingStartDate, setIsEditingStartDate] = useState(false);
@@ -123,7 +125,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   const isMobile = useIsMobile();
   
   // Check if any inline editing is currently active
-  const isAnyInlineEditing = isEditingName || isEditingCompany || isEditingStartDate || 
+  const isAnyInlineEditing = isEditingName || isEditingReference || isEditingCompany || isEditingStartDate || 
     isEditingEndDate || isEditingAmount || isEditingFrequency || isEditingContactPerson || 
     isEditingAddress || isEditingDescription || isEditingNotes || isEditingEmail || 
     isEditingPhone || isEditingWebsite || isEditingCurrency || isEditingStatus || 
@@ -640,6 +642,28 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   const isStale = new Date(contract.updatedAt).getTime() < Date.now() - 6 * 30 * 24 * 60 * 60 * 1000; // 6 months ago
   const isOld = new Date(contract.updatedAt).getTime() < Date.now() - 3 * 30 * 24 * 60 * 60 * 1000; // 3 months ago
   
+  // Reference editing handlers
+  const handleReferenceSave = async () => {
+    if (!onUpdate) return;
+    
+    try {
+      setIsSaving(true);
+      await onUpdate(contract.id, { reference: editingReference.trim() });
+      setIsEditingReference(false);
+    } catch (error) {
+      console.error('Failed to update reference:', error);
+      setEditingReference(contract.reference || '');
+      setIsEditingReference(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleReferenceCancel = () => {
+    setEditingReference(contract.reference || '');
+    setIsEditingReference(false);
+  };
+  
   return (
     <Card 
       id={`contract-${contract.id}`}
@@ -767,6 +791,59 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
             <p className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-1 rounded mt-2 inline-block">
               ID: {contract.contractId}
             </p>
+            {isDetailPage && isEditingReference ? (
+              <div className="flex items-center gap-2 mt-1" data-editable="true">
+                <Input
+                  type="text"
+                  value={editingReference}
+                  onChange={(e) => setEditingReference(e.target.value)}
+                  className="text-xs h-6 bg-background"
+                  placeholder="Enter reference number..."
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleReferenceSave}
+                  disabled={isSaving}
+                  className="h-5 w-5 p-0"
+                >
+                  {isSaving ? '...' : '✓'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleReferenceCancel}
+                  disabled={isSaving}
+                  className="h-5 w-5 p-0"
+                >
+                  ✕
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-1">
+                {contract.reference ? (
+                  <p className="text-xs text-muted-foreground font-mono bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded inline-block">
+                    Ref: {contract.reference}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground font-mono bg-muted/30 px-2 py-1 rounded inline-block">
+                    No reference
+                  </p>
+                )}
+                {isDetailPage && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setIsEditingReference(true)}
+                    className="h-5 w-5 p-0 hover:bg-muted/30"
+                    title="Click to edit reference"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            )}
             <p className={`text-xs text-muted-foreground mt-1 flex items-center gap-1 ${isOld || isStale ? 'font-semibold' : ''}`}>
               {isStale && <AlertTriangle className="h-3 w-3 text-destructive" />}
               {isOld && !isStale && <Clock3 className="h-3 w-3 text-muted-foreground" />}

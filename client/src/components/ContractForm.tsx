@@ -47,6 +47,7 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
   
   const [formData, setFormData] = useState({
     contractId: contract?.contractId || '',
+    reference: contract?.reference || '',
     name: contract?.name || '',
     company: contract?.company || '',
     description: contract?.description || '',
@@ -78,6 +79,7 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
   // Track initial form data for dirty state detection
   const initialFormData = useRef({
     contractId: contract?.contractId || '',
+    reference: contract?.reference || '',
     name: contract?.name || '',
     company: contract?.company || '',
     description: contract?.description || '',
@@ -255,6 +257,19 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
                 required
               />
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="reference">Reference Number</Label>
+            <Input
+              id="reference"
+              value={formData.reference}
+              onChange={(e) => updateFormData({ reference: e.target.value })}
+              placeholder="e.g., REF-2024-001, PO-12345, or contract reference"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Important reference number for this contract (e.g., purchase order, invoice number, etc.)
+            </p>
           </div>
 
             <div>

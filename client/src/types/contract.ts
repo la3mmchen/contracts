@@ -11,6 +11,7 @@ export interface PriceChange {
 export interface Contract {
   id: string;
   contractId: string;
+  reference?: string; // Reference number for the contract
   name: string;
   company: string;
   description?: string;
@@ -59,7 +60,7 @@ export interface ContractFilters {
   tags?: string[];
   needsMoreInfo?: boolean;
   pinned?: boolean;
-  sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate';
+  sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {
     min?: number;
@@ -84,6 +85,7 @@ export interface ContractStats {
 
 export interface CreateContractRequest {
   contractId: string;
+  reference?: string; // Reference number for the contract
   name: string;
   company?: string; // Made optional for draft contracts
   description?: string;
