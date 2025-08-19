@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '@/services/api';
+import { smartApi } from '@/services/smartApi';
 import { loadConfig } from '@/services/config';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
   const checkConnection = async () => {
     setStatus('checking');
     try {
-      const result = await api.checkApiHealth();
+      const result = await smartApi.checkApiHealth();
       setDetails(result);
       
       if (result.status === 'ok') {
@@ -30,7 +30,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
         
         // Also fetch data info when connected
         try {
-          const dataResult = await api.getDataInfo();
+          const dataResult = await smartApi.getDataInfo();
           setDataInfo(dataResult);
         } catch (dataError) {
           console.warn('Failed to fetch data info:', dataError);

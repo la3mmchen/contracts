@@ -7,12 +7,14 @@ import Index from "./pages/Index";
 import ContractDetail from "./pages/ContractDetail";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { DemoModeBanner } from "@/components/DemoModeBanner";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <DemoModeBanner />
       <Toaster />
       <Sonner />
       <BrowserRouter>

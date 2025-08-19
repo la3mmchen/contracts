@@ -9,6 +9,7 @@ import { ContractStats } from '@/components/ContractStats';
 import { NotificationBanner } from '@/components/NotificationBanner';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { ThemeToggle } from '@/components/ThemeToggle';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -505,6 +506,8 @@ const Index = () => {
         {/* Connection Status with Search and Sort */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <ConnectionStatus onStatusChange={setApiConnected} />
+          
+
           
           {/* Active Filters Display */}
           {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined) && (

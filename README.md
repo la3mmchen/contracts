@@ -2,6 +2,11 @@
 
 Organize contracts, maintain visibility, and track your spendings.
 
+## 🚀 Live Demo
+
+**Try it out now!** Visit our live demo at: [https://la3mmchen.github.io/contracts](https://la3mmchen.github.io/contracts)
+
+The demo showcases all the features below with sample data. **No installation or API server required!** The app automatically runs in demo mode when deployed to GitHub Pages.
 
 ## ✨ Features
 

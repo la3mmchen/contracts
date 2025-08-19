@@ -28,7 +28,7 @@ import {
   Star,
   X
 } from 'lucide-react';
-import { api } from '@/services/api';
+import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 
@@ -484,7 +484,7 @@ const ContractDetail = () => {
                           description: "Please wait while we generate your markdown document.",
                         });
                         
-                        await api.exportContractToMarkdown(contract.id);
+                        await smartApi.exportContractToMarkdown(contract.id);
                         
                         toast({
                           title: "Markdown Generated Successfully!",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Contract, ContractStats } from '@/types/contract';
-import { api } from '@/services/api';
+import { smartApi } from '@/services/smartApi';
 import { toast } from '@/hooks/use-toast';
 import { migrateContract, needsMigration } from '@/lib/contractMigration';
 
@@ -16,7 +16,7 @@ export const useContractStorage = () => {
   const loadContracts = async () => {
     try {
       setLoading(true);
-      const data = await api.getContracts();
+      const data = await smartApi.getContracts();
       
       // Migrate legacy contracts if needed and save them back to the API
       const migratedContracts = [];
@@ -46,7 +46,7 @@ export const useContractStorage = () => {
             // Explicitly mark legacy fields for removal by setting them to null
             (cleanUpdateData as any).paymentInfo = null;
             
-            await api.updateContract(id, cleanUpdateData);
+            await smartApi.updateContract(id, cleanUpdateData);
           } catch (updateError) {
             console.error(`Failed to save migrated contract ${contract.contractId}:`, updateError);
           }
@@ -69,7 +69,7 @@ export const useContractStorage = () => {
 
   const addContract = async (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      const result = await api.createContract(contract);
+      const result = await smartApi.createContract(contract);
       
       if (result.created) {
         // New contract was created
@@ -101,7 +101,7 @@ export const useContractStorage = () => {
 
   const updateContract = async (id: string, updates: Partial<Contract>) => {
       try {
-        const updatedContract = await api.updateContract(id, updates);
+        const updatedContract = await smartApi.updateContract(id, updates);
 
         setContracts(prev => prev.map(contract =>
           contract.id === id ? updatedContract : contract
@@ -125,7 +125,7 @@ export const useContractStorage = () => {
   const deleteContract = async (id: string) => {
     try {
       const contractToDelete = contracts.find(c => c.id === id);
-      await api.deleteContract(id);
+      await smartApi.deleteContract(id);
       setContracts(prev => prev.filter(contract => contract.id !== id));
       
       toast({
@@ -193,7 +193,7 @@ export const useContractStorage = () => {
         // Import contracts one by one
         for (const contract of migratedContracts) {
           const { id, createdAt, updatedAt, ...contractData } = contract;
-          await api.createContract(contractData);
+          await smartApi.createContract(contractData);
         }
         
         // Reload contracts
