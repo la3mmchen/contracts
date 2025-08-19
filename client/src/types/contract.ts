@@ -60,6 +60,7 @@ export interface ContractFilters {
   tags?: string[];
   needsMoreInfo?: boolean;
   pinned?: boolean;
+  hasAdditionalFields?: boolean; // Filter contracts that have custom fields
   sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {

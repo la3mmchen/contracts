@@ -32,6 +32,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       tags: undefined,
       needsMoreInfo: undefined,
       pinned: undefined,
+      hasAdditionalFields: undefined,
       sortBy: 'name'
     });
   };
@@ -45,6 +46,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
     if (filters.tags && filters.tags.length > 0) count++;
     if (filters.needsMoreInfo !== undefined) count++;
     if (filters.pinned !== undefined) count++;
+    if (filters.hasAdditionalFields !== undefined) count++;
     return count;
   };
 
@@ -64,7 +66,8 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
 
       {/* All Filter Options - Responsive Layout */}
       <div className="bg-muted/50 rounded-lg p-4 border w-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        {/* Row 1: Core Contract Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>
             <Label htmlFor="status-filter" className="text-sm font-medium">Status</Label>
             <Select value={filters.status || 'all'} onValueChange={(value) => updateFilter('status', value === 'all' ? undefined : value)}>
@@ -115,7 +118,10 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
               </SelectContent>
             </Select>
           </div>
+        </div>
 
+        {/* Row 2: Metadata Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="needs-more-info-filter" className="text-sm font-medium">Contract Status</Label>
             <Select value={filters.needsMoreInfo === undefined ? 'all' : filters.needsMoreInfo.toString()} onValueChange={(value) => updateFilter('needsMoreInfo', value === 'all' ? undefined : value === 'true')}>
@@ -140,6 +146,20 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
                 <SelectItem value="all">All Contracts</SelectItem>
                 <SelectItem value="true">Pinned Only</SelectItem>
                 <SelectItem value="false">Not Pinned</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="additional-fields-filter" className="text-sm font-medium">Additional Fields</Label>
+            <Select value={filters.hasAdditionalFields === undefined ? 'all' : filters.hasAdditionalFields.toString()} onValueChange={(value) => updateFilter('hasAdditionalFields', value === 'all' ? undefined : value === 'true')}>
+              <SelectTrigger id="additional-fields-filter" className="w-full">
+                <SelectValue placeholder="All Contracts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Contracts</SelectItem>
+                <SelectItem value="true">With Additional Fields</SelectItem>
+                <SelectItem value="false">No Additional Fields</SelectItem>
               </SelectContent>
             </Select>
           </div>

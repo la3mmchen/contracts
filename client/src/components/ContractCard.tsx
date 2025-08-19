@@ -138,6 +138,58 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
     }
   }, [isAnyInlineEditing, onInlineEditingChange]);
   
+  // Reset all inline editing states when contract changes (for navigation between contracts)
+  useEffect(() => {
+    // Reset all editing states
+    setIsEditingName(false);
+    setIsEditingReference(false);
+    setIsEditingCompany(false);
+    setIsEditingStartDate(false);
+    setIsEditingEndDate(false);
+    setIsEditingAmount(false);
+    setIsEditingFrequency(false);
+    setIsEditingContactPerson(false);
+    setIsEditingAddress(false);
+    setIsEditingDescription(false);
+    setIsEditingNotes(false);
+    setIsEditingEmail(false);
+    setIsEditingPhone(false);
+    setIsEditingWebsite(false);
+    setIsEditingCurrency(false);
+    setIsEditingStatus(false);
+    setIsEditingCategory(false);
+    setIsEditingTags(false);
+    setIsEditingDocumentLink(false);
+    setIsEditingCustomFields(false);
+    
+    // Reset all editing values to current contract values
+    setEditingName(contract.name || '');
+    setEditingReference(contract.reference || '');
+    setEditingCompany(contract.company || '');
+    setEditingStartDate(contract.startDate);
+    setEditingEndDate(contract.endDate || '');
+    setEditingAmount(contract.amount.toString());
+    setEditingFrequency(contract.frequency);
+    setEditingContactPerson(contract.contactInfo.contactPerson || '');
+    setEditingAddress(contract.contactInfo.address || '');
+    setEditingDescription(contract.description || '');
+    setEditingNotes(contract.notes || '');
+    setEditingEmail(contract.contactInfo.email || '');
+    setEditingPhone(contract.contactInfo.phone || '');
+    setEditingWebsite(contract.contactInfo.website || '');
+    setEditingCurrency(contract.currency);
+    setEditingStatus(contract.status);
+    setEditingCategory(contract.category);
+    setEditingTags(contract.tags?.join(', ') || '');
+    setEditingDocumentLink(contract.documentLink || '');
+    setEditingCustomFields(contract.customFields || {});
+    
+    // Reset other states
+    setEditingReason('');
+    setNewCustomFieldKey('');
+    setNewCustomFieldValue('');
+  }, [contract]);
+  
   // Get the category color using the shared utility function
   const categoryColor = useMemo(() => getCategoryBadgeColor(contract.category), [contract.category]);
   

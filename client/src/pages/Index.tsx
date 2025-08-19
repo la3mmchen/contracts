@@ -64,13 +64,15 @@ const Index = () => {
     const statusParam = searchParams.get('status');
     const categoryParam = searchParams.get('category');
     const tagsParam = searchParams.get('tags');
+    const hasAdditionalFieldsParam = searchParams.get('hasAdditionalFields');
     
-    if (statusParam || categoryParam || tagsParam) {
+    if (statusParam || categoryParam || tagsParam || hasAdditionalFieldsParam) {
       setFilters(prev => ({
         ...prev,
         ...(statusParam && { status: statusParam as Contract['status'] }),
-        ...(categoryParam && { category: categoryParam as Contract['status'] }),
-        ...(tagsParam && { tags: [tagsParam] })
+        ...(categoryParam && { category: categoryParam as Contract['category'] }),
+        ...(tagsParam && { tags: [tagsParam] }),
+        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' })
       }));
       
       // Clear URL parameters after applying them
@@ -87,6 +89,7 @@ const Index = () => {
     if (filters.tags && filters.tags.length > 0) params.set('tags', filters.tags.join(','));
     if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
     if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
+    if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
     if (filters.searchTerm) params.set('search', filters.searchTerm);
     if (filters.sortBy) params.set('sortBy', filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
@@ -185,6 +188,14 @@ const Index = () => {
     // Apply pinned filter
     if (filters.pinned !== undefined) {
       filtered = filtered.filter(contract => contract.pinned === filters.pinned);
+    }
+
+    // Apply hasAdditionalFields filter
+    if (filters.hasAdditionalFields !== undefined) {
+      filtered = filtered.filter(contract => {
+        const hasCustomFields = contract.customFields && Object.keys(contract.customFields).length > 0;
+        return filters.hasAdditionalFields === hasCustomFields;
+      });
     }
 
     // Apply sorting
@@ -560,6 +571,18 @@ const Index = () => {
                     </button>
                   </div>
                 )}
+                {filters.hasAdditionalFields !== undefined && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                    <span className="text-xs font-medium">Additional Fields: {filters.hasAdditionalFields ? 'Yes' : 'No'}</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }))}
+                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                      title="Remove additional fields filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -574,6 +597,7 @@ const Index = () => {
                   <span className="px-2 py-1 bg-muted rounded-md">name</span>
                   <span className="px-2 py-1 bg-muted rounded-md">company</span>
                   <span className="px-2 py-1 bg-muted rounded-md">ID</span>
+                  <span className="px-2 py-1 bg-muted rounded-md">reference</span>
                   <span className="px-2 py-1 bg-muted rounded-md">description</span>
                   <span className="px-2 py-1 bg-muted rounded-md">tags</span>
                   <span className="px-2 py-1 bg-muted rounded-md">notes</span>
@@ -606,7 +630,7 @@ const Index = () => {
             </div>
             
             {/* Clear All Filters Button */}
-            {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.searchTerm) && (
+            {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
               <Button
                 variant="outline"
                 size="sm"
@@ -706,6 +730,18 @@ const Index = () => {
                   searchTerm: '' // Clear search when filtering
                 }));
               }
+            } else if (filterType === 'hasAdditionalFields') {
+              // If clicking the same hasAdditionalFields filter, reset it
+              if (filters.hasAdditionalFields === (value === 'true')) {
+                setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }));
+              } else {
+                // Clear search when applying a hasAdditionalFields filter
+                setFilters(prev => ({ 
+                  ...prev,
+                  hasAdditionalFields: value === 'true',
+                  searchTerm: '' // Clear search when filtering
+                }));
+              }
             } else if (filterType === 'invalidCategories') {
               // Filter to show only contracts with invalid categories
               const invalidCategoryContracts = contracts.filter(contract => !isValidCategory(contract.category));
@@ -717,7 +753,8 @@ const Index = () => {
                 status: undefined,
                 tags: undefined,
                 needsMoreInfo: undefined,
-                pinned: undefined
+                pinned: undefined,
+                hasAdditionalFields: undefined
               }));
             }
           }}
@@ -725,7 +762,8 @@ const Index = () => {
             status: filters.status,
             category: filters.category,
             needsMoreInfo: filters.needsMoreInfo,
-            pinned: filters.pinned
+            pinned: filters.pinned,
+            hasAdditionalFields: filters.hasAdditionalFields
           }}
           filters={filters}
           onFiltersChange={setFilters}
@@ -885,6 +923,17 @@ const Index = () => {
                           setFilters(prev => ({ 
                             ...prev,
                             pinned: value === 'true',
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
+                      } else if (filterType === 'hasAdditionalFields') {
+                        // If clicking the same hasAdditionalFields filter, reset it
+                        if (filters.hasAdditionalFields === (value === 'true')) {
+                          setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev,
+                            hasAdditionalFields: value === 'true',
                             searchTerm: '' // Clear search when filtering
                           }));
                         }

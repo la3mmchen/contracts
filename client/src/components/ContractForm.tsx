@@ -112,28 +112,71 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
   const [customFieldNames, setCustomFieldNames] = useState<Record<string, string>>({});
   const [customFieldError, setCustomFieldError] = useState<string>('');
 
-  // Initialize custom field IDs and names from existing custom fields
+
+
+  // Reset form data when contract changes (for navigation between contracts)
   useEffect(() => {
-    if (contract?.customFields) {
-      const keys = Object.keys(contract.customFields);
-      setCustomFieldIds(keys);
+    if (contract) {
+      const newFormData = {
+        contractId: contract.contractId || '',
+        reference: contract.reference || '',
+        name: contract.name || '',
+        company: contract.company || '',
+        description: contract.description || '',
+        startDate: contract.startDate || new Date().toISOString().split('T')[0],
+        endDate: contract.endDate || '',
+        amount: contract.amount || '',
+        currency: contract.currency || 'EUR',
+        frequency: contract.frequency || smartDefaultFrequency as Contract['frequency'],
+        status: contract.status || smartDefaultStatus as Contract['status'],
+        category: contract.category || smartDefaultCategory as Contract['category'],
+        payDate: contract.payDate || '',
+        contactInfo: {
+          email: contract.contactInfo.email || '',
+          phone: contract.contactInfo.phone || '',
+          address: contract.contactInfo.address || '',
+          website: contract.contactInfo.website || '',
+          contactPerson: contract.contactInfo.contactPerson || '',
+        },
+        notes: contract.notes || '',
+        tags: contract.tags?.join(', ') || '',
+        needsMoreInfo: contract.needsMoreInfo || false,
+        pinned: contract.pinned || false,
+        draft: contract.draft || false,
+        customFields: contract.customFields || {},
+        documentLink: contract.documentLink || '',
+        priceChangeReason: '',
+      };
       
-      // Create a mapping where the key is the field name and value is the field value
-      const fieldNames: Record<string, string> = {};
-      const fieldValues: Record<string, string> = {};
+      setFormData(newFormData);
       
-      keys.forEach(key => {
-        fieldNames[key] = key; // Use the key as both name and ID
-        fieldValues[key] = contract.customFields[key];
-      });
+      // Also update the initial form data for dirty state tracking
+      initialFormData.current = { ...newFormData };
       
-      setCustomFieldNames(fieldNames);
-      setFormData(prev => ({
-        ...prev,
-        customFields: fieldValues
-      }));
+      // Reset custom field state
+      if (contract.customFields) {
+        const keys = Object.keys(contract.customFields);
+        setCustomFieldIds(keys);
+        
+        const fieldNames: Record<string, string> = {};
+        const fieldValues: Record<string, string> = {};
+        
+        keys.forEach(key => {
+          fieldNames[key] = key;
+          fieldValues[key] = contract.customFields[key];
+        });
+        
+        setCustomFieldNames(fieldNames);
+      } else {
+        setCustomFieldIds([]);
+        setCustomFieldNames({});
+      }
+      
+      // Reset dirty state when switching contracts
+      setIsDirty(false);
+      onDirtyStateChange?.(false);
     }
-  }, [contract?.customFields]);
+  }, [contract, smartDefaultFrequency, smartDefaultStatus, smartDefaultCategory]);
 
   // Check if form is dirty (has unsaved changes)
   const checkDirtyState = (newFormData: typeof formData) => {

@@ -6,9 +6,10 @@ Organize contracts, maintain visibility, and track your spendings.
 ## ✨ Features
 
 - 📝 **Easy Contract Management** - Add, edit, and organize all your contracts in one place
-- 💰 **Track Any Currency** - Works with dollars, euros, pounds, and 7 other major currencies
+- 🏷️ **Reference Number Tracking** - Store and search important contract identifiers like purchase orders, invoice numbers, and account references
+- 💰 **Track Any Currency** - Works with euros (default), dollars, pounds, and 7 other major currencies
 - 📊 **Smart Spending Insights** - See where your money goes with beautiful charts and summaries
-- 🔍 **Find Anything Fast** - Search contracts by name, company, or filter by type and status
+- 🔍 **Find Anything Fast** - Search contracts by name, company, reference number, or filter by type and status
 - 📱 **Works Everywhere** - Use on your phone, tablet, or computer - always looks great
 - 📤 **Export Your Data** - Download contracts as markdown files or backup everything at once
 - 🔒 **Keep Your Data Safe** - Automatic backups and protection against losing your work
@@ -66,9 +67,9 @@ The application supports the following environment variables for customization:
 | `CONTRACTS_CATEGORIES` | Contract categories for organization | `subscription,insurance,utilities,rent,services,software,maintenance,other` |
 | `CONTRACTS_STATUSES` | Contract status options | `active,expired,cancelled,terminated,closed` |
 | `CONTRACTS_FREQUENCIES` | Payment frequency options | `monthly,quarterly,yearly,weekly,bi-weekly,one-time` |
-| `CONTRACTS_CURRENCIES` | Supported currencies | `USD,EUR,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK` |
+| `CONTRACTS_CURRENCIES` | Supported currencies (EUR is default) | `EUR,USD,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK` |
 
-**Note:** All values are comma-separated strings. If an environment variable is not set, the application will use the default values listed above.
+**Note:** All values are comma-separated strings. If an environment variable is not set, the application will use the default values listed above. The default currency for new contracts is EUR.
 
 **Example Custom Configuration:**
 ```bash
@@ -81,9 +82,14 @@ CONTRACTS_STATUSES="draft,pending,active,review,expired,archived"
 # Custom frequencies for different business models
 CONTRACTS_FREQUENCIES="daily,weekly,monthly,quarterly,annually"
 
-# Custom currencies for international business
-CONTRACTS_CURRENCIES="USD,EUR,GBP,JPY,CNY,INR,BRL"
+# Custom currencies for international business (EUR is default)
+CONTRACTS_CURRENCIES="EUR,USD,GBP,JPY,CNY,INR,BRL"
 ```
+
+**New Features:**
+- **Reference Field**: Each contract now includes an optional reference field for storing important identifiers like purchase order numbers, invoice references, account numbers, etc.
+- **EUR Default Currency**: New contracts default to EUR instead of USD
+- **Enhanced Search**: Search now includes reference numbers for better contract discovery
 
 We don't bring any authentication in the app or api yet, so help yourself with basic auth if you want to use this over the internet.
 
@@ -193,7 +199,7 @@ The API provides endpoints for:
 | `CONTRACTS_CATEGORIES` | `subscription,insurance,utilities,rent,services,software,maintenance,other` | Comma-separated list of contract categories |
 | `CONTRACTS_STATUSES` | `active,expired,cancelled,terminated,closed` | Comma-separated list of contract statuses |
 | `CONTRACTS_FREQUENCIES` | `monthly,quarterly,yearly,weekly,bi-weekly,one-time` | Comma-separated list of payment frequencies |
-| `CONTRACTS_CURRENCIES` | `USD,EUR,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK` | Comma-separated list of supported currencies |
+| `CONTRACTS_CURRENCIES` | `EUR,USD,GBP,CAD,AUD,JPY,CHF,SEK,NOK,DKK` | Comma-separated list of supported currencies (EUR is default) |
 | `API_URL` | `http://localhost:3001/api` | Backend API endpoint |
 
 ### Backend (API)
@@ -211,7 +217,7 @@ environment:
   - CONTRACTS_CATEGORIES=subscription,insurance,utilities,rent,services,marketing,legal
   - CONTRACTS_STATUSES=draft,pending,active,review,expired,archived
   - CONTRACTS_FREQUENCIES=daily,weekly,monthly,quarterly,annually
-  - CONTRACTS_CURRENCIES=USD,EUR,GBP,JPY,CNY,INR,BRL
+  - CONTRACTS_CURRENCIES=EUR,USD,GBP,JPY,CNY,INR,BRL
 (...)
 environment:
 

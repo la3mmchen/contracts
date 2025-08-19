@@ -25,6 +25,7 @@ interface ContractStatsProps {
     category?: string;
     needsMoreInfo?: boolean;
     pinned?: boolean;
+    hasAdditionalFields?: boolean;
   };
   filters: FilterType;
   onFiltersChange: (filters: FilterType) => void;
