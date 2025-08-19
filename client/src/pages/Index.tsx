@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
@@ -56,6 +56,9 @@ const Index = () => {
     sortOrder: 'desc'
   });
 
+  // Ref for the search input field
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Apply URL parameters to filters on component mount
   useEffect(() => {
     const statusParam = searchParams.get('status');
@@ -91,6 +94,28 @@ const Index = () => {
     // Update search params using React Router (this will update window.location.search)
     setSearchParams(params);
   }, [filters, setSearchParams]);
+
+  // Handle Ctrl+F (or Cmd+F on Mac) to focus search field
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Ctrl+F (Windows/Linux) or Cmd+F (Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        // If search field is already focused, let browser handle Ctrl+F (release the user)
+        if (document.activeElement === searchInputRef.current) {
+          return; // Don't prevent default, let browser's find work
+        }
+        
+        // Otherwise, focus our search field
+        event.preventDefault(); // Prevent browser's default find behavior
+        searchInputRef.current?.focus();
+        // Optionally select all text for easy replacement
+        searchInputRef.current?.select();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Extract all available tags from contracts
   const availableTags = useMemo(() => {
@@ -553,6 +578,7 @@ const Index = () => {
             <div className="relative flex-1 sm:flex-none sm:max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
+                ref={searchInputRef}
                 placeholder="Search contracts..."
                 value={filters.searchTerm || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
