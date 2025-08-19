@@ -54,7 +54,7 @@ export const demoContracts: Contract[] = [
     startDate: '2024-03-01',
     endDate: '2025-03-01',
     amount: 16.99,
-    currency: 'EUR',
+    currency: 'USD',
     frequency: 'monthly',
     status: 'active',
     category: 'subscription',

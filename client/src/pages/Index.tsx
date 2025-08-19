@@ -7,7 +7,8 @@ import { ContractForm } from '@/components/ContractForm';
 
 import { ContractStats } from '@/components/ContractStats';
 import { NotificationBanner } from '@/components/NotificationBanner';
-import { ConnectionStatus } from '@/components/ConnectionStatus';
+
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 import { Button } from '@/components/ui/button';
@@ -25,12 +26,14 @@ import {
   FileText,
   AlertTriangle,
   Search,
-  X
+  X,
+  Info
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { isValidCategory } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { smartApi } from '@/services/smartApi';
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,7 +53,8 @@ const Index = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
-  const [apiConnected, setApiConnected] = useState<boolean | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState<boolean | null>(null);
+
   const [filters, setFilters] = useState<FilterType>({
     searchTerm: '',
     sortBy: 'updatedAt',
@@ -59,6 +63,15 @@ const Index = () => {
 
   // Ref for the search input field
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Check if we're in demo mode
+  useEffect(() => {
+    const checkDemoMode = async () => {
+      const isDemo = await smartApi.isDemoMode();
+      setIsDemoMode(isDemo);
+    };
+    checkDemoMode();
+  }, []);
 
   // Apply URL parameters to filters on component mount
   useEffect(() => {
@@ -426,6 +439,45 @@ const Index = () => {
               <p className="text-primary-foreground/80 mt-1 text-sm sm:text-base">Manage your contracts efficiently</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-foreground/60" />
+                <Input
+                  ref={searchInputRef}
+                  placeholder="Search contracts..."
+                  value={filters.searchTerm || ''}
+                  onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+                  className="pl-10 w-64 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/20"
+                />
+                {filters.searchTerm && (
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, searchTerm: '' }))}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-foreground/60 hover:text-primary-foreground transition-colors"
+                    title="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              
+              {/* Sort Dropdown */}
+              <Select value={filters.sortBy || 'name'} onValueChange={(value) => {
+                const newSortBy = value as any;
+                const newSortOrder = (newSortBy === 'updatedAt' || newSortBy === 'createdAt' || newSortBy === 'nextPaymentDate') ? 'desc' : 'asc';
+                setFilters(prev => ({ ...prev, sortBy: newSortBy, sortOrder: newSortOrder }));
+              }}>
+                <SelectTrigger className="w-32 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="amount">Amount</SelectItem>
+                  <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
+                  <SelectItem value="createdAt">Created Date</SelectItem>
+                  <SelectItem value="updatedAt">Last Updated</SelectItem>
+                </SelectContent>
+              </Select>
+
               <Button
                 variant="secondary"
                 onClick={exportContracts}
@@ -503,183 +555,126 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6 sm:py-8">
-        {/* Connection Status with Search and Sort */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <ConnectionStatus onStatusChange={setApiConnected} />
-          
-
-          
-          {/* Active Filters Display */}
-          {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined) && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground font-medium">Active Filters:</span>
-              <div className="flex flex-wrap items-center gap-2">
-                {filters.status && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Status: {filters.status}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, status: undefined }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove status filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-                {filters.category && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Category: {filters.category}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, category: undefined }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove category filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-                {filters.frequency && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Frequency: {filters.frequency}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, frequency: undefined }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove frequency filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-                {filters.tags && filters.tags.length > 0 && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Tags: {filters.tags.join(', ')}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove tags filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-                {filters.needsMoreInfo !== undefined && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Needs Info: {filters.needsMoreInfo ? 'Yes' : 'No'}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove needs info filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-                {filters.pinned !== undefined && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, pinned: undefined }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove pinned filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-                {filters.hasAdditionalFields !== undefined && (
-                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
-                    <span className="text-xs font-medium">Additional Fields: {filters.hasAdditionalFields ? 'Yes' : 'No'}</span>
-                    <button
-                      onClick={() => setFilters(prev => ({ ...prev, hasAdditionalFields: undefined }))}
-                      className="ml-1 text-primary/70 hover:text-primary transition-colors"
-                      title="Remove additional fields filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          
-          {/* Search and Sort Fields */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-            {/* Searchable fields info - only show when searching */}
-            {filters.searchTerm && (
-              <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-medium">Searching in:</span>
-                <div className="flex gap-1">
-                  <span className="px-2 py-1 bg-muted rounded-md">name</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">company</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">ID</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">reference</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">description</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">tags</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">notes</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">custom fields</span>
-                  <span className="px-2 py-1 bg-muted rounded-md">document links</span>
+        {/* Demo Mode Banner */}
+        {isDemoMode && (
+          <Alert className="mb-6 bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-200">
+            <Info className="h-4 w-4" />
+            <AlertTitle>Demo Mode</AlertTitle>
+            <AlertDescription>
+              API server is not available. You're currently viewing demo data with sample contracts.
+              All changes will be temporary and won't be saved to a server.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Active Filters Display */}
+        {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined) && (
+          <div className="flex items-center gap-2 text-sm mb-6">
+            <span className="text-muted-foreground font-medium">Active Filters:</span>
+            <div className="flex flex-wrap items-center gap-2">
+              {filters.status && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Status: {filters.status}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, status: undefined }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove status filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
-              </div>
-            )}
-            
-            <div className="relative flex-1 sm:flex-none sm:max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                ref={searchInputRef}
-                placeholder="Search contracts..."
-                value={filters.searchTerm || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                className="pl-10 w-full"
-              />
-              {filters.searchTerm && (
-                <button
-                  onClick={() => setFilters(prev => ({ ...prev, searchTerm: '' }))}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
-                  title="Clear search"
+              )}
+              {filters.category && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Category: {filters.category}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, category: undefined }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove category filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {filters.frequency && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Frequency: {filters.frequency}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, frequency: undefined }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove frequency filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {filters.tags && filters.tags.length > 0 && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Tags: {filters.tags.join(', ')}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove tags filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {filters.needsMoreInfo !== undefined && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Needs Info: {filters.needsMoreInfo ? 'Yes' : 'No'}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove needs info filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {filters.pinned !== undefined && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, pinned: undefined }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove pinned filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {filters.hasAdditionalFields !== undefined && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                  <span className="text-xs font-medium">Additional Fields: {filters.hasAdditionalFields ? 'Yes' : 'No'}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, hasAdditionalFields: undefined }))}
+                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    title="Remove additional fields filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {/* Clear All Filters Button */}
+              {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFilters({
+                    searchTerm: '',
+                    sortBy: 'updatedAt',
+                    sortOrder: 'desc'
+                  })}
+                  className="whitespace-nowrap"
                 >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <X className="h-4 w-4 mr-1" />
+                  Clear All
+                </Button>
               )}
             </div>
-            
-            {/* Clear All Filters Button */}
-            {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setFilters({
-                  searchTerm: '',
-                  sortBy: 'updatedAt',
-                  sortOrder: 'desc'
-                })}
-                className="whitespace-nowrap"
-              >
-                <X className="h-4 w-4 mr-1" />
-                Clear All
-              </Button>
-            )}
-            
-            <Select value={filters.sortBy || 'name'} onValueChange={(value) => {
-              const newSortBy = value as any;
-              // Automatically set sort order: desc for dates, asc for others
-              const newSortOrder = (newSortBy === 'updatedAt' || newSortBy === 'createdAt' || newSortBy === 'nextPaymentDate') ? 'desc' : 'asc';
-              setFilters(prev => ({ ...prev, sortBy: newSortBy, sortOrder: newSortOrder }));
-            }}>
-              <SelectTrigger className="w-full sm:w-32">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="amount">Amount</SelectItem>
-                <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
-                <SelectItem value="createdAt">Created Date</SelectItem>
-                <SelectItem value="updatedAt">Last Updated</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </div>
+        )}
 
         {/* Statistics */}
         <ContractStats 
@@ -789,19 +784,7 @@ const Index = () => {
         {/* Notifications */}
         <NotificationBanner contracts={contracts} onEdit={scrollToContract} />
 
-        {/* API Connection Warning */}
-        {apiConnected === false && contracts.length > 0 && (
-          <div className="mb-6">
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>API Connection Issue</AlertTitle>
-              <AlertDescription>
-                The application cannot connect to the API server, but contracts are still being displayed. 
-                This may indicate cached data or a connection problem. Please check your API connection.
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
+
 
         {/* Invalid Categories Warning */}
         {(() => {

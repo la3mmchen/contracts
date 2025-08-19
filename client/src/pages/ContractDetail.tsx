@@ -286,7 +286,7 @@ const ContractDetail = () => {
               <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Contract Not Found</h1>
               <p className="text-muted-foreground text-sm sm:text-base">The contract you're looking for doesn't exist or has been deleted.</p>
               <Button asChild className="mt-4">
-                <Link to="/">Back to Contracts</Link>
+                <Link to={`${getBasePath()}/`}>Back to Contracts</Link>
               </Button>
             </div>
           </div>

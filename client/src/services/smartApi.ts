@@ -108,18 +108,8 @@ export class SmartApiService {
     return await this.checkApiAvailability();
   }
 
-  // Health check method for ConnectionStatus component
+  // Health check method for API availability
   async checkApiHealth(): Promise<{ status: 'ok' | 'error'; message?: string; details?: unknown }> {
-    // First check if we're already in demo mode
-    if (this.isApiAvailable === false) {
-      return {
-        status: 'ok',
-        message: 'Demo mode - API not available',
-        details: { mode: 'demo' }
-      };
-    }
-    
-    // Only check API if we haven't determined it's unavailable yet
     try {
       const healthCheck = await api.checkApiHealth();
       this.isApiAvailable = healthCheck.status === 'ok';
@@ -129,15 +119,14 @@ export class SmartApiService {
       console.warn('API health check failed, falling back to demo mode:', error);
       this.isApiAvailable = false;
       this.lastApiCheck = Date.now();
+      // Return error status for demo mode detection
       return {
-        status: 'ok',
-        message: 'Demo mode - API not available',
-        details: { mode: 'demo', error: error.message }
+        status: 'error',
+        message: 'API server not available - using demo mode',
+        details: { mode: 'demo', error: error instanceof Error ? error.message : 'Network error' }
       };
     }
   }
-
-
 }
 
 // Export singleton instance
