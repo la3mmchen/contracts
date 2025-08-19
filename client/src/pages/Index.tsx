@@ -193,8 +193,20 @@ const Index = () => {
     // Apply hasAdditionalFields filter
     if (filters.hasAdditionalFields !== undefined) {
       filtered = filtered.filter(contract => {
-        const hasCustomFields = contract.customFields && Object.keys(contract.customFields).length > 0;
-        return filters.hasAdditionalFields === hasCustomFields;
+        // Handle cases where customFields might be undefined, null, or empty
+        const hasCustomFields = contract.customFields && 
+                               typeof contract.customFields === 'object' && 
+                               Object.keys(contract.customFields).length > 0;
+        
+        // For hasAdditionalFields=false, we want contracts WITHOUT custom fields
+        // For hasAdditionalFields=true, we want contracts WITH custom fields
+        if (filters.hasAdditionalFields === false) {
+          return !hasCustomFields; // Include contracts without custom fields
+        } else if (filters.hasAdditionalFields === true) {
+          return hasCustomFields; // Include contracts with custom fields
+        }
+        
+        return true; // Default case
       });
     }
 
@@ -495,7 +507,7 @@ const Index = () => {
           <ConnectionStatus onStatusChange={setApiConnected} />
           
           {/* Active Filters Display */}
-          {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined) && (
+          {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined) && (
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground font-medium">Active Filters:</span>
               <div className="flex flex-wrap items-center gap-2">
@@ -563,7 +575,7 @@ const Index = () => {
                   <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
                     <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
                     <button
-                      onClick={() => setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }))}
+                      onClick={() => setFilters(prev => ({ ...prev, pinned: undefined }))}
                       className="ml-1 text-primary/70 hover:text-primary transition-colors"
                       title="Remove pinned filter"
                     >
@@ -575,7 +587,7 @@ const Index = () => {
                   <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
                     <span className="text-xs font-medium">Additional Fields: {filters.hasAdditionalFields ? 'Yes' : 'No'}</span>
                     <button
-                      onClick={() => setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }))}
+                      onClick={() => setFilters(prev => ({ ...prev, hasAdditionalFields: undefined }))}
                       className="ml-1 text-primary/70 hover:text-primary transition-colors"
                       title="Remove additional fields filter"
                     >
