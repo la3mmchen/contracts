@@ -12,7 +12,8 @@ export const loadConfig = async (): Promise<AppConfig> => {
   }
 
   try {
-    const response = await fetch('/config.json');
+    // Try to load config from the current base path
+    const response = await fetch('./config.json');
     if (!response.ok) {
       throw new Error('Failed to load config');
     }
