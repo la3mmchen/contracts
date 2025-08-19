@@ -1832,7 +1832,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
 
         {/* Notes */}
         {isDetailPage || contract.notes ? (
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
               <span>Notes:</span>
@@ -1869,15 +1869,25 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               </div>
             ) : isDetailPage ? (
               <div 
-                className="text-sm text-muted-foreground line-clamp-3 pl-6 bg-muted/30 p-2 rounded cursor-pointer hover:bg-muted/50 transition-colors"
+                className="text-sm text-muted-foreground pl-6 bg-muted/30 p-3 rounded cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => setIsEditingNotes(true)}
                 title="Click to edit notes"
               >
-                {contract.notes || 'Click to add notes...'}
+                {contract.notes ? (
+                  <div className="whitespace-pre-wrap leading-relaxed text-foreground">
+                    {contract.notes}
+                  </div>
+                ) : (
+                  'Click to add notes...'
+                )}
               </div>
             ) : (
-              <div className="text-sm text-muted-foreground line-clamp-3 pl-6 bg-muted/30 p-2 rounded">
-                {contract.notes}
+              <div className="text-sm text-muted-foreground pl-6 bg-muted/30 p-3 rounded">
+                {contract.notes && (
+                  <div className="whitespace-pre-wrap leading-relaxed text-foreground max-h-32 overflow-y-auto">
+                    {contract.notes}
+                  </div>
+                )}
               </div>
             )}
           </div>

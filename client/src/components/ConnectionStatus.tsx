@@ -65,7 +65,7 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
     
     initializeConnection();
 
-    // Set up periodic connectivity check every 15 seconds
+    // Set up periodic connectivity check every 30 seconds
     const intervalId = setInterval(() => {
       checkConnection();
     }, 30000);

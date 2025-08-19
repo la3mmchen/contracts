@@ -1,0 +1,31 @@
+{
+  "id": "test-multi-line-notes",
+  "contractId": "TEST-MULTI-001",
+  "name": "Multi-Line Notes Test Contract",
+  "company": "Test Company",
+  "description": "A test contract to demonstrate multi-line notes display",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "amount": 99.99,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "other",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "test@example.com",
+    "phone": "+1-555-123-4567",
+    "website": "https://example.com"
+  },
+  "notes": "This is a test contract with multi-line notes.\n\nLine 1: Basic information\nLine 2: Additional details\nLine 3: More information\n\nBullet points:\n• First bullet point\n• Second bullet point\n• Third bullet point\n\nFinal note: This should display with proper line breaks.",
+  "tags": ["test", "multi-line", "notes"],
+  "needsMoreInfo": false,
+  "pinned": false,
+  "draft": false,
+  "priceChanges": [],
+  "customFields": {},
+  "attachments": [],
+  "documentLink": null,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-09-01T10:30:00.000Z"
+}
