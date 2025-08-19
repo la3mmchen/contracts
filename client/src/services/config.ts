@@ -18,12 +18,19 @@ export const loadConfig = async (): Promise<AppConfig> => {
       throw new Error('Failed to load config');
     }
     config = await response.json();
+    
+    // Adjust API_URL based on current location for GitHub Pages
+    if (window.location.pathname.includes('/contracts/')) {
+      config.API_URL = '/contracts/api';
+    }
+    
     return config;
   } catch (error) {
     console.warn('Failed to load config.json, using defaults:', error);
-    // Fallback to defaults
+    // Fallback to defaults with base path detection
+    const basePath = window.location.pathname.includes('/contracts/') ? '/contracts' : '';
     config = {
-      API_URL: '/api',
+      API_URL: `${basePath}/api`,
       APP_NAME: 'Contract Manager',
       CATEGORIES: 'subscription,insurance,utilities,rent,services,software,maintenance,other'
     };

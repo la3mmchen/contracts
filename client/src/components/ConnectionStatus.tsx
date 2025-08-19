@@ -65,16 +65,19 @@ export const ConnectionStatus = ({ onStatusChange }: ConnectionStatusProps) => {
     
     initializeConnection();
 
-    // Set up periodic connectivity check every 30 seconds
+    // Set up periodic connectivity check every 5 minutes (less aggressive)
     const intervalId = setInterval(() => {
-      checkConnection();
-    }, 30000);
+      // Only check if we haven't determined the API is unavailable
+      if (status !== 'error') {
+        checkConnection();
+      }
+    }, 5 * 60 * 1000); // 5 minutes
 
     // Cleanup interval on component unmount
     return () => {
       clearInterval(intervalId);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getStatusIcon = (status: 'checking' | 'connected' | 'error') => {
     switch (status) {

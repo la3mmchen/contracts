@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { Contract } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
@@ -32,9 +32,16 @@ import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 
+// Helper function to get the correct base path
+const getBasePath = () => {
+  return window.location.pathname.includes('/contracts/') ? '/contracts' : '';
+};
+
 const ContractDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { 
     contracts, 
@@ -52,7 +59,6 @@ const ContractDetail = () => {
   const [showInlineEditingWarning, setShowInlineEditingWarning] = useState(false);
 
   // Get filtered contracts based on URL parameters for navigation context
-  const location = useLocation();
   const filteredContracts = React.useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
     let filtered = contracts;
@@ -174,7 +180,7 @@ const ContractDetail = () => {
         if (isInlineEditing) {
           setShowInlineEditingWarning(true);
         } else {
-          navigate('/');
+          navigate(`${getBasePath()}/`);
         }
       }
       
@@ -238,7 +244,7 @@ const ContractDetail = () => {
   const handleDelete = async () => {
     if (contract) {
       await deleteContract(contract.id);
-      navigate('/');
+      navigate(`${getBasePath()}/`);
     }
   };
 
@@ -250,7 +256,7 @@ const ContractDetail = () => {
     } else {
       searchParams.set(filterType, value);
     }
-    navigate(`/?${searchParams.toString()}`);
+    navigate(`${getBasePath()}/?${searchParams.toString()}`);
   };
 
 
@@ -313,7 +319,7 @@ const ContractDetail = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/')}
+                onClick={() => navigate(`${getBasePath()}/`)}
                 className="text-primary-foreground hover:bg-primary-foreground/10 p-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -383,7 +389,7 @@ const ContractDetail = () => {
                   onPrevious={navigation.goToPrevious}
                   onFirst={navigation.goToFirst}
                   onLast={navigation.goToLast}
-                  onShowList={() => navigate(`/${location.search}`)}
+                  onShowList={() => navigate(`${getBasePath()}/${location.search}`)}
                   previousContract={navigation.previousContract}
                   nextContract={navigation.nextContract}
                 />
@@ -786,7 +792,7 @@ const ContractDetail = () => {
                 setShowInlineEditingWarning(false);
                 // Allow navigation but warn about data loss
                 if (window.confirm('Are you sure you want to discard your unsaved changes? This action cannot be undone.')) {
-                  navigate('/');
+                  navigate(`${getBasePath()}/`);
                 }
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
