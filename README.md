@@ -5,15 +5,14 @@ Organize contracts, maintain visibility, and track your spendings.
 
 ## ✨ Features
 
-- 📝 **Contract Management** - Create, edit, delete with rich details
-- 💰 **Multi-Currency** - Support for 10 major currencies
-- 📊 **Analytics Dashboard** - Visual spending & category breakdowns
-- 🔍 **Smart Search & Filters** - Find contracts instantly
-- 📱 **Mobile Responsive** - Works seamlessly on all devices
-- 📤 **Export to Markdown** - Bulk export (ZIP) or individual files with filtering
-- 📤 **Backup** - Backup your data
-- 🚫 **Data Loss Prevention** - Unsaved changes protection
-- ⚡ **Real-time Stats** - Live spending & payment tracking
+- 📝 **Easy Contract Management** - Add, edit, and organize all your contracts in one place
+- 💰 **Track Any Currency** - Works with dollars, euros, pounds, and 7 other major currencies
+- 📊 **Smart Spending Insights** - See where your money goes with beautiful charts and summaries
+- 🔍 **Find Anything Fast** - Search contracts by name, company, or filter by type and status
+- 📱 **Works Everywhere** - Use on your phone, tablet, or computer - always looks great
+- 📤 **Export Your Data** - Download contracts as markdown files or backup everything at once
+- 🔒 **Keep Your Data Safe** - Automatic backups and protection against losing your work
+- ⚡ **Always Up to Date** - See your spending totals and upcoming payments in real-time
 
 ![contracts](./docs/images/sneak-peek.png)
 
@@ -181,7 +180,7 @@ The API provides endpoints for:
 
 📤 **See [Export Documentation](docs/export.md) for detailed export functionality**
 
-## Export 
+## Backup 
 
 📤 **See [Backup Documentation](docs/backup.md) for detailed backup functionality**
 
@@ -208,11 +207,14 @@ The API provides endpoints for:
 # docker-compose.yml
 environment:
   - APP_NAME=My Contract App
+  - API_URL=https://contracts.yourdomain.com/api
   - CONTRACTS_CATEGORIES=subscription,insurance,utilities,rent,services,marketing,legal
   - CONTRACTS_STATUSES=draft,pending,active,review,expired,archived
   - CONTRACTS_FREQUENCIES=daily,weekly,monthly,quarterly,annually
   - CONTRACTS_CURRENCIES=USD,EUR,GBP,JPY,CNY,INR,BRL
-  - API_URL=https://contracts.yourdomain.com/api
+(...)
+environment:
+
   - CONTRACTS_DATA_DIR=/app/data
 ```
 
