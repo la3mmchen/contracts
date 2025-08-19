@@ -81,8 +81,8 @@ export const useContractStorage = () => {
       } else {
         // Contract already existed
         toast({
-          title: "Contract already exists",
-          description: `${contract.name} already exists in your contracts.`,
+          title: "Contract ID already exists",
+          description: `A contract with ID "${contract.contractId}" already exists. Please use a different contract ID.`,
           variant: "default",
         });
       }
