@@ -24,4 +24,35 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Optimize build for GitHub Pages
+    target: 'es2015',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+    // Ensure consistent builds
+    sourcemap: false,
+    minify: 'esbuild',
+    // Force esbuild for better compatibility
+    ...(process.env.VITE_FORCE_ESBUILD === 'true' && {
+      minify: 'esbuild',
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
+    }),
+  },
+  optimizeDeps: {
+    // Force esbuild for dependency optimization
+    esbuildOptions: {
+      target: 'es2015',
+    },
+    // Disable Rollup for dependency optimization if forced
+    ...(process.env.VITE_FORCE_ESBUILD === 'true' && {
+      force: true,
+    }),
+  },
 }));
