@@ -680,16 +680,31 @@ const Index = () => {
         <ContractStats 
           contracts={contracts} 
           onFilter={(filterType, value) => {
-            if (filterType === 'status') {
-              // If clicking the same status filter, reset it
-              if (filters.status === value) {
-                setFilters(prev => ({ ...prev, status: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a status filter
+            if (filterType === 'viewMode') {
+              // Handle view mode as mutually exclusive options
+              if (value === 'all') {
+                // Reset all filters to show all contracts
                 setFilters(prev => ({ 
                   ...prev,
-                  status: value as Contract['status'],
-                  searchTerm: '' // Clear search when filtering
+                  status: undefined,
+                  needsMoreInfo: undefined,
+                  searchTerm: ''
+                }));
+              } else if (value === 'active') {
+                // Show only active contracts
+                setFilters(prev => ({ 
+                  ...prev,
+                  status: 'active',
+                  needsMoreInfo: undefined,
+                  searchTerm: ''
+                }));
+              } else if (value === 'needsAttention') {
+                // Show only contracts that need attention
+                setFilters(prev => ({ 
+                  ...prev,
+                  status: undefined,
+                  needsMoreInfo: true,
+                  searchTerm: ''
                 }));
               }
             } else if (filterType === 'category') {
@@ -713,18 +728,6 @@ const Index = () => {
                 setFilters(prev => ({ 
                   ...prev,
                   tags: [value],
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'needsMoreInfo') {
-              // If clicking the same needsMoreInfo filter, reset it
-              if (filters.needsMoreInfo === (value === 'true')) {
-                setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a needsMoreInfo filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  needsMoreInfo: value === 'true',
                   searchTerm: '' // Clear search when filtering
                 }));
               }
@@ -869,15 +872,31 @@ const Index = () => {
                     onUpdate={updateContract}
                     currentSearchParams={searchParams.toString()}
                     onFilter={(filterType, value) => {
-                      if (filterType === 'status') {
-                        // If clicking the same status filter, reset it
-                        if (filters.status === value) {
-                          setFilters(prev => ({ ...prev, status: undefined, searchTerm: '' }));
-                        } else {
+                      if (filterType === 'viewMode') {
+                        // Handle view mode as mutually exclusive options
+                        if (value === 'all') {
+                          // Reset all filters to show all contracts
                           setFilters(prev => ({ 
                             ...prev,
-                            status: value as Contract['status'],
-                            searchTerm: '' // Clear search when filtering
+                            status: undefined,
+                            needsMoreInfo: undefined,
+                            searchTerm: ''
+                          }));
+                        } else if (value === 'active') {
+                          // Show only active contracts
+                          setFilters(prev => ({ 
+                            ...prev,
+                            status: 'active',
+                            needsMoreInfo: undefined,
+                            searchTerm: ''
+                          }));
+                        } else if (value === 'needsAttention') {
+                          // Show only contracts that need attention
+                          setFilters(prev => ({ 
+                            ...prev,
+                            status: undefined,
+                            needsMoreInfo: true,
+                            searchTerm: ''
                           }));
                         }
                       } else if (filterType === 'category') {
@@ -899,17 +918,6 @@ const Index = () => {
                           setFilters(prev => ({ 
                             ...prev,
                             tags: [value],
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'needsMoreInfo') {
-                        // If clicking the same needsMoreInfo filter, reset it
-                        if (filters.needsMoreInfo === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            needsMoreInfo: value === 'true',
                             searchTerm: '' // Clear search when filtering
                           }));
                         }

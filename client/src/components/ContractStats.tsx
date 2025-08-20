@@ -42,12 +42,12 @@ export const ContractStats = ({
   availableTags,
   filteredContracts
 }: ContractStatsProps) => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('quickFilters');
 
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    // Reset filters when switching tabs
-    if (onFilter) {
+    // Reset filters when switching to advanced filters tab
+    if (newTab === 'filters' && onFilter) {
       onFilter('reset', '');
     }
   };
@@ -122,8 +122,8 @@ export const ContractStats = ({
       color: 'text-primary',
       bgColor: 'bg-primary/10',
       clickable: true,
-      filterType: 'reset',
-      filterValue: '',
+      filterType: 'viewMode',
+      filterValue: 'all',
     },
     {
       title: 'Active Contracts',
@@ -132,7 +132,7 @@ export const ContractStats = ({
       color: 'text-success',
       bgColor: 'bg-success/10',
       clickable: true,
-      filterType: 'status',
+      filterType: 'viewMode',
       filterValue: 'active',
     },
     {
@@ -142,12 +142,12 @@ export const ContractStats = ({
       color: 'text-yellow-600 dark:text-yellow-400',
       bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
       clickable: true,
-      filterType: 'needsMoreInfo',
-      filterValue: 'true',
+      filterType: 'viewMode',
+      filterValue: 'needsAttention',
     },
-         {
-       title: filteredContracts ? 'Filtered Monthly Spend' : 'Total Monthly Spend',
-       value: `$${(filteredContracts ?? contracts)
+    {
+      title: filteredContracts ? 'Filtered Monthly Spend' : 'Total Monthly Spend',
+      value: `$${(filteredContracts ?? contracts)
         .filter(c => c.status === 'active')
         .reduce((total, contract) => {
           switch (contract.frequency) {
@@ -171,19 +171,60 @@ export const ContractStats = ({
       icon: Coins,
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-100 dark:bg-green-900/30',
-             clickable: false,
+      clickable: false,
     },
 
     ...generateCategoryStats(),
   ];
 
+  // Helper function to render a compact stat card
+  const renderCompactStatCard = (stat: StatItem, index: number) => {
+    const isActive = activeFilters && (
+      (stat.filterType === 'viewMode' && (
+        (stat.filterValue === 'all' && !activeFilters.status && !activeFilters.needsMoreInfo) ||
+        (stat.filterValue === 'active' && activeFilters.status === 'active') ||
+        (stat.filterValue === 'needsAttention' && activeFilters.needsMoreInfo === true)
+      )) ||
+      (stat.filterType === 'category' && activeFilters.category === stat.filterValue) ||
+      (stat.filterType === 'pinned' && activeFilters.pinned === (stat.filterValue === 'true'))
+    );
+    
+    return (
+      <Card 
+        key={`compact-${stat.filterType}-${index}`}
+        className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-200 ${
+          stat.clickable && onFilter ? 'cursor-pointer hover:scale-[1.02] border-primary/30 hover:border-primary/50' : ''
+        } ${isActive ? 'ring-2 ring-primary bg-primary/5 border-primary/50' : ''}`} 
+        onClick={stat.clickable && onFilter ? () => onFilter(stat.filterType!, stat.filterValue!) : undefined}
+      >
+        <CardContent className="p-3">
+          <div className="flex items-center gap-3">
+            <div className={`${stat.bgColor} p-2 rounded-lg flex-shrink-0`}>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-muted-foreground leading-tight truncate">
+                {stat.title}
+              </p>
+              <p className="text-lg font-bold text-foreground leading-tight">
+                {stat.value}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   // Helper function to render a stat card
   const renderStatCard = (stat: StatItem, index: number) => {
     const isActive = activeFilters && (
-      (stat.filterType === 'status' && activeFilters.status === stat.filterValue) ||
-      (stat.filterType === 'reset' && !activeFilters.status && !activeFilters.category && !activeFilters.pinned) ||
+      (stat.filterType === 'viewMode' && (
+        (stat.filterValue === 'all' && !activeFilters.status && !activeFilters.needsMoreInfo) ||
+        (stat.filterValue === 'active' && activeFilters.status === 'active') ||
+        (stat.filterValue === 'needsAttention' && activeFilters.needsMoreInfo === true)
+      )) ||
       (stat.filterType === 'category' && activeFilters.category === stat.filterValue) ||
-      (stat.filterType === 'needsMoreInfo' && activeFilters.needsMoreInfo === (stat.filterValue === 'true')) ||
       (stat.filterType === 'pinned' && activeFilters.pinned === (stat.filterValue === 'true'))
     );
     
@@ -192,7 +233,7 @@ export const ContractStats = ({
         key={`${stat.filterType}-${index}`}
         className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
           stat.clickable && onFilter ? 'cursor-pointer hover:scale-105 border-primary/30 hover:border-primary/50' : ''
-        } ${isActive ? 'ring-2 ring-primary' : ''}`} 
+        } ${isActive ? 'ring-2 ring-primary bg-primary/5 border-primary/50' : ''}`} 
         style={{ animationDelay: `${index * 0.1}s` }}
         onClick={stat.clickable && onFilter ? () => onFilter(stat.filterType!, stat.filterValue!) : undefined}
       >
@@ -241,25 +282,26 @@ export const ContractStats = ({
     return (
       <Card 
         key={`category-${index}`}
-        className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
-          stat.clickable && onFilter ? 'cursor-pointer hover:scale-105 border-primary/30 hover:border-primary/50' : ''
-        } ${isActive ? 'ring-2 ring-primary' : ''}`} 
-        style={{ animationDelay: `${index * 0.1}s` }}
+        className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-200 ${
+          stat.clickable && onFilter ? 'cursor-pointer hover:scale-[1.02] border-primary/30 hover:border-primary/50' : ''
+        } ${isActive ? 'ring-2 ring-primary bg-primary/5 border-primary/50' : ''}`} 
         onClick={stat.clickable && onFilter ? () => onFilter(stat.filterType!, stat.filterValue!) : undefined}
       >
         <CardContent className="p-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <div className={`${stat.bgColor} p-1 rounded`}>
-                <stat.icon className={`h-3 w-3 ${stat.color}`} />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">
-                {stat.title}
-              </span>
+          <div className="flex items-center gap-2">
+            <div className={`${stat.bgColor} p-1.5 rounded flex-shrink-0`}>
+              <stat.icon className={`h-3 w-3 ${stat.color}`} />
             </div>
-            <span className="text-sm font-bold text-foreground">
-              {stat.value}
-            </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-muted-foreground truncate">
+                  {stat.title}
+                </span>
+                <span className="text-xs font-bold text-foreground ml-1">
+                  {stat.value}
+                </span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -267,35 +309,43 @@ export const ContractStats = ({
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-4">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-          <TabsTrigger value="categories" className="text-xs sm:text-sm">Categories</TabsTrigger>
-          <TabsTrigger value="filters" className="text-xs sm:text-sm">Filters</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="quickFilters" className="text-xs sm:text-sm">Quick Filters</TabsTrigger>
+          <TabsTrigger value="filters" className="text-xs sm:text-sm">Advanced Filters</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="overview" className="space-y-2">
-          {/* Main Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-            {stats.filter(stat => stat.filterType !== 'category').map((stat, index) => 
-              renderStatCard(stat, index)
-            )}
+        <TabsContent value="quickFilters" className="space-y-3">
+          {/* Main Stats - More Compact */}
+          <div className="p-3 bg-muted/20 rounded-lg border border-border/50">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-foreground">Quick View Options</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {stats.filter(stat => stat.filterType !== 'category').map((stat, index) => 
+                renderCompactStatCard(stat, index)
+              )}
+            </div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="categories" className="space-y-2">
-          {/* Category Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
-            {stats.filter(stat => stat.filterType === 'category')
-              .filter(stat => typeof stat.value === 'number' && stat.value > 0)
-              .sort((a, b) => (b.value as number) - (a.value as number))
-              .map((stat, index) => renderCategoryCard(stat, index))}
+          
+          {/* Category Stats - More Compact */}
+          <div className="p-3 bg-muted/10 rounded-lg border border-border/30">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-foreground">Filter by Category</h3>
+              <span className="text-xs text-muted-foreground">Click to filter</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+              {stats.filter(stat => stat.filterType === 'category')
+                .filter(stat => typeof stat.value === 'number' && stat.value > 0)
+                .sort((a, b) => (b.value as number) - (a.value as number))
+                .map((stat, index) => renderCategoryCard(stat, index))}
+            </div>
           </div>
         </TabsContent>
         
         <TabsContent value="filters" className="space-y-2">
-          {/* Filters Section */}
+          {/* Advanced Filters Section */}
           <div className="w-full">
             <ContractFilters 
               filters={filters} 
