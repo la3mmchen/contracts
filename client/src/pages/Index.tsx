@@ -431,7 +431,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground border-b">
+      <div className="bg-black text-white border-b border-gray-700 shadow-sm">
         <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -441,18 +441,18 @@ const Index = () => {
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               {/* Search Input */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-foreground/60" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60" />
                 <Input
                   ref={searchInputRef}
                   placeholder="Search contracts..."
                   value={filters.searchTerm || ''}
                   onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                  className="pl-10 w-64 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/20"
+                  className="pl-10 w-64 bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 transition-all duration-200 hover:bg-white/15 focus:bg-white/20"
                 />
                 {filters.searchTerm && (
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, searchTerm: '' }))}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-foreground/60 hover:text-primary-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60 hover:text-white transition-colors"
                     title="Clear search"
                   >
                     <X className="h-4 w-4" />
@@ -466,7 +466,7 @@ const Index = () => {
                 const newSortOrder = (newSortBy === 'updatedAt' || newSortBy === 'createdAt' || newSortBy === 'nextPaymentDate') ? 'desc' : 'asc';
                 setFilters(prev => ({ ...prev, sortBy: newSortBy, sortOrder: newSortOrder }));
               }}>
-                <SelectTrigger className="w-32 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+                <SelectTrigger className="w-32 bg-white/10 border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -482,7 +482,7 @@ const Index = () => {
                 variant="secondary"
                 onClick={exportContracts}
                 size="sm"
-                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20 text-xs sm:text-sm"
+                className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm transition-all duration-200"
               >
                 <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Export
@@ -490,7 +490,7 @@ const Index = () => {
               <Button 
                 variant="secondary" 
                 size="sm"
-                className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/30 hover:border-primary-foreground/40 transition-colors text-xs sm:text-sm"
+                className="bg-white/10 text-white border-white/20 hover:bg-white/30 hover:border-white/40 transition-all duration-200 text-xs sm:text-sm"
                 onClick={() => document.getElementById('file-upload')?.click()}
               >
                 <input
@@ -506,7 +506,7 @@ const Index = () => {
               <ThemeToggle />
               <Dialog open={isFormOpen} onOpenChange={handleDialogClose}>
                 <DialogTrigger asChild>
-                  <Button onClick={openAddForm} size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 text-xs sm:text-sm">
+                  <Button onClick={openAddForm} size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 hover:scale-105 text-xs sm:text-sm transition-all duration-200">
                     <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Add Contract
                   </Button>
@@ -557,7 +557,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Demo Mode Banner */}
         {isDemoMode && (
-          <Alert className="mb-6 bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-200">
+                          <Alert className="mb-6 bg-[#01A5E1]/10 border-[#01A5E1]/20 text-[#01A5E1] dark:bg-[#01A5E1]/20 dark:border-[#01A5E1]/30 dark:text-[#01A5E1]">
             <Info className="h-4 w-4" />
             <AlertTitle>Demo Mode</AlertTitle>
             <AlertDescription>
@@ -573,11 +573,11 @@ const Index = () => {
             <span className="text-muted-foreground font-medium">Active Filters:</span>
             <div className="flex flex-wrap items-center gap-2">
               {filters.status && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#A7E459]/10 text-[#A7E459] rounded-md border border-[#A7E459]/20">
                   <span className="text-xs font-medium">Status: {filters.status}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, status: undefined }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#A7E459]/70 hover:text-[#A7E459] transition-colors"
                     title="Remove status filter"
                   >
                     <X className="h-3 w-3" />
@@ -585,11 +585,11 @@ const Index = () => {
                 </div>
               )}
               {filters.category && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#0DD1EE]/10 text-[#0DD1EE] rounded-md border border-[#0DD1EE]/20">
                   <span className="text-xs font-medium">Category: {filters.category}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, category: undefined }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#0DD1EE]/70 hover:text-[#0DD1EE] transition-colors"
                     title="Remove category filter"
                   >
                     <X className="h-3 w-3" />
@@ -597,11 +597,11 @@ const Index = () => {
                 </div>
               )}
               {filters.frequency && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#F5DA6C]/10 text-[#F5DA6C] rounded-md border border-[#F5DA6C]/20">
                   <span className="text-xs font-medium">Frequency: {filters.frequency}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, frequency: undefined }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#F5DA6C]/70 hover:text-[#F5DA6C] transition-colors"
                     title="Remove frequency filter"
                   >
                     <X className="h-3 w-3" />
@@ -609,11 +609,11 @@ const Index = () => {
                 </div>
               )}
               {filters.tags && filters.tags.length > 0 && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#285CC4]/10 text-[#285CC4] rounded-md border border-[#285CC4]/20">
                   <span className="text-xs font-medium">Tags: {filters.tags.join(', ')}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#285CC4]/70 hover:text-[#285CC4] transition-colors"
                     title="Remove tags filter"
                   >
                     <X className="h-3 w-3" />
@@ -621,11 +621,11 @@ const Index = () => {
                 </div>
               )}
               {filters.needsMoreInfo !== undefined && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#E45093]/10 text-[#E45093] rounded-md border border-[#E45093]/20">
                   <span className="text-xs font-medium">Needs Info: {filters.needsMoreInfo ? 'Yes' : 'No'}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#E45093]/70 hover:text-[#E45093] transition-colors"
                     title="Remove needs info filter"
                   >
                     <X className="h-3 w-3" />
@@ -633,11 +633,11 @@ const Index = () => {
                 </div>
               )}
               {filters.pinned !== undefined && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#01A5E1]/10 text-[#01A5E1] rounded-md border border-[#01A5E1]/20">
                   <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, pinned: undefined }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#01A5E1]/70 hover:text-[#01A5E1] transition-colors"
                     title="Remove pinned filter"
                   >
                     <X className="h-3 w-3" />
@@ -645,11 +645,11 @@ const Index = () => {
                 </div>
               )}
               {filters.hasAdditionalFields !== undefined && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md border border-primary/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#A7E459]/10 text-[#A7E459] rounded-md border border-[#A7E459]/20">
                   <span className="text-xs font-medium">Additional Fields: {filters.hasAdditionalFields ? 'Yes' : 'No'}</span>
                   <button
                     onClick={() => setFilters(prev => ({ ...prev, hasAdditionalFields: undefined }))}
-                    className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                    className="ml-1 text-[#A7E459]/70 hover:text-[#A7E459] transition-colors"
                     title="Remove additional fields filter"
                   >
                     <X className="h-3 w-3" />

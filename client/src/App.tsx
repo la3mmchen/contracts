@@ -7,12 +7,14 @@ import Index from "./pages/Index";
 import ContractDetail from "./pages/ContractDetail";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ColorfulBar } from "@/components/ColorfulBar";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <ColorfulBar />
       <Toaster />
       <Sonner />
       <BrowserRouter basename={window.location.pathname.includes('/contracts/') ? '/contracts' : '/'}>

@@ -56,75 +56,147 @@ export function formatRelativeTime(dateString: string): string {
   return `${diffInYears} year${diffInYears === 1 ? '' : 's'} ago`;
 }
 
-// Color palette for dynamic category colors (for badges)
+// Color palette for dynamic category colors (for badges) - using the new 6-color scheme with better contrast
 const badgeColorPalette = [
-  'bg-red-100 text-red-800 border-red-200',
-  'bg-pink-100 text-pink-800 border-pink-200',
-  'bg-purple-100 text-purple-800 border-purple-200',
-  'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'bg-blue-100 text-blue-800 border-blue-200',
-  'bg-cyan-100 text-cyan-800 border-cyan-200',
-  'bg-teal-100 text-teal-800 border-teal-200',
-  'bg-emerald-100 text-emerald-800 border-emerald-200',
-  'bg-green-100 text-green-800 border-green-200',
-  'bg-lime-100 text-lime-800 border-lime-200',
-  'bg-yellow-100 text-yellow-800 border-yellow-200',
-  'bg-amber-100 text-amber-800 border-amber-200',
-  'bg-orange-100 text-orange-800 border-orange-200',
-  'bg-rose-100 text-rose-800 border-rose-200',
-  'bg-slate-100 text-slate-800 border-slate-200',
-  'bg-zinc-100 text-zinc-800 border-zinc-200',
-  'bg-stone-100 text-stone-800 border-stone-200',
-  'bg-violet-100 text-violet-800 border-violet-200',
-  'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
-  'bg-sky-100 text-sky-800 border-sky-200',
+  'bg-[#01A5E1]/10 text-[#01A5E1] border-[#01A5E1]/20',
+  'bg-[#0DD1EE]/10 text-[#0DD1EE] border-[#0DD1EE]/20',
+  'bg-[#F5DA6C]/10 text-[#B8860B] border-[#F5DA6C]/20', // Darker text for better contrast
+  'bg-[#285CC4]/10 text-[#285CC4] border-[#285CC4]/20',
+  'bg-[#A7E459]/10 text-[#4A7C59] border-[#A7E459]/20', // Darker text for better contrast
+  'bg-[#E45093]/10 text-[#E45093] border-[#E45093]/20',
+  // Repeat the pattern for more categories with better contrast
+  'bg-[#01A5E1]/15 text-[#01A5E1] border-[#01A5E1]/25',
+  'bg-[#0DD1EE]/15 text-[#0DD1EE] border-[#0DD1EE]/25',
+  'bg-[#F5DA6C]/15 text-[#B8860B] border-[#F5DA6C]/25',
+  'bg-[#285CC4]/15 text-[#285CC4] border-[#285CC4]/25',
+  'bg-[#A7E459]/15 text-[#4A7C59] border-[#A7E459]/25',
+  'bg-[#E45093]/15 text-[#E45093] border-[#E45093]/25',
+  // Additional variations with better contrast
+  'bg-[#01A5E1]/20 text-[#01A5E1] border-[#01A5E1]/30',
+  'bg-[#0DD1EE]/20 text-[#0DD1EE] border-[#0DD1EE]/30',
+  'bg-[#F5DA6C]/20 text-[#B8860B] border-[#F5DA6C]/30',
+  'bg-[#285CC4]/20 text-[#285CC4] border-[#285CC4]/30',
+  'bg-[#A7E459]/20 text-[#4A7C59] border-[#A7E459]/30',
+  'bg-[#E45093]/20 text-[#E45093] border-[#E45093]/30',
 ];
 
-// Color palette for dynamic category colors (for stats)
+// Black and white theme color palette
+const blackWhiteBadgePalette = [
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  // Repeat the pattern for more categories
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  // Additional variations
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+  'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600',
+];
+
+// Color palette for dynamic category colors (for stats) - using the new 6-color scheme
 const statsColorPalette = [
-  'text-red-600',
-  'text-pink-600',
-  'text-purple-600',
-  'text-indigo-600',
-  'text-blue-600',
-  'text-cyan-600',
-  'text-teal-600',
-  'text-emerald-600',
-  'text-green-600',
-  'text-lime-600',
-  'text-yellow-600',
-  'text-amber-600',
-  'text-orange-600',
-  'text-rose-600',
-  'text-slate-600',
-  'text-zinc-600',
-  'text-stone-600',
-  'text-violet-600',
-  'text-fuchsia-600',
-  'text-sky-600',
+  'text-[#01A5E1]',
+  'text-[#0DD1EE]',
+  'text-[#F5DA6C]',
+  'text-[#285CC4]',
+  'text-[#A7E459]',
+  'text-[#E45093]',
+  // Repeat the pattern for more categories
+  'text-[#01A5E1]',
+  'text-[#0DD1EE]',
+  'text-[#F5DA6C]',
+  'text-[#285CC4]',
+  'text-[#A7E459]',
+  'text-[#E45093]',
+  // Additional variations
+  'text-[#01A5E1]',
+  'text-[#0DD1EE]',
+  'text-[#F5DA6C]',
+  'text-[#285CC4]',
+  'text-[#A7E459]',
+  'text-[#E45093]',
+];
+
+// Black and white theme stats colors
+const blackWhiteStatsPalette = [
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  // Repeat the pattern for more categories
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  // Additional variations
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
+  'text-gray-800 dark:text-gray-200',
 ];
 
 const statsBgColorPalette = [
-  'bg-red-100',
-  'bg-pink-100',
-  'bg-purple-100',
-  'bg-indigo-100',
-  'bg-blue-100',
-  'bg-cyan-100',
-  'bg-teal-100',
-  'bg-emerald-100',
-  'bg-green-100',
-  'bg-lime-100',
-  'bg-yellow-100',
-  'bg-amber-100',
-  'bg-orange-100',
-  'bg-rose-100',
-  'bg-slate-100',
-  'bg-zinc-100',
-  'bg-stone-100',
-  'bg-violet-100',
-  'bg-fuchsia-100',
-  'bg-sky-100',
+  'bg-[#01A5E1]/10',
+  'bg-[#0DD1EE]/10',
+  'bg-[#F5DA6C]/10',
+  'bg-[#285CC4]/10',
+  'bg-[#A7E459]/10',
+  'bg-[#E45093]/10',
+  // Repeat the pattern for more categories
+  'bg-[#01A5E1]/15',
+  'bg-[#0DD1EE]/15',
+  'bg-[#F5DA6C]/15',
+  'bg-[#285CC4]/15',
+  'bg-[#A7E459]/15',
+  'bg-[#E45093]/15',
+  // Additional variations
+  'bg-[#01A5E1]/20',
+  'bg-[#0DD1EE]/20',
+  'bg-[#F5DA6C]/20',
+  'bg-[#285CC4]/20',
+  'bg-[#A7E459]/20',
+  'bg-[#E45093]/20',
+];
+
+// Black and white theme stats background colors
+const blackWhiteStatsBgPalette = [
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  // Repeat the pattern for more categories
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  // Additional variations
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
+  'bg-gray-100 dark:bg-gray-800',
 ];
 
 /**
@@ -133,12 +205,21 @@ const statsBgColorPalette = [
  * @returns A Tailwind CSS class string for the category color
  */
 export const getCategoryBadgeColor = (category: string): string => {
+  // Check if we're in black-and-white theme
+  const isBlackWhiteTheme = document.documentElement.classList.contains('black-and-white');
+  
   // Generate a consistent color for all categories using hash
   const hash = category.split('').reduce((acc, char) => {
     return char.charCodeAt(0) + ((acc << 5) - acc);
   }, 0);
   
   const colorIndex = Math.abs(hash) % badgeColorPalette.length;
+  
+  // Return appropriate color palette based on theme
+  if (isBlackWhiteTheme) {
+    return blackWhiteBadgePalette[colorIndex];
+  }
+  
   return badgeColorPalette[colorIndex];
 };
 
@@ -148,12 +229,24 @@ export const getCategoryBadgeColor = (category: string): string => {
  * @returns An object with color and bgColor Tailwind CSS classes
  */
 export const getCategoryStatsColor = (category: string): { color: string; bgColor: string } => {
+  // Check if we're in black-and-white theme
+  const isBlackWhiteTheme = document.documentElement.classList.contains('black-and-white');
+  
   // Generate a consistent color for all categories using hash
   const hash = category.split('').reduce((acc, char) => {
     return char.charCodeAt(0) + ((acc << 5) - acc);
   }, 0);
   
   const colorIndex = Math.abs(hash) % statsColorPalette.length;
+  
+  // Return appropriate color palette based on theme
+  if (isBlackWhiteTheme) {
+    return {
+      color: blackWhiteStatsPalette[colorIndex],
+      bgColor: blackWhiteStatsBgPalette[colorIndex]
+    };
+  }
+  
   return {
     color: statsColorPalette[colorIndex],
     bgColor: statsBgColorPalette[colorIndex]

@@ -62,11 +62,11 @@ interface ContractCardProps {
 }
 
 const statusColors = {
-  active: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800',
-  expired: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800',
-  cancelled: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
-  closed: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
-  terminated: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-200 dark:border-gray-800',
+  active: 'bg-[#A7E459]/10 text-[#4A7C59] border-[#A7E459]/20 dark:bg-[#A7E459]/20 dark:text-[#A7E459] dark:border-[#A7E459]/30 black-and-white:bg-gray-100 black-and-white:text-gray-800 black-and-white:border-gray-200 dark:black-and-white:bg-gray-800 dark:black-and-white:text-gray-200 dark:black-and-white:border-gray-600',
+  expired: 'bg-[#E45093]/10 text-[#E45093] border-[#E45093]/20 dark:bg-[#E45093]/20 dark:text-[#E45093] dark:border-[#E45093]/30 black-and-white:bg-gray-100 black-and-white:text-gray-800 black-and-white:border-gray-200 dark:black-and-white:bg-gray-800 dark:black-and-white:text-gray-200 dark:black-and-white:border-gray-600',
+  cancelled: 'bg-[#285CC4]/10 text-[#285CC4] border-[#285CC4]/20 dark:bg-[#285CC4]/20 dark:text-[#285CC4] dark:border-[#285CC4]/30 black-and-white:bg-gray-100 black-and-white:text-gray-800 black-and-white:border-gray-200 dark:black-and-white:bg-gray-800 dark:black-and-white:text-gray-200 dark:black-and-white:border-gray-600',
+  closed: 'bg-[#01A5E1]/10 text-[#01A5E1] border-[#01A5E1]/20 dark:bg-[#01A5E1]/20 dark:text-[#01A5E1] dark:border-[#01A5E1]/30 black-and-white:bg-gray-100 black-and-white:text-gray-800 black-and-white:border-gray-200 dark:black-and-white:bg-gray-800 dark:black-and-white:text-gray-200 dark:black-and-white:border-gray-600',
+  terminated: 'bg-[#F5DA6C]/10 text-[#B8860B] border-[#F5DA6C]/20 dark:bg-[#F5DA6C]/20 dark:text-[#F5DA6C] dark:border-[#F5DA6C]/30 black-and-white:bg-gray-100 black-and-white:text-gray-800 black-and-white:border-gray-200 dark:black-and-white:bg-gray-800 dark:black-and-white:text-gray-200 dark:black-and-white:border-gray-600',
 };
 
   // Helper function to get the correct base path

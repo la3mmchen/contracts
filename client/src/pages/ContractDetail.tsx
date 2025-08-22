@@ -312,7 +312,7 @@ const ContractDetail = () => {
       )}
       
       {/* Header */}
-      <div className="bg-primary text-primary-foreground border-b">
+      <div className="bg-black text-white border-b border-gray-700 shadow-sm">
         <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -320,7 +320,7 @@ const ContractDetail = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(`${getBasePath()}/`)}
-                className="text-primary-foreground hover:bg-primary-foreground/10 p-2"
+                className="text-white hover:bg-white/10 hover:scale-105 p-2 transition-all duration-200"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
