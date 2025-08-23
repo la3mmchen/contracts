@@ -9,7 +9,7 @@ import { ContractNavigation } from '@/components/ContractNavigation';
 import { NotesSection } from '@/components/NotesSection';
 import { useContractNavigation } from '@/hooks/useContractNavigation';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -58,6 +58,27 @@ const ContractDetail = () => {
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isInlineEditing, setIsInlineEditing] = useState(false);
   const [showInlineEditingWarning, setShowInlineEditingWarning] = useState(false);
+
+
+
+
+
+
+
+
+
+  // Handle unsaved changes confirmation
+  const handleUnsavedChangesConfirm = () => {
+    setShowUnsavedChangesDialog(false);
+    setIsEditFormOpen(false);
+    setIsFormDirty(false);
+  };
+
+  // Handle unsaved changes cancellation
+  const handleUnsavedChangesCancel = () => {
+    setShowUnsavedChangesDialog(false);
+    // Keep the dialog open for continued editing
+  };
 
   // Get filtered contracts based on URL parameters for navigation context
   const filteredContracts = React.useMemo(() => {
@@ -177,8 +198,18 @@ const ContractDetail = () => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !isEditFormOpen) {
-        if (isInlineEditing) {
+      // ESC key handling
+      if (event.key === 'Escape') {
+        if (isEditFormOpen) {
+          // ESC should close the edit form modal
+          if (isFormDirty) {
+            setShowUnsavedChangesDialog(true);
+          } else {
+            setIsEditFormOpen(false);
+            setIsFormDirty(false);
+          }
+          return;
+        } else if (isInlineEditing) {
           setShowInlineEditingWarning(true);
         } else {
           navigate(`${getBasePath()}/`);
@@ -205,7 +236,7 @@ const ContractDetail = () => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, isEditFormOpen, isInlineEditing, navigation, filteredContracts.length]);
+  }, [navigate, isEditFormOpen, isInlineEditing, navigation, filteredContracts.length, isFormDirty]);
 
   // Navigation protection when inline editing is active
   useEffect(() => {
@@ -470,7 +501,7 @@ const ContractDetail = () => {
                       className="cursor-pointer"
                       onClick={() => {
                         // Show a helpful tooltip about editing modes
-                        alert('💡 Editing Tips:\n\n• Click any field to edit it inline\n• Use "Full Form Edit" for changing many fields at once\n• Inline editing is perfect for quick updates\n• Form editing is better for major changes');
+                        alert('💡 Editing Tips:\n\n• Click any field to edit it inline\n• Use "Full Form Edit" button above for changing many fields at once\n• Inline editing is perfect for quick updates\n• Form editing is better for major changes');
                       }}
                     >
                       <Settings className="h-4 w-4 mr-2" />
@@ -623,6 +654,8 @@ const ContractDetail = () => {
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete Contract
                 </Button>
+
+
               </CardContent>
             </Card>
 
@@ -704,33 +737,68 @@ const ContractDetail = () => {
         </div>
       </div>
 
-      {/* Edit Form Dialog */}
-      <Dialog open={isEditFormOpen} onOpenChange={(open) => {
-        if (!open && isFormDirty) {
-          setShowUnsavedChangesDialog(true);
-        } else {
-          setIsEditFormOpen(open);
-          if (!open) setIsFormDirty(false);
-        }
-      }}>
-        <DialogContent className="max-w-5xl w-[90vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Contract</DialogTitle>
-          </DialogHeader>
-          <ContractForm
-            contract={contract}
-            onSubmit={handleEdit}
-            onCancel={() => {
+      {/* Edit Form Modal */}
+      {isEditFormOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => {
               if (isFormDirty) {
                 setShowUnsavedChangesDialog(true);
               } else {
                 setIsEditFormOpen(false);
+                setIsFormDirty(false);
               }
             }}
-            onDirtyStateChange={setIsFormDirty}
           />
-        </DialogContent>
-      </Dialog>
+          
+          {/* Modal Content */}
+          <div className="relative bg-background rounded-lg shadow-xl max-w-5xl w-[90vw] max-h-[90vh] overflow-y-auto border">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b">
+              <div>
+                <h2 className="text-lg font-semibold">Edit Contract</h2>
+                <p className="text-sm text-muted-foreground">
+                  Edit the contract details below. All changes will be saved when you submit the form.
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (isFormDirty) {
+                    setShowUnsavedChangesDialog(true);
+                  } else {
+                    setIsEditFormOpen(false);
+                    setIsFormDirty(false);
+                  }
+                }}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {/* Form Content */}
+            <div className="p-6">
+              <ContractForm
+                contract={contract}
+                onSubmit={handleEdit}
+                            onCancel={() => {
+              if (isFormDirty) {
+                setShowUnsavedChangesDialog(true);
+              } else {
+                setIsEditFormOpen(false);
+                setIsFormDirty(false);
+              }
+            }}
+                onDirtyStateChange={setIsFormDirty}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
@@ -763,15 +831,11 @@ const ContractDetail = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowUnsavedChangesDialog(false)}>
+            <AlertDialogCancel onClick={handleUnsavedChangesCancel}>
               Continue Editing
             </AlertDialogCancel>
             <AlertDialogAction 
-              onClick={() => {
-                setShowUnsavedChangesDialog(false);
-                setIsEditFormOpen(false);
-                setIsFormDirty(false);
-              }}
+              onClick={handleUnsavedChangesConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Discard Changes
