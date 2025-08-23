@@ -297,6 +297,75 @@ contractRoutes.get('/:id/export/markdown', async (req: Request, res: Response) =
   }
 });
 
+// POST /api/contracts/cleanup/notes-history - Cleanup notes history for all contracts
+contractRoutes.post('/cleanup/notes-history', async (req: Request, res: Response) => {
+  try {
+    const { maxEntries = 10 } = req.body;
+    
+    // Validate maxEntries parameter
+    const maxEntriesNum = parseInt(maxEntries as string);
+    if (isNaN(maxEntriesNum) || maxEntriesNum < 1 || maxEntriesNum < 100) {
+      return res.status(400).json({ 
+        error: 'maxEntries must be a number between 1 and 100' 
+      });
+    }
+    
+    const result = await contractService.cleanupNotesHistory(maxEntriesNum);
+    
+    res.json({
+      message: `Successfully cleaned up notes history for ${result.contractsUpdated} contracts`,
+      ...result,
+      maxEntries: maxEntriesNum
+    });
+  } catch (error) {
+    console.error('Error cleaning up notes history:', error);
+    res.status(500).json({ error: 'Failed to cleanup notes history' });
+  }
+});
+
+// GET /api/contracts/stats/notes-history - Get notes history statistics
+contractRoutes.get('/stats/notes-history', async (req: Request, res: Response) => {
+  try {
+    const contracts = await contractService.getAllContracts();
+    
+    let totalNotesEntries = 0;
+    let contractsWithNotesHistory = 0;
+    let maxEntriesInContract = 0;
+    let contractsExceedingLimit = 0;
+    const limit = 10; // Current limit
+    
+    for (const contract of contracts) {
+      if (contract.notesHistory && contract.notesHistory.length > 0) {
+        contractsWithNotesHistory++;
+        totalNotesEntries += contract.notesHistory.length;
+        
+        if (contract.notesHistory.length > maxEntriesInContract) {
+          maxEntriesInContract = contract.notesHistory.length;
+        }
+        
+        if (contract.notesHistory.length > limit) {
+          contractsExceedingLimit++;
+        }
+      }
+    }
+    
+    res.json({
+      totalContracts: contracts.length,
+      contractsWithNotesHistory,
+      totalNotesEntries,
+      maxEntriesInContract,
+      contractsExceedingLimit,
+      currentLimit: limit,
+      averageEntriesPerContract: contractsWithNotesHistory > 0 
+        ? Math.round(totalNotesEntries / contractsWithNotesHistory * 100) / 100 
+        : 0
+    });
+  } catch (error) {
+    console.error('Error getting notes history statistics:', error);
+    res.status(500).json({ error: 'Failed to get notes history statistics' });
+  }
+});
+
 
 
  

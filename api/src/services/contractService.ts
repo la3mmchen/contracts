@@ -167,10 +167,30 @@ class ContractService {
       return null;
     }
 
+    // Check if this is only a notes update
+    const isOnlyNotesUpdate = Object.keys(data).length === 1 && data.notes !== undefined;
+    
+    // Track notes changes with timestamp if notes are being updated
+    let notesHistory = existingContract.notesHistory || [];
+    if (data.notes !== undefined && data.notes !== existingContract.notes) {
+      const notesEntry = {
+        timestamp: new Date().toISOString(),
+        notes: data.notes
+      };
+      notesHistory = [...notesHistory, notesEntry];
+      
+      // Limit notes history to the 10 most recent entries
+      if (notesHistory.length > 10) {
+        notesHistory = notesHistory.slice(-10);
+      }
+    }
+
     const updatedContract = {
       ...existingContract,
       ...data,
-      updatedAt: new Date().toISOString(),
+      notesHistory,
+      // Only update updatedAt if this is NOT just a notes update
+      updatedAt: isOnlyNotesUpdate ? existingContract.updatedAt : new Date().toISOString(),
     };
 
     // Remove fields that are explicitly set to null (for migration cleanup)
@@ -181,7 +201,7 @@ class ContractService {
     });
 
     await this.saveContractToFile(updatedContract);
-    console.log(`Updated contract: ${updatedContract.name} (${id})`);
+    console.log(`Updated contract: ${updatedContract.name} (${id})${isOnlyNotesUpdate ? ' (notes only)' : ''}`);
     
     return updatedContract;
   }
@@ -265,6 +285,26 @@ class ContractService {
       totalSize,
       averageSize: fileCount > 0 ? Math.round(totalSize / fileCount) : 0
     };
+  }
+
+  async cleanupNotesHistory(maxEntries: number = 10): Promise<{ contractsUpdated: number; totalEntriesRemoved: number }> {
+    const contracts = await this.getAllContracts();
+    let contractsUpdated = 0;
+    let totalEntriesRemoved = 0;
+
+    for (const contract of contracts) {
+      if (contract.notesHistory && contract.notesHistory.length > maxEntries) {
+        const originalLength = contract.notesHistory.length;
+        const cleanedHistory = contract.notesHistory.slice(-maxEntries);
+        
+        await this.updateContract(contract.id, { notesHistory: cleanedHistory });
+        
+        contractsUpdated++;
+        totalEntriesRemoved += (originalLength - maxEntries);
+      }
+    }
+
+    return { contractsUpdated, totalEntriesRemoved };
   }
 
   async exportToMarkdown(contracts: Contract[]): Promise<string> {

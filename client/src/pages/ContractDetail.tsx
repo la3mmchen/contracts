@@ -6,6 +6,7 @@ import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ContractNavigation } from '@/components/ContractNavigation';
+import { NotesSection } from '@/components/NotesSection';
 import { useContractNavigation } from '@/hooks/useContractNavigation';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -693,6 +694,12 @@ const ContractDetail = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Notes Section */}
+            <NotesSection
+              contract={contract}
+              onUpdate={updateContract}
+            />
           </div>
         </div>
       </div>

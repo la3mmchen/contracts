@@ -6,6 +6,11 @@ export interface PriceChange {
   effectiveDate: string;
 }
 
+export interface NotesHistoryEntry {
+  timestamp: string;
+  notes: string;
+}
+
 export interface Contract {
   id: string;
   contractId: string;
@@ -29,6 +34,7 @@ export interface Contract {
     contactPerson?: string;
   };
   notes?: string;
+  notesHistory?: NotesHistoryEntry[]; // Track notes changes with timestamps
   tags?: string[];
   needsMoreInfo?: boolean; // Flag to indicate contract needs more information
   pinned?: boolean; // Flag to pin contract to the top of the list

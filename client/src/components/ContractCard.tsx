@@ -1102,6 +1102,37 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
 
         </div>
 
+        {/* Notes Display - Show most recent note */}
+        {contract.notes && (
+          <div className="bg-muted/30 rounded-lg p-3 border-l-2 border-primary/30">
+            <div className="flex items-start gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-muted-foreground font-medium mb-1">Latest Note</div>
+                <div className="text-sm text-foreground line-clamp-2">
+                  {contract.notes.length > 100 
+                    ? `${contract.notes.substring(0, 100)}...` 
+                    : contract.notes
+                  }
+                </div>
+                {/* Show timestamp if we have notes history */}
+                {contract.notesHistory && contract.notesHistory.length > 0 ? (
+                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <span>Added:</span>
+                    <span className="font-medium">
+                      {new Date(contract.notesHistory[contract.notesHistory.length - 1].timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <span>Note created</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Invalid Category Warning */}
         {hasInvalidCategory && (
           <div className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-md">
@@ -1964,68 +1995,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
           </div>
         ) : null}
 
-        {/* Notes */}
-        {isDetailPage || contract.notes ? (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>Notes:</span>
-            </div>
-            {isDetailPage && isEditingNotes ? (
-              <div className="pl-6 space-y-2">
-                <Textarea
-                  value={editingNotes}
-                  onChange={(e) => setEditingNotes(e.target.value)}
-                  className="text-sm min-h-[80px]"
-                  placeholder="Enter notes..."
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleNotesSave}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleNotesCancel}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : isDetailPage ? (
-              <div 
-                className="text-sm text-muted-foreground pl-6 bg-muted/30 p-3 rounded cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setIsEditingNotes(true)}
-                title="Click to edit notes"
-              >
-                {contract.notes ? (
-                  <div className="whitespace-pre-wrap leading-relaxed text-foreground">
-                    {contract.notes}
-                  </div>
-                ) : (
-                  'Click to add notes...'
-                )}
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground pl-6 bg-muted/30 p-3 rounded">
-                {contract.notes && (
-                  <div className="whitespace-pre-wrap leading-relaxed text-foreground max-h-32 overflow-y-auto">
-                    {contract.notes}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ) : null}
+
 
 
 
