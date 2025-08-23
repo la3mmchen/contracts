@@ -12,12 +12,22 @@ export const loadConfig = async (): Promise<AppConfig> => {
   }
 
   try {
-    // Try to load config from the current base path
-    const response = await fetch('./config.json');
+    // Try to load config from the root path, not relative to current location
+    const basePath = window.location.pathname.includes('/contracts/') ? '/contracts' : '';
+    const configUrl = `${basePath}/config.json`;
+    
+    const response = await fetch(configUrl);
+    
     if (!response.ok) {
-      throw new Error('Failed to load config');
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    config = await response.json();
+    
+    const configText = await response.text();
+    try {
+      config = JSON.parse(configText);
+    } catch (parseError) {
+      throw new Error(`Invalid JSON in config: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+    }
     
     // Adjust API_URL based on current location for GitHub Pages
     if (window.location.pathname.includes('/contracts/')) {
@@ -40,4 +50,10 @@ export const loadConfig = async (): Promise<AppConfig> => {
 
 export const getConfig = (): AppConfig | null => {
   return config;
+};
+
+// Force reload config (useful for debugging or when config changes)
+export const reloadConfig = async (): Promise<AppConfig> => {
+  config = null;
+  return await loadConfig();
 }; 
