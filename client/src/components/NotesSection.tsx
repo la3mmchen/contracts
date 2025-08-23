@@ -54,10 +54,31 @@ export const NotesSection: React.FC<NotesSectionProps> = ({ contract, onUpdate }
           <Clock className="h-5 w-5" />
           Notes
           {!isEditing && (
-            <Edit 
-              className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors ml-auto" 
-              onClick={() => setIsEditing(true)}
-            />
+            <div className="flex items-center gap-2 ml-auto">
+              {contract.notes && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={async () => {
+                    if (window.confirm('Are you sure you want to clear all notes? This action cannot be undone.')) {
+                      try {
+                        await onUpdate(contract.id, { notes: '' });
+                      } catch (error) {
+                        console.error('Failed to clear notes:', error);
+                      }
+                    }
+                  }}
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  title="Clear notes"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+              <Edit 
+                className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" 
+                onClick={() => setIsEditing(true)}
+              />
+            </div>
           )}
         </CardTitle>
       </CardHeader>
@@ -88,6 +109,16 @@ export const NotesSection: React.FC<NotesSectionProps> = ({ contract, onUpdate }
                 className="flex-1"
               >
                 Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setEditingNotes('')}
+                disabled={isSaving}
+                className="px-3"
+                title="Clear notes"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -126,9 +157,20 @@ export const NotesSection: React.FC<NotesSectionProps> = ({ contract, onUpdate }
                         <span className="font-medium text-muted-foreground">
                           {formatTimestamp(entry.timestamp)}
                         </span>
+                        {!entry.notes && (
+                          <Badge variant="outline" className="text-xs text-muted-foreground">
+                            Empty
+                          </Badge>
+                        )}
                       </div>
                       <div className="text-foreground whitespace-pre-wrap line-clamp-3">
-                        {entry.notes}
+                        {entry.notes ? (
+                          entry.notes
+                        ) : (
+                          <span className="text-muted-foreground italic">
+                            Notes were cleared
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
