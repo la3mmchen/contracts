@@ -35,7 +35,7 @@ export const ColorfulBar: React.FC = () => {
   // For black-and-white theme, show a simple black bar
   if (currentTheme === 'black-and-white') {
     return (
-      <div className="fixed top-0 left-0 w-full h-2 bg-black z-50">
+      <div className="fixed top-0 left-0 w-full h-3 bg-black z-50">
         {/* Simple black bar for black-white theme */}
       </div>
     );
@@ -43,7 +43,7 @@ export const ColorfulBar: React.FC = () => {
   
   // For all other themes (light, dark, sepia, system), show the colorful bar
   return (
-    <div className="fixed top-0 left-0 w-full h-2 bg-gradient-to-r from-[#01A5E1] via-[#0DD1EE] via-[#F5DA6C] via-[#285CC4] via-[#A7E459] to-[#E45093] z-50">
+    <div className="fixed top-0 left-0 w-full h-3 bg-gradient-to-r from-[#01A5E1] via-[#0DD1EE] via-[#F5DA6C] via-[#285CC4] via-[#A7E459] to-[#E45093] z-50">
       {/* Individual color segments for precise control */}
       <div className="flex h-full">
         <div className="flex-1 bg-[#01A5E1]"></div>
