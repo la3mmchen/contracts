@@ -100,7 +100,7 @@ const Index = () => {
     if (filters.status) params.set('status', filters.status);
     if (filters.category) params.set('category', filters.category);
     if (filters.frequency) params.set('frequency', filters.frequency);
-    if (filters.tags && filters.tags.length > 0) params.set('tags', filters.tags.join(','));
+    if (filters.tags?.length) params.set('tags', filters.tags.join(','));
     if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
     if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
     if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
@@ -108,45 +108,14 @@ const Index = () => {
     if (filters.sortBy) params.set('sortBy', filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
     
-    // Update search params using React Router (this will update window.location.search)
-    setSearchParams(params);
-  }, [filters, setSearchParams]);
+    // Update URL without triggering navigation
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+    window.history.replaceState({}, '', newUrl);
+  }, [filters]);
 
-  // Handle Ctrl+F (or Cmd+F on Mac) to focus search field
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Check for Ctrl+F (Windows/Linux) or Cmd+F (Mac)
-      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
-        // If search field is already focused, let browser handle Ctrl+F (release the user)
-        if (document.activeElement === searchInputRef.current) {
-          return; // Don't prevent default, let browser's find work
-        }
-        
-        // Otherwise, focus our search field
-        event.preventDefault(); // Prevent browser's default find behavior
-        searchInputRef.current?.focus();
-        // Optionally select all text for easy replacement
-        searchInputRef.current?.select();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Extract all available tags from contracts
-  const availableTags = useMemo(() => {
-    const tagsSet = new Set<string>();
-    contracts.forEach(contract => {
-      contract.tags?.forEach(tag => tagsSet.add(tag));
-    });
-    return Array.from(tagsSet).sort();
-  }, [contracts]);
-
-
-
+  // Filter and sort contracts based on current filters
   const filteredContracts = useMemo(() => {
-    let filtered = contracts;
+    let filtered = [...contracts];
 
     // Apply search filter
     if (filters.searchTerm) {
@@ -158,11 +127,7 @@ const Index = () => {
         contract.reference?.toLowerCase().includes(searchLower) ||
         contract.description?.toLowerCase().includes(searchLower) ||
         contract.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
-        contract.notes?.toLowerCase().includes(searchLower) ||
-        (contract.customFields && Object.values(contract.customFields).some(value => 
-          value.toLowerCase().includes(searchLower)
-        )) ||
-        contract.documentLink?.toLowerCase().includes(searchLower)
+        contract.notes?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -182,13 +147,13 @@ const Index = () => {
     }
 
     // Apply tags filter
-    if (filters.tags && filters.tags.length > 0) {
+    if (filters.tags?.length) {
       filtered = filtered.filter(contract => 
-        contract.tags && contract.tags.some(tag => filters.tags!.includes(tag))
+        contract.tags?.some(tag => filters.tags!.includes(tag))
       );
     }
 
-    // Apply needsMoreInfo filter (now includes draft contracts)
+    // Apply needsMoreInfo filter
     if (filters.needsMoreInfo !== undefined) {
       if (filters.needsMoreInfo === false) {
         // "Complete" should show contracts where needsMoreInfo is false OR null/undefined AND not draft
@@ -206,22 +171,15 @@ const Index = () => {
 
     // Apply hasAdditionalFields filter
     if (filters.hasAdditionalFields !== undefined) {
-      filtered = filtered.filter(contract => {
-        // Handle cases where customFields might be undefined, null, or empty
-        const hasCustomFields = contract.customFields && 
-                               typeof contract.customFields === 'object' && 
-                               Object.keys(contract.customFields).length > 0;
-        
-        // For hasAdditionalFields=false, we want contracts WITHOUT custom fields
-        // For hasAdditionalFields=true, we want contracts WITH custom fields
-        if (filters.hasAdditionalFields === false) {
-          return !hasCustomFields; // Include contracts without custom fields
-        } else if (filters.hasAdditionalFields === true) {
-          return hasCustomFields; // Include contracts with custom fields
-        }
-        
-        return true; // Default case
-      });
+      if (filters.hasAdditionalFields) {
+        filtered = filtered.filter(contract => 
+          contract.customFields && Object.keys(contract.customFields).length > 0
+        );
+      } else {
+        filtered = filtered.filter(contract => 
+          !contract.customFields || Object.keys(contract.customFields).length === 0
+        );
+      }
     }
 
     // Apply sorting
@@ -268,6 +226,39 @@ const Index = () => {
 
     return filtered;
   }, [contracts, filters]);
+
+  // Handle Ctrl+F (or Cmd+F on Mac) to focus search field
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Ctrl+F (Windows/Linux) or Cmd+F (Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        // If search field is already focused, let browser handle Ctrl+F (release the user)
+        if (document.activeElement === searchInputRef.current) {
+          return; // Don't prevent default, let browser's find work
+        }
+        
+        // Otherwise, focus our search field
+        event.preventDefault(); // Prevent browser's default find behavior
+        searchInputRef.current?.focus();
+        // Optionally select all text for easy replacement
+        searchInputRef.current?.select();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Extract all available tags from contracts
+  const availableTags = useMemo(() => {
+    const tagsSet = new Set<string>();
+    contracts.forEach(contract => {
+      contract.tags?.forEach(tag => tagsSet.add(tag));
+    });
+    return Array.from(tagsSet).sort();
+  }, [contracts]);
+
+
 
   const handleAddContract = async (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
