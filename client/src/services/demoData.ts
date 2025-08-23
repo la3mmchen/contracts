@@ -24,6 +24,24 @@ export const demoContracts: Contract[] = [
       address: '100 Winchester Circle, Los Gatos, CA 95032'
     },
     notes: 'Premium plan with 4K Ultra HD quality and 4 simultaneous streams. Shared account with family.',
+    notesHistory: [
+      {
+        timestamp: '2024-01-01T08:00:00.000Z',
+        notes: 'Initial setup - Premium plan with 4K Ultra HD quality and 4 simultaneous streams.'
+      },
+      {
+        timestamp: '2024-03-15T14:30:00.000Z',
+        notes: 'Added family members to the account. All 4 slots are now in use.'
+      },
+      {
+        timestamp: '2024-07-01T10:15:00.000Z',
+        notes: 'Price increased from $19.99 to $22.99. Still worth it for the 4K quality and family sharing.'
+      },
+      {
+        timestamp: '2024-09-15T16:45:00.000Z',
+        notes: 'Premium plan with 4K Ultra HD quality and 4 simultaneous streams. Shared account with family.'
+      }
+    ],
     tags: ['streaming', 'entertainment', '4K'],
     pinned: true,
     priceChanges: [
@@ -66,6 +84,20 @@ export const demoContracts: Contract[] = [
       address: '4 World Trade Center, 150 Greenwich Street, New York, NY 10007'
     },
     notes: 'Family plan with 6 accounts. Shared payment method.',
+    notesHistory: [
+      {
+        timestamp: '2024-03-01T10:00:00.000Z',
+        notes: 'Started family plan with 6 premium accounts. Great value for money compared to individual plans.'
+      },
+      {
+        timestamp: '2024-05-20T11:30:00.000Z',
+        notes: 'Added all family members successfully. Everyone enjoying ad-free music and offline downloads.'
+      },
+      {
+        timestamp: '2024-08-10T15:20:00.000Z',
+        notes: 'Family plan with 6 accounts. Shared payment method.'
+      }
+    ],
     tags: ['music', 'streaming', 'family'],
     customFields: {
       'Account Email': 'family@example.com',
@@ -97,6 +129,24 @@ export const demoContracts: Contract[] = [
       address: 'Alexanderplatz 1, 10178 Berlin, Germany'
     },
     notes: 'Premium membership includes access to all gym locations, unlimited classes, personal training sessions, and spa facilities.',
+    notesHistory: [
+      {
+        timestamp: '2024-01-01T09:00:00.000Z',
+        notes: 'Signed up for premium membership. Includes access to all locations and unlimited classes.'
+      },
+      {
+        timestamp: '2024-02-15T13:45:00.000Z',
+        notes: 'First personal training session completed. Trainer is excellent and very motivating.'
+      },
+      {
+        timestamp: '2024-06-20T17:30:00.000Z',
+        notes: 'Spa facilities are amazing! Great addition to the workout routine.'
+      },
+      {
+        timestamp: '2024-09-15T11:00:00.000Z',
+        notes: 'Premium membership includes access to all gym locations, unlimited classes, personal training sessions, and spa facilities.'
+      }
+    ],
     tags: ['fitness', 'health', 'premium'],
     customFields: {
       'Membership Level': 'Premium',
@@ -128,6 +178,24 @@ export const demoContracts: Contract[] = [
       address: 'Friedrich-Ebert-Allee 140, 53113 Bonn, Germany'
     },
     notes: '1Gbps fiber connection with unlimited data. Includes basic TV package with 100+ channels.',
+    notesHistory: [
+      {
+        timestamp: '2024-01-01T08:00:00.000Z',
+        notes: 'Fiber installation completed. Speed test shows 950+ Mbps download and upload.'
+      },
+      {
+        timestamp: '2024-03-10T12:15:00.000Z',
+        notes: 'TV package activated. Picture quality is excellent, especially for sports channels.'
+      },
+      {
+        timestamp: '2024-07-05T19:30:00.000Z',
+        notes: 'Connection has been very stable. No outages since installation.'
+      },
+      {
+        timestamp: '2024-09-15T10:00:00.000Z',
+        notes: '1Gbps fiber connection with unlimited data. Includes basic TV package with 100+ channels.'
+      }
+    ],
     tags: ['internet', 'fiber', 'TV'],
     customFields: {
       'Connection Type': 'Fiber',
@@ -198,9 +266,25 @@ export const demoApi = {
       throw new Error('Contract not found');
     }
     
+    // Track notes changes with timestamp if notes are being updated
+    let notesHistory = demoContracts[index].notesHistory || [];
+    if (data.notes !== undefined && data.notes !== demoContracts[index].notes) {
+      const notesEntry = {
+        timestamp: new Date().toISOString(),
+        notes: data.notes
+      };
+      notesHistory = [...notesHistory, notesEntry];
+      
+      // Limit notes history to the 10 most recent entries
+      if (notesHistory.length > 10) {
+        notesHistory = notesHistory.slice(-10);
+      }
+    }
+    
     const updatedContract = {
       ...demoContracts[index],
       ...data,
+      notesHistory,
       updatedAt: new Date().toISOString()
     };
     
