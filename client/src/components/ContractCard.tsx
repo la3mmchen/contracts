@@ -1411,89 +1411,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
           )}
         </div>
 
-        {/* Price Changes - Collapsible */}
-        {contract.priceChanges && contract.priceChanges.length > 0 && (
-          <Collapsible open={isPriceChangesOpen} onOpenChange={setIsPriceChangesOpen}>
-            <CollapsibleTrigger asChild>
-              <div className="flex items-center justify-between text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
-                <div className="flex items-center gap-2">
-                  <Coins className="h-4 w-4 text-amber-600" />
-                  <span>Price Changes:</span>
-                  <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                    {contract.priceChanges.length}
-                  </span>
-                </div>
-                {isPriceChangesOpen ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="space-y-2 pl-6">
-                {/* Show only the last price change by default */}
-                {(() => {
-                  const mostRecentChange = contract.priceChanges
-                    .sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime())[0];
-                  return (
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>Latest:</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs bg-muted/30 px-2 py-1 rounded">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">
-                            {formatDate(mostRecentChange.effectiveDate)}
-                          </span>
-                          <span className="text-muted-foreground">→</span>
-                          <span className="font-medium text-foreground">
-                            {formatCurrency(mostRecentChange.newAmount, contract.currency)}
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground max-w-24 truncate" title={mostRecentChange.reason}>
-                          {mostRecentChange.reason}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
-                
-                {/* Show all changes if there are more than 1 */}
-                {contract.priceChanges.length > 1 && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>All changes:</span>
-                    </div>
-                    <div className="space-y-1">
-                      {contract.priceChanges
-                        .sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime())
-                        .map((change, index) => (
-                          <div key={index} className="bg-muted/20 p-2 rounded text-xs">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-muted-foreground">
-                                {formatDate(change.effectiveDate)}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <span className="line-through">{formatCurrency(change.previousAmount, contract.currency)}</span>
-                              <span className="text-foreground">→</span>
-                              <span className="font-medium text-foreground">{formatCurrency(change.newAmount, contract.currency)}</span>
-                            </div>
-                            {change.reason && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {change.reason}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
+
 
 
 
@@ -1806,6 +1724,7 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
           ) : null}
           {isDetailPage || contract.contactInfo.address ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
               {isDetailPage && isEditingAddress ? (
                 <div className="flex items-center gap-2">
                   <Input

@@ -7,6 +7,8 @@ import { ContractForm } from '@/components/ContractForm';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ContractNavigation } from '@/components/ContractNavigation';
 import { NotesSection } from '@/components/NotesSection';
+import { PriceOverTimeChart } from '@/components/PriceOverTimeChart';
+import { PriceChangesSection } from '@/components/PriceChangesSection';
 import { useContractNavigation } from '@/hooks/useContractNavigation';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -441,7 +443,7 @@ const ContractDetail = () => {
         {/* Contract Details */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Contract Info */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <ContractCard
               contract={contract}
               onEdit={() => setIsEditFormOpen(true)}
@@ -449,11 +451,14 @@ const ContractDetail = () => {
               onUpdate={updateContract}
               onFilter={handleFilter}
               defaultExpandCustomFields={true}
-              defaultExpandPriceChanges={true}
+              defaultExpandPriceChanges={false}
               defaultExpandPayments={true}
               isDetailPage={true}
               onInlineEditingChange={setIsInlineEditing}
             />
+            
+            {/* Price Changes Section */}
+            <PriceChangesSection contract={contract} />
           </div>
 
           {/* Sidebar */}
@@ -677,18 +682,6 @@ const ContractDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-3">
-                  <div className="flex items-start gap-2">
-                    <PenTool className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                    <div className="text-xs text-blue-800 dark:text-blue-200">
-                      <p className="font-medium mb-1">Quick Inline Editing Available!</p>
-                      <p>Click on any field below to edit it directly. Perfect for quick updates!</p>
-                      <p className="text-blue-600 dark:text-blue-400 mt-1">
-                        💡 Use "Full Form Edit" button above for changing multiple fields at once.
-                      </p>
-                    </div>
-                  </div>
-                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Contract ID:</span>
                   <span className="text-sm font-mono font-medium">{contract.contractId}</span>
@@ -733,6 +726,9 @@ const ContractDetail = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Payment Over Time Chart */}
+            <PriceOverTimeChart contract={contract} />
 
             {/* Notes Section */}
             <NotesSection

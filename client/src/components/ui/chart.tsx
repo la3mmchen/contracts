@@ -353,6 +353,16 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
+// Add missing chart components
+const LineChart = RechartsPrimitive.LineChart;
+const Line = RechartsPrimitive.Line;
+const XAxis = RechartsPrimitive.XAxis;
+const YAxis = RechartsPrimitive.YAxis;
+const CartesianGrid = RechartsPrimitive.CartesianGrid;
+const ResponsiveContainer = RechartsPrimitive.ResponsiveContainer;
+const BarChart = RechartsPrimitive.BarChart;
+const Bar = RechartsPrimitive.Bar;
+
 export {
   ChartContainer,
   ChartTooltip,
@@ -360,4 +370,13 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  // Add missing chart components
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
 }
