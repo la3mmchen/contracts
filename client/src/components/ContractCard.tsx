@@ -82,6 +82,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   const [editingAmount, setEditingAmount] = useState(contract.amount.toString());
   const [editingReason, setEditingReason] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+
   
   // Inline editing states for other fields
   const [isEditingName, setIsEditingName] = useState(false);
@@ -916,7 +918,8 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="View details"
             >
-                              <Link to={`${getBasePath()}/contract/${contract.id}`}>
+
+                              <Link to={`${getBasePath()}/contract/${contract.id}${currentSearchParams ? `?${currentSearchParams}` : ''}`}>
                 <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
               </Link>
             </Button>

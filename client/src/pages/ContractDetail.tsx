@@ -85,6 +85,8 @@ const ContractDetail = () => {
     const searchParams = new URLSearchParams(location.search);
     let filtered = contracts;
 
+
+
     // Apply filters based on URL parameters
     const status = searchParams.get('status');
     const category = searchParams.get('category');
@@ -172,6 +174,8 @@ const ContractDetail = () => {
       return aValue > bValue ? 1 : -1;
     });
 
+
+
     return filtered;
   }, [contracts, location.search]);
 
@@ -180,6 +184,8 @@ const ContractDetail = () => {
     contracts: filteredContracts,
     currentContractId: id
   });
+
+
 
 
   

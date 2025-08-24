@@ -47,6 +47,8 @@ const Index = () => {
     exportContracts 
   } = useContractStorage();
 
+
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | undefined>();
   const [isCopying, setIsCopying] = useState(false);
@@ -89,8 +91,7 @@ const Index = () => {
         ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' })
       }));
       
-      // Clear URL parameters after applying them
-      setSearchParams({});
+      // Don't clear URL parameters - keep them for navigation context
     }
   }, [searchParams, setSearchParams]);
 
@@ -108,10 +109,9 @@ const Index = () => {
     if (filters.sortBy) params.set('sortBy', filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
     
-    // Update URL without triggering navigation
-    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-    window.history.replaceState({}, '', newUrl);
-  }, [filters]);
+    // Use setSearchParams to properly update React Router's search params state
+    setSearchParams(params);
+  }, [filters, setSearchParams]);
 
   // Filter and sort contracts based on current filters
   const filteredContracts = useMemo(() => {
