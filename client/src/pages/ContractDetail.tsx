@@ -622,7 +622,7 @@ const ContractDetail = () => {
                   }}
                 >
                   <PenTool className="h-4 w-4 mr-2" />
-                  {contract.draft ? 'Remove Draft' : 'Convert to Draft'}
+                  {contract.draft ? 'Remove Draft Status' : 'Convert to Draft'}
                 </Button>
 
                 {/* Need More Info Button - Always show, toggle the needsMoreInfo flag */}
