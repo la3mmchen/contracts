@@ -11,8 +11,6 @@ interface NotificationBannerProps {
 }
 
 export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProps) => {
-  const [isUpcomingPaymentsExpanded, setIsUpcomingPaymentsExpanded] = useState(true);
-  const [isExpiredContractsExpanded, setIsExpiredContractsExpanded] = useState(true);
   const now = new Date();
 
   const upcomingPayments = contracts
@@ -33,6 +31,10 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
     })
     .sort((a, b) => a.daysUntil - b.daysUntil);
 
+  // Start collapsed if there are more than 3 upcoming payments
+  const [isUpcomingPaymentsExpanded, setIsUpcomingPaymentsExpanded] = useState(upcomingPayments.length <= 3);
+  const [isExpiredContractsExpanded, setIsExpiredContractsExpanded] = useState(true);
+
   const expiredContracts = contracts.filter(c => c.status === 'expired');
 
   if (upcomingPayments.length === 0 && expiredContracts.length === 0) {
@@ -46,7 +48,7 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
         <Alert>
           <Calendar className="h-4 w-4" />
           <div className="flex items-center justify-between w-full">
-            <AlertTitle>Upcoming Payments</AlertTitle>
+            <AlertTitle>{upcomingPayments.length} Upcoming Payments </AlertTitle>
             <button
               onClick={() => setIsUpcomingPaymentsExpanded(!isUpcomingPaymentsExpanded)}
               className="p-1 hover:bg-muted rounded transition-colors"
