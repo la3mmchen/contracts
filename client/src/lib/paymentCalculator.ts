@@ -92,7 +92,7 @@ export const calculateNextPaymentDate = (
 export const calculateNextThreePayments = (
   contract: Contract
 ): PaymentDate[] => {
-  const { startDate, frequency, amount, currency, endDate } = contract;
+  const { startDate, frequency, amount, currency, endDate, payDate } = contract;
   
   if (frequency === 'one-time') {
     return [{
@@ -104,13 +104,23 @@ export const calculateNextThreePayments = (
   }
   
   const payments: PaymentDate[] = [];
-  let currentDate = new Date(startDate);
   const now = new Date();
   const end = endDate ? new Date(endDate) : null;
   
-  // Find the next payment date
-  let nextPaymentDate = calculateNextPaymentDate(startDate, frequency);
-  let currentPaymentDate = new Date(nextPaymentDate);
+  // If payDate is set and it's in the future, use it as the starting point
+  let currentPaymentDate: Date;
+  if (payDate) {
+    const payDateObj = new Date(payDate);
+    if (payDateObj > now) {
+      currentPaymentDate = payDateObj;
+    } else {
+      // payDate is in the past, calculate the next payment from it
+      currentPaymentDate = new Date(calculateNextPaymentDate(payDate, frequency));
+    }
+  } else {
+    // No payDate set, calculate from start date
+    currentPaymentDate = new Date(calculateNextPaymentDate(startDate, frequency));
+  }
   
   // Generate the next 3 payments
   for (let i = 0; i < 3; i++) {
