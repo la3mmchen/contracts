@@ -136,7 +136,6 @@ export const ContractStats = ({
     });
 
     return Array.from(familyMembers)
-      .sort()
       .map(member => {
         const count = contracts.filter(c => c.familyMember === member).length;
         return {
@@ -149,7 +148,8 @@ export const ContractStats = ({
           filterType: 'familyMember',
           filterValue: member
         };
-      });
+      })
+      .sort((a, b) => (b.value as number) - (a.value as number)); // Sort by count descending
   };
 
   const generateCompanyStats = (): StatItem[] => {
@@ -162,7 +162,6 @@ export const ContractStats = ({
     });
 
     return Array.from(companies)
-      .sort()
       .map(company => {
         const count = contracts.filter(c => c.company === company).length;
         return {
@@ -175,7 +174,8 @@ export const ContractStats = ({
           filterType: 'company',
           filterValue: company
         };
-      });
+      })
+      .sort((a, b) => (b.value as number) - (a.value as number)); // Sort by count descending
   };
 
   const stats: StatItem[] = [
