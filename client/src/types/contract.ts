@@ -41,6 +41,7 @@ export interface Contract {
   needsMoreInfo?: boolean; // Flag to indicate contract needs more information
   pinned?: boolean; // Flag to pin contract to the top of the list
   draft?: boolean; // Flag to indicate contract is in draft state
+  optimizable?: boolean; // Flag to indicate contract could be optimized
   priceChanges?: PriceChange[]; // Array of amount changes over time
   familyMember?: string; // Which family member the contract is for
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
@@ -68,6 +69,7 @@ export interface ContractFilters {
   tags?: string[];
   needsMoreInfo?: boolean;
   pinned?: boolean;
+  optimizable?: boolean; // Filter contracts that could be optimized
   hasAdditionalFields?: boolean; // Filter contracts that have custom fields
   dataQualityGrade?: 'A' | 'B' | 'C' | 'D' | 'F'; // Filter by data quality grade
   sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference';
@@ -113,6 +115,7 @@ export interface CreateContractRequest {
   needsMoreInfo?: boolean;
   pinned?: boolean;
   draft?: boolean; // Flag to indicate contract is in draft state
+  optimizable?: boolean; // Flag to indicate contract could be optimized
   familyMember?: string; // Which family member the contract is for
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;

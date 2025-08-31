@@ -27,6 +27,7 @@ interface ContractStatsProps {
     familyMember?: string;
     needsMoreInfo?: boolean;
     pinned?: boolean;
+    optimizable?: boolean;
     hasAdditionalFields?: boolean;
   };
   filters: FilterType;
@@ -173,6 +174,7 @@ export const ContractStats = ({
       filterType: 'viewMode',
       filterValue: 'needsAttention',
     },
+
     {
       title: filteredContracts ? 'Filtered Monthly Spend' : 'Total Monthly Spend',
       value: `$${(filteredContracts ?? contracts)

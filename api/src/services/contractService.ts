@@ -151,6 +151,7 @@ class ContractService {
       needsMoreInfo: data.needsMoreInfo,
       pinned: data.pinned,
       draft: data.draft,
+      optimizable: data.optimizable,
       priceChanges: data.priceChanges,
       customFields: data.customFields,
       attachments: [],

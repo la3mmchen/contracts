@@ -74,6 +74,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     tags: contract?.tags?.join(', ') || '',
     needsMoreInfo: contract?.needsMoreInfo || false,
     pinned: contract?.pinned || false,
+    optimizable: contract?.optimizable || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -105,6 +106,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     tags: contract?.tags?.join(', ') || '',
     needsMoreInfo: contract?.needsMoreInfo || false,
     pinned: contract?.pinned || false,
+    optimizable: contract?.optimizable || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
@@ -148,6 +150,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
         needsMoreInfo: contract.needsMoreInfo || false,
         pinned: contract.pinned || false,
         draft: contract.draft || false,
+        optimizable: contract.optimizable || false,
         customFields: contract.customFields || {},
         documentLink: contract.documentLink || '',
         priceChangeReason: '',
@@ -681,6 +684,22 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
           </div>
           <p className="text-sm text-muted-foreground -mt-2">
             Pinned contracts will appear at the top of your contract list
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <input
+              id="optimizable"
+              type="checkbox"
+              checked={formData.optimizable}
+              onChange={(e) => updateFormData({ optimizable: e.target.checked })}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="optimizable" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Mark for Optimization
+            </Label>
+          </div>
+          <p className="text-sm text-muted-foreground -mt-2">
+            Check this box if you think this contract could be optimized for better terms, pricing, or service
           </p>
           <div>
             <div className="flex items-center justify-between mb-2">

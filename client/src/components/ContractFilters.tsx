@@ -33,6 +33,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       needsMoreInfo: undefined,
       pinned: undefined,
       hasAdditionalFields: undefined,
+      optimizable: undefined,
       sortBy: 'name'
     });
   };
@@ -47,6 +48,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
     if (filters.needsMoreInfo !== undefined) count++;
     if (filters.pinned !== undefined) count++;
     if (filters.hasAdditionalFields !== undefined) count++;
+    if (filters.optimizable !== undefined) count++;
     return count;
   };
 
@@ -124,7 +126,21 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="needs-more-info-filter" className="text-sm font-medium">Contract Status</Label>
-            <Select value={filters.needsMoreInfo === undefined ? 'all' : filters.needsMoreInfo.toString()} onValueChange={(value) => updateFilter('needsMoreInfo', value === 'all' ? undefined : value === 'true')}>
+            <Select value={filters.needsMoreInfo === undefined && filters.optimizable === undefined ? 'all' : (filters.needsMoreInfo === true ? 'true' : filters.optimizable === true ? 'optimizable' : 'false')} onValueChange={(value) => {
+              if (value === 'all') {
+                updateFilter('needsMoreInfo', undefined);
+                updateFilter('optimizable', undefined);
+              } else if (value === 'true') {
+                updateFilter('needsMoreInfo', true);
+                updateFilter('optimizable', undefined);
+              } else if (value === 'false') {
+                updateFilter('needsMoreInfo', false);
+                updateFilter('optimizable', undefined);
+              } else if (value === 'optimizable') {
+                updateFilter('needsMoreInfo', undefined);
+                updateFilter('optimizable', true);
+              }
+            }}>
               <SelectTrigger id="needs-more-info-filter" className="w-full">
                 <SelectValue placeholder="All Contracts" />
               </SelectTrigger>
@@ -132,6 +148,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
                 <SelectItem value="all">All Contracts</SelectItem>
                 <SelectItem value="true">Needs Attention</SelectItem>
                 <SelectItem value="false">Complete</SelectItem>
+                <SelectItem value="optimizable">Needs Optimization</SelectItem>
               </SelectContent>
             </Select>
           </div>

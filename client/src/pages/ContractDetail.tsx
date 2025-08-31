@@ -29,7 +29,8 @@ import {
   Download,
   Copy,
   Star,
-  X
+  X,
+  TrendingUp
 } from 'lucide-react';
 import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
@@ -655,6 +656,26 @@ const ContractDetail = () => {
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   {contract.needsMoreInfo ? 'Remove Info Flag' : 'Need More Info'}
+                </Button>
+
+                {/* Mark for Optimization Button - Always show, toggle the optimizable flag */}
+                <Button 
+                  variant={contract.optimizable ? "default" : "outline"}
+                  className="w-full"
+                  size="sm"
+                  onClick={() => {
+                    if (contract) {
+                      updateContract(contract.id, { optimizable: !contract.optimizable });
+                      toast({
+                        title: contract.optimizable ? "Optimization Flag Removed!" : "Contract Marked for Optimization!",
+                        description: contract.optimizable ? "Contract is no longer marked for optimization." : "Contract has been marked for potential optimization.",
+                        variant: "default",
+                      });
+                    }
+                  }}
+                >
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  {contract.optimizable ? 'Remove Optimization Flag' : 'Mark for Optimization'}
                 </Button>
 
                 <Button 

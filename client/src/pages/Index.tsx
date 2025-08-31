@@ -179,6 +179,11 @@ const Index = () => {
       filtered = filtered.filter(contract => contract.pinned === filters.pinned);
     }
 
+    // Apply optimizable filter
+    if (filters.optimizable !== undefined) {
+      filtered = filtered.filter(contract => contract.optimizable === filters.optimizable);
+    }
+
     // Apply hasAdditionalFields filter
     if (filters.hasAdditionalFields !== undefined) {
       if (filters.hasAdditionalFields) {
@@ -702,6 +707,18 @@ const Index = () => {
                   </button>
                 </div>
               )}
+              {filters.optimizable !== undefined && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#FF6B35]/10 text-[#FF6B35] rounded-md border border-[#FF6B35]/20">
+                  <span className="text-xs font-medium">Optimizable: {filters.optimizable ? 'Yes' : 'No'}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, optimizable: undefined }))}
+                    className="ml-1 text-[#FF6B35]/70 hover:text-[#FF6B35] transition-colors"
+                    title="Remove optimizable filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
               {filters.hasAdditionalFields !== undefined && (
                 <div className="flex items-center gap-1 px-2 py-1 bg-[#A7E459]/10 text-[#A7E459] rounded-md border border-[#A7E459]/20">
                   <span className="text-xs font-medium">Additional Fields: {filters.hasAdditionalFields ? 'Yes' : 'No'}</span>
@@ -716,7 +733,7 @@ const Index = () => {
               )}
 
               {/* Clear All Filters Button */}
-              {(filters.status || filters.category || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
+              {(filters.status || filters.category || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.optimizable !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -848,6 +865,7 @@ const Index = () => {
             familyMember: filters.familyMember,
             needsMoreInfo: filters.needsMoreInfo,
             pinned: filters.pinned,
+            optimizable: filters.optimizable,
             hasAdditionalFields: filters.hasAdditionalFields
           }}
           filters={filters}
