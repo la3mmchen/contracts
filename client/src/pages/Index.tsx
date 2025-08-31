@@ -773,7 +773,6 @@ const Index = () => {
         <ContractStats 
           contracts={contracts} 
           onFilter={(filterType, value) => {
-            console.log('Filter applied:', filterType, value, 'Current filters:', filters);
             if (filterType === 'reset') {
               // Reset all filters when switching tabs
               setFilters({
