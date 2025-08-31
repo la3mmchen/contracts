@@ -83,22 +83,41 @@ const Index = () => {
     const statusParam = searchParams.get('status');
     const categoryParam = searchParams.get('category');
     const familyMemberParam = searchParams.get('familyMember');
+    const companyParam = searchParams.get('company');
+    const frequencyParam = searchParams.get('frequency');
     const tagsParam = searchParams.get('tags');
+    const needsMoreInfoParam = searchParams.get('needsMoreInfo');
+    const pinnedParam = searchParams.get('pinned');
     const hasAdditionalFieldsParam = searchParams.get('hasAdditionalFields');
+    const searchParam = searchParams.get('search');
+    const sortByParam = searchParams.get('sortBy');
+    const sortOrderParam = searchParams.get('sortOrder');
     
-    if (statusParam || categoryParam || familyMemberParam || tagsParam || hasAdditionalFieldsParam) {
+    if (statusParam || categoryParam || familyMemberParam || companyParam || frequencyParam || 
+        tagsParam || needsMoreInfoParam !== null || pinnedParam !== null || 
+        hasAdditionalFieldsParam || searchParam || sortByParam || sortOrderParam) {
+      
       setFilters(prev => ({
         ...prev,
         ...(statusParam && { status: statusParam as Contract['status'] }),
         ...(categoryParam && { category: categoryParam as Contract['category'] }),
         ...(familyMemberParam && { familyMember: familyMemberParam }),
+        ...(companyParam && { company: companyParam }),
+        ...(frequencyParam && { frequency: frequencyParam as Contract['frequency'] }),
         ...(tagsParam && { tags: [tagsParam] }),
-        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' })
+        ...(needsMoreInfoParam !== null && { needsMoreInfo: needsMoreInfoParam === 'true' }),
+        ...(pinnedParam !== null && { pinned: pinnedParam === 'true' }),
+        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' }),
+        ...(searchParam && { searchTerm: searchParam }),
+        ...(sortByParam && { sortBy: sortByParam as 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference' }),
+        ...(sortOrderParam && { sortOrder: sortOrderParam as 'asc' | 'desc' })
       }));
       
       // Don't clear URL parameters - keep them for navigation context
     }
   }, [searchParams, setSearchParams]);
+
+
 
   // Store current filter state in URL for navigation context
   useEffect(() => {
@@ -106,6 +125,7 @@ const Index = () => {
     if (filters.status) params.set('status', filters.status);
     if (filters.category) params.set('category', filters.category);
     if (filters.familyMember) params.set('familyMember', filters.familyMember);
+    if (filters.company) params.set('company', filters.company);
     if (filters.frequency) params.set('frequency', filters.frequency);
     if (filters.tags?.length) params.set('tags', filters.tags.join(','));
     if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());

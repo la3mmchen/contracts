@@ -162,8 +162,7 @@ export const ContractStats = ({
       }
     });
 
-    console.log('All company names found:', Array.from(companies).sort());
-    console.log('All contracts with company names:', contracts.map(c => ({ name: c.name, company: c.company })).filter(c => c.company));
+
 
     return Array.from(companies)
       .map(company => {

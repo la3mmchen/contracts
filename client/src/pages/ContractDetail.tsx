@@ -91,9 +91,13 @@ const ContractDetail = () => {
 
 
 
+
+
     // Apply filters based on URL parameters
     const status = searchParams.get('status');
     const category = searchParams.get('category');
+    const familyMember = searchParams.get('familyMember');
+    const company = searchParams.get('company');
     const frequency = searchParams.get('frequency');
     const tags = searchParams.get('tags');
     const needsMoreInfo = searchParams.get('needsMoreInfo');
@@ -107,6 +111,12 @@ const ContractDetail = () => {
     }
     if (category && category !== 'all') {
       filtered = filtered.filter(c => c.category === category);
+    }
+    if (familyMember && familyMember !== 'all') {
+      filtered = filtered.filter(c => c.familyMember === familyMember);
+    }
+    if (company && company !== 'all') {
+      filtered = filtered.filter(c => c.company === company);
     }
     if (frequency && frequency !== 'all') {
       filtered = filtered.filter(c => c.frequency === frequency);
@@ -135,7 +145,8 @@ const ContractDetail = () => {
         c.contractId.toLowerCase().includes(searchLower) ||
         c.description?.toLowerCase().includes(searchLower) ||
         c.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
-        c.notes?.toLowerCase().includes(searchLower)
+        c.notes?.toLowerCase().includes(searchLower) ||
+        c.familyMember?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -398,6 +409,8 @@ const ContractDetail = () => {
                         
                         if (params.get('status')) activeFilters.push(`Status: ${params.get('status')}`);
                         if (params.get('category')) activeFilters.push(`Category: ${params.get('category')}`);
+                        if (params.get('familyMember')) activeFilters.push(`Family Member: ${params.get('familyMember')}`);
+                        if (params.get('company')) activeFilters.push(`Company: ${params.get('company')}`);
                         if (params.get('frequency')) activeFilters.push(`Frequency: ${params.get('frequency')}`);
                         if (params.get('tags')) activeFilters.push(`Tags: ${params.get('tags')}`);
                         if (params.get('search')) activeFilters.push(`Search: "${params.get('search')}"`);
