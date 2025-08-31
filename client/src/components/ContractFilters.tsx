@@ -17,7 +17,8 @@ interface ContractFiltersProps {
 
 export const ContractFilters = ({ filters, onFiltersChange, availableTags = [], existingContracts = [] }: ContractFiltersProps) => {
   const updateFilter = (key: keyof FilterType, value: any) => {
-    onFiltersChange({ ...filters, [key]: value });
+    const newFilters = { ...filters, [key]: value };
+    onFiltersChange(newFilters);
   };
 
   const clearFilter = (key: keyof FilterType) => {
@@ -146,19 +147,28 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [], 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="needs-more-info-filter" className="text-sm font-medium">Contract Status</Label>
-            <Select value={filters.needsMoreInfo === undefined && filters.optimizable === undefined ? 'all' : (filters.needsMoreInfo === true ? 'true' : filters.optimizable === true ? 'optimizable' : 'false')} onValueChange={(value) => {
+            <Select value={(() => {
+              if (filters.needsMoreInfo === true) return 'true';
+              if (filters.optimizable === true) return 'optimizable';
+              if (filters.needsMoreInfo === false) return 'false';
+              return 'all';
+            })()} onValueChange={(value) => {
               if (value === 'all') {
-                updateFilter('needsMoreInfo', undefined);
-                updateFilter('optimizable', undefined);
+                // Batch update: clear both filters at once
+                const newFilters = { ...filters, needsMoreInfo: undefined, optimizable: undefined };
+                onFiltersChange(newFilters);
               } else if (value === 'true') {
-                updateFilter('needsMoreInfo', true);
-                updateFilter('optimizable', undefined);
+                // Batch update: set needsMoreInfo and clear optimizable
+                const newFilters = { ...filters, needsMoreInfo: true, optimizable: undefined };
+                onFiltersChange(newFilters);
               } else if (value === 'false') {
-                updateFilter('needsMoreInfo', false);
-                updateFilter('optimizable', undefined);
+                // Batch update: set needsMoreInfo to false and clear optimizable
+                const newFilters = { ...filters, needsMoreInfo: false, optimizable: undefined };
+                onFiltersChange(newFilters);
               } else if (value === 'optimizable') {
-                updateFilter('needsMoreInfo', undefined);
-                updateFilter('optimizable', true);
+                // Batch update: set optimizable and clear needsMoreInfo
+                const newFilters = { ...filters, needsMoreInfo: undefined, optimizable: true };
+                onFiltersChange(newFilters);
               }
             }}>
               <SelectTrigger id="needs-more-info-filter" className="w-full">

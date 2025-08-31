@@ -64,6 +64,8 @@ const Index = () => {
     sortOrder: 'desc'
   });
 
+
+
   // Ref for the search input field
   const searchInputRef = useRef<HTMLInputElement>(null);
 
