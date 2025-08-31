@@ -64,7 +64,40 @@ export const ContractStats = ({
     }
   };
   const activeContracts = contracts.filter(c => c.status === 'active');
-  
+  const isMobile = useIsMobile();
+
+  // Helper function to get tab label and icon based on screen size
+  const getTabContent = (tabType: string) => {
+    if (isMobile) {
+      // Mobile: Show only icons
+      switch (tabType) {
+        case 'quickFilters':
+          return { icon: Tag, label: 'Quick' };
+        case 'companies':
+          return { icon: Building2, label: 'Company' };
+        case 'persons':
+          return { icon: User, label: 'Person' };
+        case 'filters':
+          return { icon: TrendingUp, label: 'Filters' };
+        default:
+          return { icon: Tag, label: tabType };
+      }
+    } else {
+      // Desktop: Show full text
+      switch (tabType) {
+        case 'quickFilters':
+          return { icon: Tag, label: 'Quick Filters' };
+        case 'companies':
+          return { icon: Building2, label: 'Show by Company' };
+        case 'persons':
+          return { icon: User, label: 'Show by Person' };
+        case 'filters':
+          return { icon: TrendingUp, label: 'Advanced Filters' };
+        default:
+          return { icon: Tag, label: tabType };
+      }
+    }
+  };
 
   type StatItem = {
     title: string;
@@ -385,10 +418,33 @@ export const ContractStats = ({
     <div className="mb-4">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-4">
-          <TabsTrigger value="quickFilters" className="text-xs sm:text-sm">Quick Filters</TabsTrigger>
-          <TabsTrigger value="companies" className="text-xs sm:text-sm">Show by Company</TabsTrigger>
-          <TabsTrigger value="persons" className="text-xs sm:text-sm">Show by Person</TabsTrigger>
-          <TabsTrigger value="filters" className="text-xs sm:text-sm">Advanced Filters</TabsTrigger>
+          {(() => {
+            const quickFilters = getTabContent('quickFilters');
+            const companies = getTabContent('companies');
+            const persons = getTabContent('persons');
+            const filters = getTabContent('filters');
+            
+            return (
+              <>
+                <TabsTrigger value="quickFilters" className="text-xs sm:text-sm flex items-center gap-2">
+                  <quickFilters.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{quickFilters.label}</span>
+                </TabsTrigger>
+                <TabsTrigger value="companies" className="text-xs sm:text-sm flex items-center gap-2">
+                  <companies.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{companies.label}</span>
+                </TabsTrigger>
+                <TabsTrigger value="persons" className="text-xs sm:text-sm flex items-center gap-2">
+                  <persons.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{persons.label}</span>
+                </TabsTrigger>
+                <TabsTrigger value="filters" className="text-xs sm:text-sm flex items-center gap-2">
+                  <filters.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{filters.label}</span>
+                </TabsTrigger>
+              </>
+            );
+          })()}
         </TabsList>
         
         <TabsContent value="quickFilters" className="space-y-3">
