@@ -25,6 +25,7 @@ interface ContractStatsProps {
     status?: string;
     category?: string;
     familyMember?: string;
+    company?: string;
     needsMoreInfo?: boolean;
     pinned?: boolean;
     optimizable?: boolean;
@@ -51,6 +52,14 @@ export const ContractStats = ({
     setActiveTab(newTab);
     // Reset filters when switching to advanced filters tab
     if (newTab === 'filters' && onFilter) {
+      onFilter('reset', '');
+    }
+    // Reset filters when switching to persons tab
+    if (newTab === 'persons' && onFilter) {
+      onFilter('reset', '');
+    }
+    // Reset filters when switching to companies tab
+    if (newTab === 'companies' && onFilter) {
       onFilter('reset', '');
     }
   };
@@ -139,6 +148,32 @@ export const ContractStats = ({
           clickable: count > 0,
           filterType: 'familyMember',
           filterValue: member
+        };
+      });
+  };
+
+  const generateCompanyStats = (): StatItem[] => {
+    // Extract unique companies from contracts
+    const companies = new Set<string>();
+    contracts.forEach(contract => {
+      if (contract.company?.trim()) {
+        companies.add(contract.company.trim());
+      }
+    });
+
+    return Array.from(companies)
+      .sort()
+      .map(company => {
+        const count = contracts.filter(c => c.company === company).length;
+        return {
+          title: company,
+          value: count,
+          icon: Building2, // Using Building2 icon for companies
+          color: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+          clickable: count > 0,
+          filterType: 'company',
+          filterValue: company
         };
       });
   };
@@ -305,11 +340,12 @@ export const ContractStats = ({
     return cardContent;
   };
 
-  // Helper function to render compact category and family member cards
+  // Helper function to render compact category, family member, and company cards
   const renderCategoryCard = (stat: StatItem, index: number) => {
     const isActive = activeFilters && (
       (stat.filterType === 'category' && activeFilters.category === stat.filterValue) ||
-      (stat.filterType === 'familyMember' && activeFilters.familyMember === stat.filterValue)
+      (stat.filterType === 'familyMember' && activeFilters.familyMember === stat.filterValue) ||
+      (stat.filterType === 'company' && activeFilters.company === stat.filterValue)
     );
     
     return (
@@ -344,25 +380,56 @@ export const ContractStats = ({
   return (
     <div className="mb-4">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+        <TabsList className="grid w-full grid-cols-4 mb-4">
           <TabsTrigger value="quickFilters" className="text-xs sm:text-sm">Quick Filters</TabsTrigger>
+          <TabsTrigger value="companies" className="text-xs sm:text-sm">Show by Company</TabsTrigger>
+          <TabsTrigger value="persons" className="text-xs sm:text-sm">Show by Person</TabsTrigger>
           <TabsTrigger value="filters" className="text-xs sm:text-sm">Advanced Filters</TabsTrigger>
         </TabsList>
         
         <TabsContent value="quickFilters" className="space-y-3">
-          {/* Quick Filter - Categories and Family Members */}
+          {/* Quick Filter - Categories Only */}
           <div className="p-3 bg-muted/10 rounded-lg border border-border/30">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-foreground">Quick Filter</h3>
+              <h3 className="text-sm font-medium text-foreground">Filter by Category</h3>
               <span className="text-xs text-muted-foreground">Click to filter</span>
             </div>
             
-            {/* Combined Categories and Family Members */}
+            {/* Categories Only */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {stats.filter(stat => stat.filterType === 'category')
                 .filter(stat => typeof stat.value === 'number' && stat.value > 0)
                 .sort((a, b) => (b.value as number) - (a.value as number))
                 .map((stat, index) => renderCategoryCard(stat, index))}
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="companies" className="space-y-3">
+          {/* Company Filter */}
+          <div className="p-3 bg-muted/10 rounded-lg border border-border/30">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-foreground">Filter by Company</h3>
+              <span className="text-xs text-muted-foreground">Click to filter</span>
+            </div>
+            
+            {/* Company Filter Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+              {generateCompanyStats().map((stat, index) => renderCategoryCard(stat, index))}
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="persons" className="space-y-3">
+          {/* Person Filter */}
+          <div className="p-3 bg-muted/10 rounded-lg border border-border/30">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-foreground">Filter by Person</h3>
+              <span className="text-xs text-muted-foreground">Click to filter</span>
+            </div>
+            
+            {/* Person Filter Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {generateFamilyMemberStats().map((stat, index) => renderCategoryCard(stat, index))}
             </div>
           </div>
@@ -375,6 +442,7 @@ export const ContractStats = ({
               filters={filters} 
               onFiltersChange={onFiltersChange} 
               availableTags={availableTags}
+              existingContracts={contracts}
             />
           </div>
         </TabsContent>

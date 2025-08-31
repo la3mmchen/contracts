@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ContractFilters as FilterType } from '@/types/contract';
+import { ContractFilters as FilterType, Contract } from '@/types/contract';
 import { getCategories, getCategoryDisplayName } from '@/config/categories';
 import { getStatuses, getStatusDisplayName } from '@/config/statuses';
 import { getFrequencies, getFrequencyDisplayName } from '@/config/frequencies';
@@ -12,9 +12,10 @@ interface ContractFiltersProps {
   filters: FilterType;
   onFiltersChange: (filters: FilterType) => void;
   availableTags?: string[];
+  existingContracts?: Contract[];
 }
 
-export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }: ContractFiltersProps) => {
+export const ContractFilters = ({ filters, onFiltersChange, availableTags = [], existingContracts = [] }: ContractFiltersProps) => {
   const updateFilter = (key: keyof FilterType, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
   };
@@ -28,6 +29,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       searchTerm: '',
       status: undefined,
       category: undefined,
+      company: undefined,
       frequency: undefined,
       tags: undefined,
       needsMoreInfo: undefined,
@@ -43,6 +45,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
     if (filters.searchTerm) count++;
     if (filters.status) count++;
     if (filters.category) count++;
+    if (filters.company) count++;
     if (filters.frequency) count++;
     if (filters.tags && filters.tags.length > 0) count++;
     if (filters.needsMoreInfo !== undefined) count++;
@@ -69,7 +72,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
       {/* All Filter Options - Responsive Layout */}
       <div className="bg-muted/50 rounded-lg p-4 border w-full">
         {/* Row 1: Core Contract Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <Label htmlFor="status-filter" className="text-sm font-medium">Status</Label>
             <Select value={filters.status || 'all'} onValueChange={(value) => updateFilter('status', value === 'all' ? undefined : value)}>
@@ -98,6 +101,23 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [] }
                 {getCategories().map(category => (
                   <SelectItem key={category} value={category}>
                     {getCategoryDisplayName(category)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="company-filter" className="text-sm font-medium">Company</Label>
+            <Select value={filters.company || 'all'} onValueChange={(value) => updateFilter('company', value === 'all' ? undefined : value)}>
+              <SelectTrigger id="company-filter" className="w-full">
+                <SelectValue placeholder="All Companies" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Companies</SelectItem>
+                {existingContracts && Array.from(new Set(existingContracts.map(c => c.company).filter(Boolean))).sort().map(company => (
+                  <SelectItem key={company} value={company}>
+                    {company}
                   </SelectItem>
                 ))}
               </SelectContent>

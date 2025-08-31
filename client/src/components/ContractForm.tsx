@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Plus, X, FileEdit } from 'lucide-react';
 import { FamilyMemberInput } from '@/components/FamilyMemberInput';
+import { CompanyInput } from '@/components/CompanyInput';
 
 interface ContractFormProps {
   contract?: Contract;
@@ -341,13 +342,16 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
                 Company
                 {showRequired('company') && <span className="text-red-500 ml-1">*</span>}
               </Label>
-              <Input
-                id="company"
+              <CompanyInput
                 value={formData.company}
-                onChange={(e) => updateFormData({ company: e.target.value })}
-                placeholder="e.g., Netflix Inc."
+                onChange={(value) => updateFormData({ company: value })}
+                existingContracts={existingContracts || []}
+                placeholder="e.g., Netflix Inc., Amazon Web Services, Spotify"
                 required={!formData.draft}
               />
+              <p className="text-sm text-muted-foreground mt-1">
+                Start typing to see suggestions from existing contracts
+              </p>
             </div>
 
           <div>

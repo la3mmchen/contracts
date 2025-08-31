@@ -151,6 +151,11 @@ const Index = () => {
       filtered = filtered.filter(contract => contract.familyMember === filters.familyMember);
     }
 
+    // Apply company filter
+    if (filters.company) {
+      filtered = filtered.filter(contract => contract.company === filters.company);
+    }
+
     // Apply frequency filter
     if (filters.frequency) {
       filtered = filtered.filter(contract => contract.frequency === filters.frequency);
@@ -619,7 +624,7 @@ const Index = () => {
         )}
         
         {/* Active Filters Display */}
-        {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
+        {(filters.status || filters.category || filters.company || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
           <div className="flex items-center gap-2 text-sm mb-6">
             <span className="text-muted-foreground font-medium">Active Filters:</span>
             <div className="flex flex-wrap items-center gap-2">
@@ -654,6 +659,18 @@ const Index = () => {
                     onClick={() => setFilters(prev => ({ ...prev, familyMember: undefined }))}
                     className="ml-1 text-[#A855F7]/70 hover:text-[#A855F7] transition-colors"
                     title="Remove family member filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {filters.company && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#3B82F6]/10 text-[#3B82F6] rounded-md border border-[#3B82F6]/20">
+                  <span className="text-xs font-medium">Company: {filters.company}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, company: undefined }))}
+                    className="ml-1 text-[#3B82F6]/70 hover:text-[#3B82F6] transition-colors"
+                    title="Remove company filter"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -733,7 +750,7 @@ const Index = () => {
               )}
 
               {/* Clear All Filters Button */}
-              {(filters.status || filters.category || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.optimizable !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
+              {(filters.status || filters.category || filters.familyMember || filters.company || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.optimizable !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -756,7 +773,15 @@ const Index = () => {
         <ContractStats 
           contracts={contracts} 
           onFilter={(filterType, value) => {
-            if (filterType === 'viewMode') {
+            console.log('Filter applied:', filterType, value, 'Current filters:', filters);
+            if (filterType === 'reset') {
+              // Reset all filters when switching tabs
+              setFilters({
+                searchTerm: '',
+                sortBy: 'updatedAt',
+                sortOrder: 'desc'
+              });
+            } else if (filterType === 'viewMode') {
               // Handle view mode as mutually exclusive options
               if (value === 'all') {
                 // Reset all filters to show all contracts
@@ -804,6 +829,18 @@ const Index = () => {
                 setFilters(prev => ({ 
                   ...prev,
                   familyMember: value,
+                  searchTerm: '' // Clear search when filtering
+                }));
+              }
+            } else if (filterType === 'company') {
+              // If clicking the same company filter, reset it
+              if (filters.company === value) {
+                setFilters(prev => ({ ...prev, company: undefined, searchTerm: '' }));
+              } else {
+                // Clear search when applying a company filter
+                setFilters(prev => ({ 
+                  ...prev,
+                  company: value,
                   searchTerm: '' // Clear search when filtering
                 }));
               }
@@ -863,6 +900,7 @@ const Index = () => {
             status: filters.status,
             category: filters.category,
             familyMember: filters.familyMember,
+            company: filters.company,
             needsMoreInfo: filters.needsMoreInfo,
             pinned: filters.pinned,
             optimizable: filters.optimizable,

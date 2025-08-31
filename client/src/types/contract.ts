@@ -64,6 +64,7 @@ export interface ContractFilters {
   status?: Contract['status'];
   category?: Contract['category'];
   familyMember?: string; // Filter by family member
+  company?: string; // Filter by company
   frequency?: Contract['frequency'];
   searchTerm?: string;
   tags?: string[];
