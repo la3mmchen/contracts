@@ -42,6 +42,7 @@ import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalc
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
 import { isValidCategory, formatRelativeTime, getCategoryBadgeColor } from '@/lib/utils';
+import { calculateDataQualityScore, getGradeColor } from '@/lib/dataQualityCalculator';
 import { useState, useMemo, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -804,6 +805,26 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
                 )}
               </div>
             )}
+            
+            {/* Data Quality Score Indicator */}
+            <div className="flex items-center gap-2 mt-1">
+              {(() => {
+                const qualityScore = calculateDataQualityScore(contract);
+                return (
+                  <span 
+                    className={`inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold ${getGradeColor(qualityScore.grade)}`}
+                    title={`Data Quality: ${qualityScore.grade} (${qualityScore.percentage}%)${qualityScore.score > qualityScore.maxScore ? ` +${qualityScore.score - qualityScore.maxScore} bonus points` : ''}`}
+                  >
+                    {qualityScore.grade} • {qualityScore.percentage}%
+                    {qualityScore.score > qualityScore.maxScore && (
+                      <span className="ml-1 text-green-600 dark:text-green-400">
+                        +{qualityScore.score - qualityScore.maxScore}
+                      </span>
+                    )}
+                  </span>
+                );
+              })()}
+            </div>
             
             {isDetailPage && isEditingCompany ? (
               <div className="flex items-center gap-2 mt-1" data-editable="true">

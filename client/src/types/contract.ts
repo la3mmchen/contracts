@@ -67,6 +67,7 @@ export interface ContractFilters {
   needsMoreInfo?: boolean;
   pinned?: boolean;
   hasAdditionalFields?: boolean; // Filter contracts that have custom fields
+  dataQualityGrade?: 'A' | 'B' | 'C' | 'D' | 'F'; // Filter by data quality grade
   sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {

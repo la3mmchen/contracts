@@ -34,6 +34,7 @@ import {
 import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
+import { DataQualityScore } from '@/components/DataQualityScore';
 
 // Helper function to get the correct base path
 const getBasePath = () => {
@@ -669,6 +670,12 @@ const ContractDetail = () => {
 
               </CardContent>
             </Card>
+
+            {/* Data Quality Score */}
+            <DataQualityScore 
+              contract={contract} 
+              onEdit={() => setIsEditFormOpen(true)}
+            />
 
             {/* Contract Overview */}
             <Card>

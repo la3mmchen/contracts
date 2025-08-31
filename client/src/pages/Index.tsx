@@ -32,6 +32,7 @@ import {
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { isValidCategory } from '@/lib/utils';
+import { calculateDataQualityScore } from '@/lib/dataQualityCalculator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { smartApi } from '@/services/smartApi';
 
@@ -81,14 +82,16 @@ const Index = () => {
     const categoryParam = searchParams.get('category');
     const tagsParam = searchParams.get('tags');
     const hasAdditionalFieldsParam = searchParams.get('hasAdditionalFields');
+    const dataQualityGradeParam = searchParams.get('dataQualityGrade');
     
-    if (statusParam || categoryParam || tagsParam || hasAdditionalFieldsParam) {
+    if (statusParam || categoryParam || tagsParam || hasAdditionalFieldsParam || dataQualityGradeParam) {
       setFilters(prev => ({
         ...prev,
         ...(statusParam && { status: statusParam as Contract['status'] }),
         ...(categoryParam && { category: categoryParam as Contract['category'] }),
         ...(tagsParam && { tags: [tagsParam] }),
-        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' })
+        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' }),
+        ...(dataQualityGradeParam && { dataQualityGrade: dataQualityGradeParam as 'A' | 'B' | 'C' | 'D' | 'F' })
       }));
       
       // Don't clear URL parameters - keep them for navigation context
@@ -105,6 +108,7 @@ const Index = () => {
     if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
     if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
     if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
+    if (filters.dataQualityGrade) params.set('dataQualityGrade', filters.dataQualityGrade);
     if (filters.searchTerm) params.set('search', filters.searchTerm);
     if (filters.sortBy) params.set('sortBy', filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
@@ -180,6 +184,14 @@ const Index = () => {
           !contract.customFields || Object.keys(contract.customFields).length === 0
         );
       }
+    }
+
+    // Apply data quality grade filter
+    if (filters.dataQualityGrade) {
+      filtered = filtered.filter(contract => {
+        const qualityScore = calculateDataQualityScore(contract);
+        return qualityScore.grade === filters.dataQualityGrade;
+      });
     }
 
     // Apply sorting
@@ -469,6 +481,23 @@ const Index = () => {
                 </SelectContent>
               </Select>
 
+              {/* Data Quality Filter */}
+              <Select value={filters.dataQualityGrade || 'all'} onValueChange={(value) => {
+                setFilters(prev => ({ ...prev, dataQualityGrade: value === 'all' ? undefined : value as 'A' | 'B' | 'C' | 'D' | 'F' }));
+              }}>
+                <SelectTrigger className="w-36 bg-white/10 border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200">
+                  <SelectValue placeholder="Data Quality" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Grades</SelectItem>
+                  <SelectItem value="A">Grade A (90%+)</SelectItem>
+                  <SelectItem value="B">Grade B (80-89%)</SelectItem>
+                  <SelectItem value="C">Grade C (70-79%)</SelectItem>
+                  <SelectItem value="D">Grade D (60-69%)</SelectItem>
+                  <SelectItem value="F">Grade F (&lt;60%)</SelectItem>
+                </SelectContent>
+              </Select>
+
               <Button
                 variant="secondary"
                 onClick={exportContracts}
@@ -559,7 +588,7 @@ const Index = () => {
         )}
         
         {/* Active Filters Display */}
-        {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined) && (
+        {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
           <div className="flex items-center gap-2 text-sm mb-6">
             <span className="text-muted-foreground font-medium">Active Filters:</span>
             <div className="flex flex-wrap items-center gap-2">
@@ -647,8 +676,20 @@ const Index = () => {
                   </button>
                 </div>
               )}
+              {filters.dataQualityGrade && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#F5DA6C]/10 text-[#F5DA6C] rounded-md border border-[#F5DA6C]/20">
+                  <span className="text-xs font-medium">Data Quality: {filters.dataQualityGrade}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, dataQualityGrade: undefined }))}
+                    className="ml-1 text-[#F5DA6C]/70 hover:text-[#F5DA6C] transition-colors"
+                    title="Remove data quality filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
               {/* Clear All Filters Button */}
-              {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
+              {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade || filters.searchTerm) && (
                 <Button
                   variant="outline"
                   size="sm"
