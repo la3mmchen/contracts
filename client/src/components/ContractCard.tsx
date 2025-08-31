@@ -1903,15 +1903,19 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               </div>
             ) : isDetailPage ? (
               <div 
-                className="text-sm text-muted-foreground line-clamp-2 pl-6 cursor-pointer hover:bg-muted/30 p-2 rounded transition-colors"
+                className="text-sm text-muted-foreground pl-6 cursor-pointer hover:bg-muted/30 p-2 rounded transition-colors"
                 onClick={() => setIsEditingDescription(true)}
                 title="Click to edit description"
               >
-                {contract.description || 'Click to add description...'}
+                <div className="whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto scrollbar-thin">
+                  {contract.description || 'Click to add description...'}
+                </div>
               </div>
             ) : (
-              <div className="text-sm text-muted-foreground line-clamp-2 pl-6">
-                {contract.description}
+              <div className="text-sm text-muted-foreground pl-6">
+                <div className="whitespace-pre-wrap leading-relaxed max-h-24 overflow-y-auto scrollbar-thin">
+                  {contract.description}
+                </div>
               </div>
             )}
           </div>

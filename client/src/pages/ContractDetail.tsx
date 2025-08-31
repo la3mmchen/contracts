@@ -756,7 +756,7 @@ const ContractDetail = () => {
           />
           
           {/* Modal Content */}
-          <div className="relative bg-background rounded-lg shadow-xl max-w-5xl w-[90vw] max-h-[90vh] overflow-y-auto border">
+          <div className="relative bg-background rounded-lg shadow-xl max-w-5xl w-[90vw] max-h-[90vh] overflow-y-auto scrollbar-thin border">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div>

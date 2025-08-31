@@ -150,7 +150,7 @@ export const NotesSection: React.FC<NotesSectionProps> = ({ contract, onUpdate }
                     {contract.notesHistory.length}
                   </Badge>
                 </div>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
+                <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin">
                   {contract.notesHistory.slice(-5).reverse().map((entry: NotesHistoryEntry, index: number) => (
                     <div key={index} className="text-xs bg-muted/20 p-2 rounded border-l-2 border-primary/30">
                       <div className="flex items-center justify-between mb-1">
