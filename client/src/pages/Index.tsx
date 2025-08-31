@@ -80,18 +80,18 @@ const Index = () => {
   useEffect(() => {
     const statusParam = searchParams.get('status');
     const categoryParam = searchParams.get('category');
+    const familyMemberParam = searchParams.get('familyMember');
     const tagsParam = searchParams.get('tags');
     const hasAdditionalFieldsParam = searchParams.get('hasAdditionalFields');
-    const dataQualityGradeParam = searchParams.get('dataQualityGrade');
     
-    if (statusParam || categoryParam || tagsParam || hasAdditionalFieldsParam || dataQualityGradeParam) {
+    if (statusParam || categoryParam || familyMemberParam || tagsParam || hasAdditionalFieldsParam) {
       setFilters(prev => ({
         ...prev,
         ...(statusParam && { status: statusParam as Contract['status'] }),
         ...(categoryParam && { category: categoryParam as Contract['category'] }),
+        ...(familyMemberParam && { familyMember: familyMemberParam }),
         ...(tagsParam && { tags: [tagsParam] }),
-        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' }),
-        ...(dataQualityGradeParam && { dataQualityGrade: dataQualityGradeParam as 'A' | 'B' | 'C' | 'D' | 'F' })
+        ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' })
       }));
       
       // Don't clear URL parameters - keep them for navigation context
@@ -103,12 +103,12 @@ const Index = () => {
     const params = new URLSearchParams();
     if (filters.status) params.set('status', filters.status);
     if (filters.category) params.set('category', filters.category);
+    if (filters.familyMember) params.set('familyMember', filters.familyMember);
     if (filters.frequency) params.set('frequency', filters.frequency);
     if (filters.tags?.length) params.set('tags', filters.tags.join(','));
     if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
     if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
     if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
-    if (filters.dataQualityGrade) params.set('dataQualityGrade', filters.dataQualityGrade);
     if (filters.searchTerm) params.set('search', filters.searchTerm);
     if (filters.sortBy) params.set('sortBy', filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
@@ -131,7 +131,8 @@ const Index = () => {
         contract.reference?.toLowerCase().includes(searchLower) ||
         contract.description?.toLowerCase().includes(searchLower) ||
         contract.tags?.some(tag => tag.toLowerCase().includes(searchLower)) ||
-        contract.notes?.toLowerCase().includes(searchLower)
+        contract.notes?.toLowerCase().includes(searchLower) ||
+        contract.familyMember?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -143,6 +144,11 @@ const Index = () => {
     // Apply category filter
     if (filters.category) {
       filtered = filtered.filter(contract => contract.category === filters.category);
+    }
+
+    // Apply family member filter
+    if (filters.familyMember) {
+      filtered = filtered.filter(contract => contract.familyMember === filters.familyMember);
     }
 
     // Apply frequency filter
@@ -186,13 +192,7 @@ const Index = () => {
       }
     }
 
-    // Apply data quality grade filter
-    if (filters.dataQualityGrade) {
-      filtered = filtered.filter(contract => {
-        const qualityScore = calculateDataQualityScore(contract);
-        return qualityScore.grade === filters.dataQualityGrade;
-      });
-    }
+
 
     // Apply sorting
     const direction = filters.sortOrder === 'asc' ? 1 : -1;
@@ -439,7 +439,47 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">{appConfig.name}</h1>
-              <p className="text-primary-foreground/80 mt-1 text-sm sm:text-base">Manage your contracts efficiently</p>
+              
+              {/* Overview Stats */}
+              <div className="flex flex-wrap items-center gap-4 mt-2 text-xs sm:text-sm">
+                {(() => {
+                  // Generate the same stats that were in ContractStats
+                  const activeContracts = contracts.filter(c => c.status === 'active');
+                  const monthlySpend = contracts
+                    .filter(c => c.status === 'active')
+                    .reduce((total, contract) => {
+                      switch (contract.frequency) {
+                        case 'monthly': return total + contract.amount;
+                        case 'quarterly': return total + (contract.amount / 3);
+                        case 'yearly': return total + (contract.amount / 12);
+                        case 'weekly': return total + (contract.amount * 4.33);
+                        case 'bi-weekly': return total + (contract.amount * 2.17);
+                        case 'one-time': return total + (contract.amount / 12);
+                        default: return total;
+                      }
+                    }, 0);
+                  
+                  return (
+                    <>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-primary-foreground/70">Total:</span>
+                        <span className="text-white font-medium">{contracts.length}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span className="text-primary-foreground/70">Active:</span>
+                        <span className="text-white font-medium">{activeContracts.length}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                        <span className="text-primary-foreground/70">Monthly:</span>
+                        <span className="text-white font-medium">${monthlySpend.toFixed(0)}</span>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               {/* Search Input */}
@@ -481,22 +521,7 @@ const Index = () => {
                 </SelectContent>
               </Select>
 
-              {/* Data Quality Filter */}
-              <Select value={filters.dataQualityGrade || 'all'} onValueChange={(value) => {
-                setFilters(prev => ({ ...prev, dataQualityGrade: value === 'all' ? undefined : value as 'A' | 'B' | 'C' | 'D' | 'F' }));
-              }}>
-                <SelectTrigger className="w-36 bg-white/10 border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200">
-                  <SelectValue placeholder="Data Quality" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Grades</SelectItem>
-                  <SelectItem value="A">Grade A (90%+)</SelectItem>
-                  <SelectItem value="B">Grade B (80-89%)</SelectItem>
-                  <SelectItem value="C">Grade C (70-79%)</SelectItem>
-                  <SelectItem value="D">Grade D (60-69%)</SelectItem>
-                  <SelectItem value="F">Grade F (&lt;60%)</SelectItem>
-                </SelectContent>
-              </Select>
+
 
               <Button
                 variant="secondary"
@@ -540,6 +565,7 @@ const Index = () => {
                   <ContractForm
                     contract={editingContract}
                     isCopying={isCopying}
+                    existingContracts={contracts}
                     onSubmit={editingContract && editingContract.id ? handleEditContract : handleAddContract}
                     onCancel={() => handleDialogClose(false)}
                     onDirtyStateChange={setIsFormDirty}
@@ -616,6 +642,18 @@ const Index = () => {
                   </button>
                 </div>
               )}
+              {filters.familyMember && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#A855F7]/10 text-[#A855F7] rounded-md border border-[#A855F7]/20">
+                  <span className="text-xs font-medium">Family Member: {filters.familyMember}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, familyMember: undefined }))}
+                    className="ml-1 text-[#A855F7]/70 hover:text-[#A855F7] transition-colors"
+                    title="Remove family member filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
               {filters.frequency && (
                 <div className="flex items-center gap-1 px-2 py-1 bg-[#F5DA6C]/10 text-[#F5DA6C] rounded-md border border-[#F5DA6C]/20">
                   <span className="text-xs font-medium">Frequency: {filters.frequency}</span>
@@ -676,20 +714,9 @@ const Index = () => {
                   </button>
                 </div>
               )}
-              {filters.dataQualityGrade && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-[#F5DA6C]/10 text-[#F5DA6C] rounded-md border border-[#F5DA6C]/20">
-                  <span className="text-xs font-medium">Data Quality: {filters.dataQualityGrade}</span>
-                  <button
-                    onClick={() => setFilters(prev => ({ ...prev, dataQualityGrade: undefined }))}
-                    className="ml-1 text-[#F5DA6C]/70 hover:text-[#F5DA6C] transition-colors"
-                    title="Remove data quality filter"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              )}
+
               {/* Clear All Filters Button */}
-              {(filters.status || filters.category || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade || filters.searchTerm) && (
+              {(filters.status || filters.category || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -751,6 +778,18 @@ const Index = () => {
                   searchTerm: '' // Clear search when filtering
                 }));
               }
+            } else if (filterType === 'familyMember') {
+              // If clicking the same family member filter, reset it
+              if (filters.familyMember === value) {
+                setFilters(prev => ({ ...prev, familyMember: undefined, searchTerm: '' }));
+              } else {
+                // Clear search when applying a family member filter
+                setFilters(prev => ({ 
+                  ...prev,
+                  familyMember: value,
+                  searchTerm: '' // Clear search when filtering
+                }));
+              }
             } else if (filterType === 'tags') {
               // If clicking the same tag filter, reset it
               if (filters.tags?.includes(value)) {
@@ -806,6 +845,7 @@ const Index = () => {
           activeFilters={{
             status: filters.status,
             category: filters.category,
+            familyMember: filters.familyMember,
             needsMoreInfo: filters.needsMoreInfo,
             pinned: filters.pinned,
             hasAdditionalFields: filters.hasAdditionalFields

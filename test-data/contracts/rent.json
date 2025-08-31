@@ -19,6 +19,7 @@
     "contactPerson": "Sarah Wilson"
   },
   "notes": "Includes utilities. Parking space #12. Pet deposit paid.",
+  "familyMember": "Mike",
   "tags": ["rent", "housing", "apartment"],
   "priceChanges": [
     {

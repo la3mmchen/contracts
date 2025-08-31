@@ -29,6 +29,7 @@ These fields enhance contract details:
 - **Contact Address** - Physical address
 - **Website** - Company website
 - **Contact Person** - Named contact individual
+- **Family Member** - Which family member the contract is for
 - **Tags** - Categorization tags
 - **Document Link** - Link to contract document
 - **Attachments** - File attachments

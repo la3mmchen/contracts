@@ -12,16 +12,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Plus, X, FileEdit } from 'lucide-react';
+import { FamilyMemberInput } from '@/components/FamilyMemberInput';
 
 interface ContractFormProps {
   contract?: Contract;
   isCopying?: boolean; // New prop to indicate if we're copying a contract
+  existingContracts?: Contract[]; // Existing contracts for autocomplete suggestions
   onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => void;
   onCancel: () => void;
   onDirtyStateChange?: (isDirty: boolean) => void;
 }
 
-export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
+export const ContractForm = ({ contract, isCopying = false, existingContracts, onSubmit, onCancel, onDirtyStateChange }: ContractFormProps) => {
   const isEditing = !!contract && !isCopying;
   
   // Get available options and determine smart defaults
@@ -68,6 +70,7 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
     },
     notes: contract?.notes || '',
     notesHistory: contract?.notesHistory || [],
+    familyMember: contract?.familyMember || '',
     tags: contract?.tags?.join(', ') || '',
     needsMoreInfo: contract?.needsMoreInfo || false,
     pinned: contract?.pinned || false,
@@ -140,6 +143,7 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
         },
         notes: contract.notes || '',
         notesHistory: contract.notesHistory || [],
+        familyMember: contract.familyMember || '',
         tags: contract.tags?.join(', ') || '',
         needsMoreInfo: contract.needsMoreInfo || false,
         pinned: contract.pinned || false,
@@ -313,6 +317,19 @@ export const ContractForm = ({ contract, isCopying = false, onSubmit, onCancel, 
             />
             <p className="text-sm text-muted-foreground mt-1">
               Important reference number for this contract (e.g., purchase order, invoice number, etc.)
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="familyMember">Family Member</Label>
+            <FamilyMemberInput
+              value={formData.familyMember}
+              onChange={(value) => updateFormData({ familyMember: value })}
+              existingContracts={existingContracts || []}
+              placeholder="e.g., Alex, Sarah, Mike, Emma, Dad"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Which family member this contract belongs to (optional)
             </p>
           </div>
 

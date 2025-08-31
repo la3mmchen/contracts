@@ -39,6 +39,7 @@ export interface Contract {
   needsMoreInfo?: boolean; // Flag to indicate contract needs more information
   pinned?: boolean; // Flag to pin contract to the top of the list
   draft?: boolean; // Flag to indicate contract is in draft state
+  familyMember?: string; // Which family member the contract is for
   priceChanges?: PriceChange[]; // Array of amount changes over time
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
@@ -76,8 +77,11 @@ export interface CreateContractRequest {
   needsMoreInfo?: boolean;
   pinned?: boolean;
   draft?: boolean; // Flag to indicate contract is in draft state
+  familyMember?: string; // Which family member the contract is for
+  notesHistory?: NotesHistoryEntry[];
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
+  documentLink?: string;
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

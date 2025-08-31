@@ -924,6 +924,16 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
                 )}
               </div>
             )}
+
+            {/* Family Member Display */}
+            {contract.familyMember && (
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-muted-foreground font-mono bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 px-2 py-1 rounded inline-block">
+                  👤 {contract.familyMember}
+                </p>
+              </div>
+            )}
+
             <p className={`text-xs text-muted-foreground mt-1 flex items-center gap-1 ${isOld || isStale ? 'font-semibold' : ''}`}>
               {isStale && <AlertTriangle className="h-3 w-3 text-destructive" />}
               {isOld && !isStale && <Clock3 className="h-3 w-3 text-muted-foreground" />}

@@ -24,6 +24,7 @@ export const demoContracts: Contract[] = [
       address: '100 Winchester Circle, Los Gatos, CA 95032'
     },
     notes: 'Premium plan with 4K Ultra HD quality and 4 simultaneous streams. Shared account with family.',
+    familyMember: 'Alex',
     notesHistory: [
       {
         timestamp: '2024-01-01T08:00:00.000Z',
@@ -84,6 +85,7 @@ export const demoContracts: Contract[] = [
       address: '4 World Trade Center, 150 Greenwich Street, New York, NY 10007'
     },
     notes: 'Family plan with 6 accounts. Shared payment method.',
+    familyMember: 'Emma',
     notesHistory: [
       {
         timestamp: '2024-03-01T10:00:00.000Z',
@@ -129,6 +131,7 @@ export const demoContracts: Contract[] = [
       address: 'Alexanderplatz 1, 10178 Berlin, Germany'
     },
     notes: 'Premium membership includes access to all gym locations, unlimited classes, personal training sessions, and spa facilities.',
+    familyMember: 'Sarah',
     notesHistory: [
       {
         timestamp: '2024-01-01T09:00:00.000Z',

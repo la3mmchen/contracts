@@ -793,15 +793,16 @@ const ContractDetail = () => {
             <div className="p-6">
               <ContractForm
                 contract={contract}
+                existingContracts={contracts}
                 onSubmit={handleEdit}
-                            onCancel={() => {
-              if (isFormDirty) {
-                setShowUnsavedChangesDialog(true);
-              } else {
-                setIsEditFormOpen(false);
-                setIsFormDirty(false);
-              }
-            }}
+                onCancel={() => {
+                  if (isFormDirty) {
+                    setShowUnsavedChangesDialog(true);
+                  } else {
+                    setIsEditFormOpen(false);
+                    setIsFormDirty(false);
+                  }
+                }}
                 onDirtyStateChange={setIsFormDirty}
               />
             </div>

@@ -19,6 +19,7 @@
     "contactPerson": "Alex Thompson"
   },
   "notes": "Membership closed due to relocation. Included personal training sessions, pool access, and 24/7 access.",
+  "familyMember": "Sarah",
   "tags": ["fitness", "health", "membership", "closed"],
   "customFields": {
     "Member ID": "FF-45678",

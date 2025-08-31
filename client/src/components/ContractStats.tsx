@@ -14,7 +14,8 @@ import {
   DollarSign, 
   Tag, 
   Coins, 
-  Building2
+  Building2,
+  User
 } from 'lucide-react';
 
 interface ContractStatsProps {
@@ -23,6 +24,7 @@ interface ContractStatsProps {
   activeFilters?: {
     status?: string;
     category?: string;
+    familyMember?: string;
     needsMoreInfo?: boolean;
     pinned?: boolean;
     hasAdditionalFields?: boolean;
@@ -112,6 +114,32 @@ export const ContractStats = ({
         filterValue: category
       };
     });
+  };
+
+  const generateFamilyMemberStats = (): StatItem[] => {
+    // Extract unique family members from contracts
+    const familyMembers = new Set<string>();
+    contracts.forEach(contract => {
+      if (contract.familyMember?.trim()) {
+        familyMembers.add(contract.familyMember.trim());
+      }
+    });
+
+    return Array.from(familyMembers)
+      .sort()
+      .map(member => {
+        const count = contracts.filter(c => c.familyMember === member).length;
+        return {
+          title: member,
+          value: count,
+          icon: User, // Using User icon for family members
+          color: 'text-purple-600 dark:text-purple-400',
+          bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+          clickable: count > 0,
+          filterType: 'familyMember',
+          filterValue: member
+        };
+      });
   };
 
   const stats: StatItem[] = [
@@ -275,13 +303,16 @@ export const ContractStats = ({
     return cardContent;
   };
 
-  // Helper function to render compact category cards
+  // Helper function to render compact category and family member cards
   const renderCategoryCard = (stat: StatItem, index: number) => {
-    const isActive = activeFilters && activeFilters.category === stat.filterValue;
+    const isActive = activeFilters && (
+      (stat.filterType === 'category' && activeFilters.category === stat.filterValue) ||
+      (stat.filterType === 'familyMember' && activeFilters.familyMember === stat.filterValue)
+    );
     
     return (
       <Card 
-        key={`category-${index}`}
+        key={`${stat.filterType}-${index}`}
         className={`bg-gradient-card border-border/50 hover:shadow-card transition-all duration-200 ${
           stat.clickable && onFilter ? 'cursor-pointer hover:scale-[1.02] border-primary/30 hover:border-primary/50' : ''
         } ${isActive ? 'ring-2 ring-primary bg-primary/5 border-primary/50' : ''}`} 
@@ -317,29 +348,20 @@ export const ContractStats = ({
         </TabsList>
         
         <TabsContent value="quickFilters" className="space-y-3">
-          {/* Main Stats - More Compact */}
-          <div className="p-3 bg-muted/20 rounded-lg border border-border/50">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-foreground">Quick View Options</h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {stats.filter(stat => stat.filterType !== 'category').map((stat, index) => 
-                renderCompactStatCard(stat, index)
-              )}
-            </div>
-          </div>
-          
-          {/* Category Stats - More Compact */}
+          {/* Quick Filter - Categories and Family Members */}
           <div className="p-3 bg-muted/10 rounded-lg border border-border/30">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-foreground">Filter by Category</h3>
+              <h3 className="text-sm font-medium text-foreground">Quick Filter</h3>
               <span className="text-xs text-muted-foreground">Click to filter</span>
             </div>
+            
+            {/* Combined Categories and Family Members */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {stats.filter(stat => stat.filterType === 'category')
                 .filter(stat => typeof stat.value === 'number' && stat.value > 0)
                 .sort((a, b) => (b.value as number) - (a.value as number))
                 .map((stat, index) => renderCategoryCard(stat, index))}
+              {generateFamilyMemberStats().map((stat, index) => renderCategoryCard(stat, index))}
             </div>
           </div>
         </TabsContent>

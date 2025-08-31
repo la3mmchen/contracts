@@ -145,13 +145,16 @@ class ContractService {
       payDate: data.payDate,
       contactInfo: data.contactInfo || {},
       notes: data.notes,
+      notesHistory: data.notesHistory,
+      familyMember: data.familyMember,
       tags: data.tags,
       needsMoreInfo: data.needsMoreInfo,
       pinned: data.pinned,
       draft: data.draft,
       priceChanges: data.priceChanges,
+      customFields: data.customFields,
       attachments: [],
-      documentLink: undefined,
+      documentLink: data.documentLink,
       createdAt: now,
       updatedAt: now,
     };
@@ -227,6 +230,7 @@ class ContractService {
       contract.contractId.toLowerCase().includes(searchTerm) ||
       (contract.reference && contract.reference.toLowerCase().includes(searchTerm)) ||
       (contract.description && contract.description.toLowerCase().includes(searchTerm)) ||
+      (contract.familyMember && contract.familyMember.toLowerCase().includes(searchTerm)) ||
       (contract.tags && contract.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
       (contract.notes && contract.notes.toLowerCase().includes(searchTerm)) ||
       (contract.customFields && Object.values(contract.customFields).some(value => 

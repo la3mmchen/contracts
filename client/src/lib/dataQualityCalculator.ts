@@ -113,6 +113,10 @@ export const calculateDataQualityScore = (contract: Contract): DataQualityScore 
     score += 3;
   }
 
+  if (contract.familyMember?.trim()) {
+    score += 3;
+  }
+
   // Bonus Points (2 points each) - Recognition for extra effort
   if (contract.priceChanges && contract.priceChanges.length > 0) {
     score += 2;
