@@ -727,13 +727,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
   return (
     <Card 
       id={`contract-${contract.id}`}
-      className={`group bg-gradient-card border-border/50 hover:shadow-card transition-all duration-300 animate-fade-in ${
-        contract.draft ? 'border-border bg-muted/30' : ''
+      className={`group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300 ${
+        contract.draft ? 'border-blue-200 bg-blue-50/50 dark:bg-blue-950/20' : ''
       } ${
-        isRecentlyUpdated && !hasInvalidCategory && !contract.draft ? 'border-border bg-muted/30' : ''
+        isRecentlyUpdated && !hasInvalidCategory && !contract.draft ? 'border-green-200 bg-green-50/50 dark:bg-green-950/20' : ''
       } ${
-        isOld && !isStale && !hasInvalidCategory && !contract.draft ? 'border-border bg-muted/20' : ''
-      } ${isStale && !hasInvalidCategory ? 'border-destructive bg-destructive/10' : ''}`}>
+        isOld && !isStale && !hasInvalidCategory && !contract.draft ? 'border-yellow-200 bg-yellow-50/50 dark:bg-yellow-950/20' : ''
+      } ${isStale && !hasInvalidCategory ? 'border-red-200 bg-red-50/50 dark:bg-red-950/20' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -1130,10 +1130,6 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               {contract.category}
             </span>
           )}
-          
-
-          
-
         </div>
 
         {/* Notes Display - Show most recent note */}
@@ -1178,16 +1174,13 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
         )}
 
         {/* Contract Period */}
-
-
-                  {/* Contract Period */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CalendarDays className="h-4 w-4" />
-              <span>Contract Period:</span>
-            </div>
-            <div className="space-y-1">
-                          {/* Start Date */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CalendarDays className="h-4 w-4" />
+            <span>Contract Period:</span>
+          </div>
+          <div className="space-y-1">
+            {/* Start Date */}
             {isDetailPage || contract.startDate ? (
               <div className="flex items-center gap-3 text-xs">
                 <span className="w-12">Start:</span>
@@ -1233,56 +1226,56 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
               </div>
             ) : null}
               
-              {/* End Date */}
-              {isDetailPage || contract.endDate ? (
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="w-12">End:</span>
-                  {isDetailPage && isEditingEndDate ? (
-                    <div className="flex items-center gap-1">
-                      <Input
-                        type="date"
-                        value={editingEndDate}
-                        onChange={(e) => setEditingEndDate(e.target.value)}
-                        className="text-xs h-6 w-32"
-                        placeholder="No end date"
-                        autoFocus
-                      />
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleEndDateSave}
-                        disabled={isSaving}
-                        className="h-5 w-5 p-0"
-                      >
-                        {isSaving ? '...' : '✓'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleEndDateCancel}
-                        disabled={isSaving}
-                        className="h-5 w-5 p-0"
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ) : isDetailPage ? (
-                    <div 
-                      className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                      onClick={() => setIsEditingEndDate(true)}
-                      title="Click to edit end date"
+            {/* End Date */}
+            {isDetailPage || contract.endDate ? (
+              <div className="flex items-center gap-3 text-xs">
+                <span className="w-12">End:</span>
+                {isDetailPage && isEditingEndDate ? (
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="date"
+                      value={editingEndDate}
+                      onChange={(e) => setEditingEndDate(e.target.value)}
+                      className="text-xs h-6 w-32"
+                      placeholder="No end date"
+                      autoFocus
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleEndDateSave}
+                      disabled={isSaving}
+                      className="h-5 w-5 p-0"
                     >
-                      {contract.endDate ? formatDate(contract.endDate) : 'Click to add end date...'}
-                    </div>
-                  ) : (
-                    <span>{formatDate(contract.endDate)}</span>
-                  )}
-                </div>
-              ) : null}
-            </div>
+                      {isSaving ? '...' : '✓'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleEndDateCancel}
+                      disabled={isSaving}
+                      className="h-5 w-5 p-0"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                ) : isDetailPage ? (
+                  <div 
+                    className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
+                    onClick={() => setIsEditingEndDate(true)}
+                    title="Click to edit end date"
+                  >
+                    {contract.endDate ? formatDate(contract.endDate) : 'Click to add end date...'}
+                  </div>
+                ) : (
+                  <span>{formatDate(contract.endDate)}</span>
+                )}
+              </div>
+            ) : null}
           </div>
+        </div>
 
-          {/* Amount and Frequency */}
+        {/* Amount and Frequency */}
         <div className="flex items-center gap-2 text-lg font-semibold">
           {isDetailPage && isEditingCurrency ? (
             <div className="flex items-center gap-1">
@@ -1442,785 +1435,185 @@ export const ContractCard = ({ contract, onEdit, onDelete, onCopy, onFilter, def
           )}
         </div>
 
-
-
-
-
         {/* Payment Schedule - Collapsible */}
-        {payments.length > 0 && (
-          <Collapsible open={isPaymentsOpen} onOpenChange={setIsPaymentsOpen}>
-            <CollapsibleTrigger asChild>
-              <div className="flex items-center justify-between text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-info" />
-                  <span>Next payments:</span>
-                  <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                    {payments.length}
-                  </span>
+        {contract.frequency !== 'one-time' && (
+          <div className="space-y-2">
+            <Collapsible open={isPaymentsOpen} onOpenChange={setIsPaymentsOpen}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-between p-2 hover:bg-muted/30"
+                >
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span className="text-sm font-medium">Payment Schedule</span>
+                  </div>
+                  {isPaymentsOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-2">
+                <div className="pl-6 space-y-2">
+                  {(() => {
+                    const nextPayments = calculateNextThreePayments(contract);
+                    return nextPayments.map((payment, index) => (
+                      <div key={index} className="flex items-center justify-between text-xs bg-muted/20 rounded px-3 py-2">
+                        <span className="text-muted-foreground">
+                          {index === 0 ? 'Next:' : index === 1 ? 'Following:' : 'Then:'}
+                        </span>
+                        <span className="font-medium">
+                          {formatPaymentDate(payment.date)} - {formatCurrency(payment.amount, contract.currency)}
+                        </span>
+                      </div>
+                    ));
+                  })()}
                 </div>
-                {isPaymentsOpen ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="space-y-1 pl-6">
-                {payments.map((payment, index) => {
-                  const paymentDate = new Date(payment.date);
-                  const now = new Date();
-                  const isPastDue = paymentDate < now;
-                  
-                  return (
-                    <div key={index} className="flex items-center justify-between text-xs">
-                      <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'} ${isPastDue ? 'line-through text-muted-foreground/60' : ''}`}>
-                        {formatPaymentDate(payment.date)}
-                      </span>
-                      <span className={`${payment.isNext ? 'font-medium' : 'text-muted-foreground'} ${isPastDue ? 'line-through text-muted-foreground/60' : ''}`}>
-                        {formatCurrency(payment.amount, payment.currency)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
         )}
 
-        {/* Contact Information */}
-        <div className="space-y-2">
-          {isDetailPage || contract.contactInfo.contactPerson ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {isDetailPage && isEditingContactPerson ? (
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <Input
-                    type="text"
-                    value={editingContactPerson}
-                    onChange={(e) => setEditingContactPerson(e.target.value)}
-                    className="text-sm w-40"
-                    placeholder="Enter contact person..."
-                    autoFocus
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleContactPersonSave}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    {isSaving ? '...' : '✓'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleContactPersonCancel}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              ) : isDetailPage ? (
-                <div 
-                  className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                  onClick={() => setIsEditingContactPerson(true)}
-                  title="Click to edit contact person"
+        {/* Price Changes - Collapsible */}
+        {contract.priceChanges && contract.priceChanges.length > 0 && (
+          <div className="space-y-2">
+            <Collapsible open={isPriceChangesOpen} onOpenChange={setIsPriceChangesOpen}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-between p-2 hover:bg-muted/30"
                 >
-                  {contract.contactInfo.contactPerson ? (
-                    <span className="text-foreground font-medium">{contract.contactInfo.contactPerson}</span>
-                  ) : (
-                    <span className="text-muted-foreground">Click to add contact person...</span>
-                  )}
-                </div>
-              ) : (
-                <span className="text-foreground font-medium">{contract.contactInfo.contactPerson}</span>
-              )}
-            </div>
-          ) : null}
-          {isDetailPage || contract.contactInfo.email ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {isDetailPage && isEditingEmail ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="email"
-                    value={editingEmail}
-                    onChange={(e) => setEditingEmail(e.target.value)}
-                    className="text-sm w-48"
-                    placeholder="Enter email..."
-                    autoFocus
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleEmailSave}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    {isSaving ? '...' : '✓'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleEmailCancel}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              ) : isDetailPage ? (
-                <div 
-                  className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                  onClick={() => setIsEditingEmail(true)}
-                  title="Click to edit email"
-                >
-                  {contract.contactInfo.email ? (
-                    <div className="flex items-center gap-2">
-                      <a 
-                        href={`mailto:${contract.contactInfo.email}`}
-                        className="text-primary hover:text-primary/80 transition-colors"
-                        title={`Send email to ${contract.contactInfo.email}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Mail className="h-4 w-4" />
-                      </a>
-                      <span 
-                        className="truncate cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                        onClick={() => setIsEditingEmail(true)}
-                        title="Click to edit email"
-                      >
-                        {contract.contactInfo.email}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">Click to add email...</span>
-                  )}
-                </div>
-              ) : (
-                <a 
-                  href={`mailto:${contract.contactInfo.email}`}
-                  className="text-primary hover:underline truncate"
-                  title={`Send email to ${contract.contactInfo.email}`}
-                >
-                  {contract.contactInfo.email}
-                </a>
-              )}
-            </div>
-          ) : null}
-          {isDetailPage || contract.contactInfo.phone ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {isDetailPage && isEditingPhone ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="tel"
-                    value={editingPhone}
-                    onChange={(e) => setEditingPhone(e.target.value)}
-                    className="text-sm w-40"
-                    placeholder="Enter phone..."
-                    autoFocus
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handlePhoneSave}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    {isSaving ? '...' : '✓'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handlePhoneCancel}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              ) : isDetailPage ? (
-                <div 
-                  className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                  onClick={() => setIsEditingPhone(true)}
-                  title="Click to edit phone"
-                >
-                  {contract.contactInfo.phone ? (
-                    <div className="flex items-center gap-2">
-                      <a 
-                        href={`tel:${contract.contactInfo.phone}`}
-                        className="text-primary hover:text-primary/80 transition-colors"
-                        title={`Call ${contract.contactInfo.phone}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Phone className="h-4 w-4" />
-                      </a>
-                      <span 
-                        className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                        onClick={() => setIsEditingPhone(true)}
-                        title="Click to edit phone"
-                      >
-                        {contract.contactInfo.phone}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">Click to add phone...</span>
-                  )}
-                </div>
-              ) : (
-                <a 
-                  href={`tel:${contract.contactInfo.phone}`}
-                  className="text-primary hover:underline"
-                  title={`Call ${contract.contactInfo.phone}`}
-                >
-                  {contract.contactInfo.phone}
-                </a>
-              )}
-            </div>
-          ) : null}
-          {isDetailPage || contract.contactInfo.website ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {isDetailPage && isEditingWebsite ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="url"
-                    value={editingWebsite}
-                    onChange={(e) => setEditingWebsite(e.target.value)}
-                    className="text-sm w-56"
-                    placeholder="Enter website..."
-                    autoFocus
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleWebsiteSave}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    {isSaving ? '...' : '✓'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleWebsiteCancel}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              ) : isDetailPage ? (
-                <div 
-                  className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                  onClick={() => setIsEditingWebsite(true)}
-                  title="Click to edit website"
-                >
-                  {contract.contactInfo.website ? (
-                    <div className="flex items-center gap-2">
-                      <a 
-                        href={contract.contactInfo.website.startsWith('http') ? contract.contactInfo.website : `https://${contract.contactInfo.website}`}
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary/80 transition-colors"
-                        title={`Visit ${contract.contactInfo.website}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Globe className="h-4 w-4" />
-                      </a>
-                      <span 
-                        className="truncate cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                        onClick={() => setIsEditingWebsite(true)}
-                        title="Click to edit website"
-                      >
-                        {contract.contactInfo.website}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">Click to add website...</span>
-                  )}
-                </div>
-              ) : (
-                <a 
-                  href={contract.contactInfo.website.startsWith('http') ? contract.contactInfo.website : `https://${contract.contactInfo.website}`}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline truncate"
-                  title={`Visit ${contract.contactInfo.website}`}
-                >
-                  {contract.contactInfo.website}
-                </a>
-              )}
-            </div>
-          ) : null}
-          {isDetailPage || contract.contactInfo.address ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              {isDetailPage && isEditingAddress ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={editingAddress}
-                    onChange={(e) => setEditingAddress(e.target.value)}
-                    className="text-sm w-48"
-                    placeholder="Enter address..."
-                    autoFocus
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleAddressSave}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    {isSaving ? '...' : '✓'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleAddressCancel}
-                    disabled={isSaving}
-                    className="h-6 w-6 p-0"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              ) : isDetailPage ? (
-                <div 
-                  className="cursor-pointer hover:bg-muted/30 px-2 py-1 rounded transition-colors"
-                  onClick={() => setIsEditingAddress(true)}
-                  title="Click to edit address"
-                >
-                  {contract.contactInfo.address ? (
-                    <a 
-                      href={`https://maps.google.com/?q=${encodeURIComponent(contract.contactInfo.address)}`}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline truncate"
-                      title={`View ${contract.contactInfo.address} on Google Maps`}
-                    >
-                      {contract.contactInfo.address}
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">Click to add address...</span>
-                  )}
-                </div>
-              ) : (
-                <a 
-                  href={`https://maps.google.com/?q=${encodeURIComponent(contract.contactInfo.address)}`}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline truncate"
-                  title={`View ${contract.contactInfo.address} on Google Maps`}
-                >
-                  {contract.contactInfo.address}
-                </a>
-              )}
-            </div>
-          ) : null}
-        </div>
-
-        {/* Document Link */}
-        {isDetailPage || contract.documentLink ? (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <FileText className="h-4 w-4 text-info" />
-              <span>Document Link:</span>
-            </div>
-            {isDetailPage && isEditingDocumentLink ? (
-              <div className="pl-6 space-y-2">
-                <Input
-                  type="url"
-                  value={editingDocumentLink}
-                  onChange={(e) => setEditingDocumentLink(e.target.value)}
-                  className="text-sm"
-                  placeholder="Enter document URL..."
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleDocumentLinkSave}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleDocumentLinkCancel}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : isDetailPage ? (
-              <div 
-                className="pl-6 cursor-pointer hover:bg-muted/30 p-2 rounded transition-colors"
-                onClick={() => setIsEditingDocumentLink(true)}
-                title="Click to edit document link"
-              >
-                {contract.documentLink ? (
-                  <a 
-                    href={contract.documentLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline font-medium"
-                    title="View contract document"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    View Contract Document
-                  </a>
-                ) : (
-                  <span className="text-muted-foreground">Click to add document link...</span>
-                )}
-              </div>
-            ) : (
-              <div className="pl-6">
-                <a 
-                  href={contract.documentLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline font-medium"
-                  title="View contract document"
-                >
-                  View Contract Document
-                </a>
-              </div>
-            )}
-          </div>
-        ) : null}
-
-        {/* Description */}
-        {isDetailPage || contract.description ? (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <FileText className="h-4 w-4" />
-              <span>Description:</span>
-            </div>
-            {isDetailPage && isEditingDescription ? (
-              <div className="pl-6 space-y-2">
-                <Textarea
-                  value={editingDescription}
-                  onChange={(e) => setEditingDescription(e.target.value)}
-                  className="text-sm min-h-[60px]"
-                  placeholder="Enter description..."
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleDescriptionSave}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleDescriptionCancel}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : isDetailPage ? (
-              <div 
-                className="text-sm text-muted-foreground pl-6 cursor-pointer hover:bg-muted/30 p-2 rounded transition-colors"
-                onClick={() => setIsEditingDescription(true)}
-                title="Click to edit description"
-              >
-                <div className="whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto scrollbar-thin">
-                  {contract.description || 'Click to add description...'}
-                </div>
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground pl-6">
-                <div className="whitespace-pre-wrap leading-relaxed max-h-24 overflow-y-auto scrollbar-thin">
-                  {contract.description}
-                </div>
-              </div>
-            )}
-          </div>
-        ) : null}
-
-
-
-
-
-        {/* Custom Fields */}
-        {contract.customFields && Object.keys(contract.customFields).length > 0 ? (
-          <div className="space-y-1">
-            {isDetailPage && isEditingCustomFields ? (
-              <div className="pl-6 space-y-3">
-                {/* Existing custom fields */}
-                {Object.entries(editingCustomFields).map(([key, value]) => (
-                  <div key={key} className="flex items-center gap-2">
-                    <Input
-                      type="text"
-                      value={key}
-                      onChange={(e) => {
-                        const newKey = e.target.value;
-                        const newCustomFields = { ...editingCustomFields };
-                        delete newCustomFields[key];
-                        newCustomFields[newKey] = value;
-                        setEditingCustomFields(newCustomFields);
-                      }}
-                      className="text-sm w-32"
-                      placeholder="Field name"
-                    />
-                    <Input
-                      type="text"
-                      value={value}
-                      onChange={(e) => {
-                        setEditingCustomFields({
-                          ...editingCustomFields,
-                          [key]: e.target.value
-                        });
-                      }}
-                      className="text-sm flex-1"
-                      placeholder="Field value"
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => removeCustomField(key)}
-                      className="h-7 w-7 p-0"
-                    >
-                      ✕
-                    </Button>
+                  <div className="flex items-center gap-2">
+                    <Coins className="h-4 w-4" />
+                    <span className="text-sm font-medium">Price Changes ({contract.priceChanges.length})</span>
                   </div>
-                ))}
-                
-                {/* Add new custom field */}
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={newCustomFieldKey}
-                    onChange={(e) => setNewCustomFieldKey(e.target.value)}
-                    className="text-sm w-32"
-                    placeholder="Field name"
-                  />
-                  <Input
-                    type="text"
-                    value={newCustomFieldValue}
-                    onChange={(e) => setNewCustomFieldValue(e.target.value)}
-                    className="text-sm flex-1"
-                    placeholder="Field value"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={addCustomField}
-                    className="h-7 px-2"
-                  >
-                    Add
-                  </Button>
-                </div>
-                
-                {/* Save/Cancel buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleCustomFieldsSave}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleCustomFieldsCancel}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : isDetailPage ? (
-              <div 
-                className="pl-6 cursor-pointer hover:bg-muted/30 p-2 rounded transition-colors"
-                onClick={() => setIsEditingCustomFields(true)}
-                title="Click to edit custom fields"
-              >
-                {contract.customFields && Object.keys(contract.customFields).length > 0 ? (
-                  <div className="space-y-2">
-                    {Object.entries(contract.customFields).map(([key, value]) => (
-                      <div key={key} className="flex items-start gap-2 text-sm">
-                        <span className="text-muted-foreground font-medium min-w-0 flex-shrink-0">
-                          {key}:
+                  {isPriceChangesOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-2">
+                <div className="pl-6 space-y-2">
+                  {contract.priceChanges.map((change, index) => (
+                    <div key={index} className="flex items-center justify-between text-xs bg-muted/20 rounded px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">
+                          {formatDate(change.date)}:
                         </span>
-                        <span className="text-foreground break-words">
-                          {value.startsWith('http') ? (
-                            <a 
-                              href={value.startsWith('http') ? value : `https://${value}`}
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                              title={`Open ${value}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {value}
-                            </a>
-                          ) : (
-                            value
-                          )}
-                        </span>
+                                               <span className="font-medium">
+                         {formatCurrency(change.previousAmount, contract.currency)} → {formatCurrency(change.newAmount, contract.currency)}
+                       </span>
                       </div>
-                    ))}
+                      {change.reason && (
+                        <span className="text-muted-foreground text-xs">
+                          ({change.reason})
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        )}
+
+        {/* Custom Fields - Collapsible */}
+        {contract.customFields && Object.keys(contract.customFields).length > 0 && (
+          <div className="space-y-2">
+            <Collapsible open={isCustomFieldsOpen} onOpenChange={setIsCustomFieldsOpen}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-between p-2 hover:bg-muted/30"
+                >
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4" />
+                    <span className="text-sm font-medium">Custom Fields ({Object.keys(contract.customFields).length})</span>
                   </div>
-                ) : (
-                  <span className="text-muted-foreground">Click to add custom fields...</span>
-                )}
-              </div>
-            ) : (
-              <Collapsible 
-                open={isCustomFieldsOpen}
-                onOpenChange={setIsCustomFieldsOpen}
-              >
-                <CollapsibleTrigger asChild>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground cursor-pointer hover:opacity-80 transition-opacity">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span>Additional Info:</span>
-                      <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                        {Object.keys(contract.customFields).length}
+                  {isCustomFieldsOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-2">
+                <div className="pl-6 space-y-2">
+                  {Object.entries(contract.customFields).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between text-xs bg-muted/20 rounded px-3 py-2">
+                      <span className="text-muted-foreground font-medium capitalize">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}:
+                      </span>
+                      <span className="font-medium">
+                        {typeof value === 'string' ? value : JSON.stringify(value)}
                       </span>
                     </div>
-                    {isCustomFieldsOpen ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="space-y-2 pl-6">
-                    {Object.entries(contract.customFields).map(([key, value]) => (
-                      <div key={key} className="flex items-start gap-2 text-sm">
-                        <span className="text-muted-foreground font-medium min-w-0 flex-shrink-0">
-                          {key}:
-                        </span>
-                        <span className="text-foreground break-words">
-                          {value.startsWith('http') ? (
-                            <a 
-                              href={value.startsWith('http') ? value : `https://${value}`}
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                              title={`Open ${value}`}
-                            >
-                              {value}
-                            </a>
-                          ) : (
-                            value
-                          )}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            )}
-          </div>
-        ) : null}
-
-        {/* Tags */}
-        {isDetailPage || (contract.tags && contract.tags.length > 0) ? (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Tag className="h-4 w-4" />
-              <span>Tags:</span>
-              {contract.tags && contract.tags.length > 0 && (
-                <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                  {contract.tags.length}
-                </span>
-              )}
-            </div>
-            {isDetailPage && isEditingTags ? (
-              <div className="pl-6 space-y-2">
-                <Input
-                  type="text"
-                  value={editingTags}
-                  onChange={(e) => setEditingTags(e.target.value)}
-                  className="text-sm"
-                  placeholder="Enter tags separated by commas..."
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleTagsSave}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleTagsCancel}
-                    disabled={isSaving}
-                    className="h-7 px-2"
-                  >
-                    Cancel
-                  </Button>
+                  ))}
                 </div>
-              </div>
-            ) : isDetailPage ? (
-              <div 
-                className="pl-6 cursor-pointer hover:bg-muted/30 p-2 rounded transition-colors"
-                onClick={() => setIsEditingTags(true)}
-                title="Click to edit tags"
-              >
-                {contract.tags && contract.tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">
-                    {contract.tags.map((tag, index) => (
-                      <Badge 
-                        key={index} 
-                        variant="outline" 
-                        className="text-xs"
-                      >
-                        {`#${tag}`}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-muted-foreground">Click to add tags...</span>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-1 pl-6">
-                {contract.tags?.map((tag, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="outline" 
-                    className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onFilter?.('tags', tag);
-                    }}
-                    title={`Filter by tag: ${tag}`}
-                  >
-                    {`#${tag}`}
-                  </Badge>
-                ))}
-              </div>
-            )}
+              </CollapsibleContent>
+            </Collapsible>
           </div>
-        ) : null}
+        )}
+
+                 {/* Contact Information - Collapsible */}
+         {(contract.contactInfo.phone || contract.contactInfo.email || contract.contactInfo.website || contract.contactInfo.address) && (
+          <div className="space-y-2">
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-between p-2 hover:bg-muted/30"
+                >
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm font-medium">Contact Information</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-2">
+                <div className="pl-6 space-y-2">
+                                     {contract.contactInfo.phone && (
+                     <div className="flex items-center gap-2 text-xs">
+                       <Phone className="h-3 w-3 text-muted-foreground" />
+                       <span className="text-muted-foreground">Phone:</span>
+                       <span className="font-medium">{contract.contactInfo.phone}</span>
+                     </div>
+                   )}
+                   {contract.contactInfo.email && (
+                     <div className="flex items-center gap-2 text-xs">
+                       <Mail className="h-3 w-3 text-muted-foreground" />
+                       <span className="text-muted-foreground">Email:</span>
+                       <span className="font-medium">{contract.contactInfo.email}</span>
+                     </div>
+                   )}
+                   {contract.contactInfo.website && (
+                     <div className="flex items-center gap-2 text-xs">
+                       <Globe className="h-3 w-3 text-muted-foreground" />
+                       <span className="text-muted-foreground">Website:</span>
+                       <span className="font-medium">{contract.contactInfo.website}</span>
+                     </div>
+                   )}
+                   {contract.contactInfo.address && (
+                     <div className="flex items-center gap-2 text-xs">
+                       <MapPin className="h-3 w-3 text-muted-foreground" />
+                       <span className="text-muted-foreground">Address:</span>
+                       <span className="font-medium">{contract.contactInfo.address}</span>
+                     </div>
+                   )}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
