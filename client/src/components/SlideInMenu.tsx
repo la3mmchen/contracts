@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Menu, Search, Download, Upload, Plus, Settings, Tag, Building2, User, TrendingUp } from 'lucide-react';
+import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetPortal, SheetOverlay } from '@/components/ui/sheet';
@@ -98,6 +98,7 @@ export const SlideInMenu = ({
       tags: undefined,
       needsMoreInfo: undefined,
       pinned: undefined,
+      draft: undefined,
       hasAdditionalFields: undefined,
       optimizable: undefined,
       sortBy: 'name'
@@ -114,6 +115,7 @@ export const SlideInMenu = ({
     if (filters.tags && filters.tags.length > 0) count++;
     if (filters.needsMoreInfo !== undefined) count++;
     if (filters.pinned !== undefined) count++;
+    if (filters.draft !== undefined) count++;
     if (filters.hasAdditionalFields !== undefined) count++;
     if (filters.optimizable !== undefined) count++;
     return count;
@@ -412,6 +414,94 @@ export const SlideInMenu = ({
                       .map((stat, index) => renderFilterCard(stat, index))}
                   </div>
                 </div>
+
+                {/* Quick Filter - Need More Info & Draft */}
+                <div className="p-3 bg-muted/10 rounded-lg border border-border/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-medium text-foreground">Quick Status Filters</h4>
+                    <span className="text-xs text-muted-foreground">Click to filter</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Need More Info Filter */}
+                    <Button
+                      variant={filters.needsMoreInfo === true ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (filters.needsMoreInfo === true) {
+                          // If already active, clear just this filter
+                          updateFilter('needsMoreInfo', undefined);
+                        } else {
+                          // Clear all other filters and set this one
+                          onFiltersChange({
+                            searchTerm: '',
+                            status: undefined,
+                            category: undefined,
+                            company: undefined,
+                            frequency: undefined,
+                            tags: undefined,
+                            needsMoreInfo: true,
+                            pinned: undefined,
+                            draft: undefined,
+                            hasAdditionalFields: undefined,
+                            optimizable: undefined,
+                            hasConnections: undefined,
+                            connectedTo: undefined,
+                            sortBy: 'name'
+                          });
+                        }
+                      }}
+                      className="w-full h-8 text-xs justify-start"
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                        <span>Need More Info</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {contracts.filter(c => c.needsMoreInfo).length}
+                        </span>
+                      </div>
+                    </Button>
+
+                    {/* Draft Filter */}
+                    <Button
+                      variant={filters.draft === true ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (filters.draft === true) {
+                          // If already active, clear just this filter
+                          updateFilter('draft', undefined);
+                        } else {
+                          // Clear all other filters and set this one
+                          onFiltersChange({
+                            searchTerm: '',
+                            status: undefined,
+                            category: undefined,
+                            company: undefined,
+                            frequency: undefined,
+                            tags: undefined,
+                            needsMoreInfo: undefined,
+                            pinned: undefined,
+                            draft: true,
+                            hasAdditionalFields: undefined,
+                            optimizable: undefined,
+                            hasConnections: undefined,
+                            connectedTo: undefined,
+                            sortBy: 'name'
+                          });
+                        }
+                      }}
+                      className="w-full h-8 text-xs justify-start"
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <span>Draft</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {contracts.filter(c => c.draft).length}
+                        </span>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
               </TabsContent>
               
               <TabsContent value="companies" className="space-y-3 mt-3">
@@ -657,10 +747,6 @@ export const SlideInMenu = ({
               <Button variant="outline" onClick={onImport} size="sm" className="w-full">
                 <Upload className="h-4 w-4 mr-2" />
                 Import
-              </Button>
-              <Button variant="outline" size="sm" className="w-full">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
               </Button>
             </div>
           </div>

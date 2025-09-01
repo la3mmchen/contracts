@@ -35,6 +35,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [], 
       tags: undefined,
       needsMoreInfo: undefined,
       pinned: undefined,
+      draft: undefined,
       hasAdditionalFields: undefined,
       optimizable: undefined,
       sortBy: 'name'
@@ -51,6 +52,7 @@ export const ContractFilters = ({ filters, onFiltersChange, availableTags = [], 
     if (filters.tags && filters.tags.length > 0) count++;
     if (filters.needsMoreInfo !== undefined) count++;
     if (filters.pinned !== undefined) count++;
+    if (filters.draft !== undefined) count++;
     if (filters.hasAdditionalFields !== undefined) count++;
     if (filters.optimizable !== undefined) count++;
     return count;

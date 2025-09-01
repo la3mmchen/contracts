@@ -1,0 +1,30 @@
+{
+  "id": "test-draft-contract",
+  "contractId": "DRAFT-001",
+  "name": "Draft Contract Test",
+  "company": "Test Company",
+  "description": "A test contract that is in draft state",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "amount": 150.00,
+  "currency": "USD",
+  "frequency": "monthly",
+  "status": "active",
+  "category": "other",
+  "payDate": "2024-09-15",
+  "contactInfo": {
+    "email": "draft@example.com",
+    "phone": "+1-555-123-4567"
+  },
+  "notes": "This is a draft contract for testing the draft filter functionality.",
+  "tags": ["test", "draft"],
+  "needsMoreInfo": false,
+  "pinned": false,
+  "draft": true,
+  "priceChanges": [],
+  "customFields": {},
+  "attachments": [],
+  "documentLink": null,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-09-01T10:30:00.000Z"
+}

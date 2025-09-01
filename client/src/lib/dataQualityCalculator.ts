@@ -11,7 +11,7 @@ export interface DataQualityScore {
 
 export const calculateDataQualityScore = (contract: Contract): DataQualityScore => {
   let score = 0;
-  const maxScore = 75; // Reduced from 150 since we removed 5 auto-set fields (5 × 15 = 75)
+  const maxScore = 67; // Reduced from 75 since we removed end date field (8 points)
   const missingFields: string[] = [];
   const suggestions: string[] = [];
 
@@ -43,13 +43,6 @@ export const calculateDataQualityScore = (contract: Contract): DataQualityScore 
   } else {
     missingFields.push('Description');
     suggestions.push('Add a contract description');
-  }
-
-  if (contract.endDate) {
-    score += 8;
-  } else {
-    missingFields.push('End Date');
-    suggestions.push('Set an end date if applicable');
   }
 
   if (contract.payDate) {

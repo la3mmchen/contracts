@@ -72,6 +72,7 @@ export interface ContractFilters {
   tags?: string[];
   needsMoreInfo?: boolean;
   pinned?: boolean;
+  draft?: boolean; // Filter contracts that are in draft state
   optimizable?: boolean; // Filter contracts that could be optimized
   hasAdditionalFields?: boolean; // Filter contracts that have custom fields
   dataQualityGrade?: 'A' | 'B' | 'C' | 'D' | 'F'; // Filter by data quality grade

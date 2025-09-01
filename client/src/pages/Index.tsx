@@ -80,6 +80,7 @@ const Index = () => {
     const tagsParam = searchParams.get('tags');
     const needsMoreInfoParam = searchParams.get('needsMoreInfo');
     const pinnedParam = searchParams.get('pinned');
+    const draftParam = searchParams.get('draft');
     const hasAdditionalFieldsParam = searchParams.get('hasAdditionalFields');
     const searchParam = searchParams.get('search');
     const sortByParam = searchParams.get('sortBy');
@@ -89,7 +90,7 @@ const Index = () => {
     const connectedToParam = searchParams.get('connectedTo');
     
     if (statusParam || categoryParam || familyMemberParam || companyParam || frequencyParam || 
-        tagsParam || needsMoreInfoParam !== null || pinnedParam !== null || 
+        tagsParam || needsMoreInfoParam !== null || pinnedParam !== null || draftParam !== null ||
         hasAdditionalFieldsParam || searchParam || sortByParam || sortOrderParam || hasConnectionsParam !== null || connectedToParam) {
       
       setFilters(prev => ({
@@ -102,6 +103,7 @@ const Index = () => {
         ...(tagsParam && { tags: [tagsParam] }),
         ...(needsMoreInfoParam !== null && { needsMoreInfo: needsMoreInfoParam === 'true' }),
         ...(pinnedParam !== null && { pinned: pinnedParam === 'true' }),
+        ...(draftParam !== null && { draft: draftParam === 'true' }),
         ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' }),
         ...(searchParam && { searchTerm: searchParam }),
         ...(sortByParam && { sortBy: sortByParam as 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference' }),
@@ -129,6 +131,7 @@ const Index = () => {
       if (filters.tags?.length) params.set('tags', filters.tags.join(','));
       if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
       if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
+      if (filters.draft !== undefined) params.set('draft', filters.draft.toString());
       if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
       if (filters.searchTerm) params.set('search', filters.searchTerm);
       if (filters.sortBy) params.set('sortBy', filters.sortBy);
@@ -209,6 +212,11 @@ const Index = () => {
     // Apply pinned filter
     if (filters.pinned !== undefined) {
       filtered = filtered.filter(contract => contract.pinned === filters.pinned);
+    }
+
+    // Apply draft filter
+    if (filters.draft !== undefined) {
+      filtered = filtered.filter(contract => contract.draft === filters.draft);
     }
 
     // Apply optimizable filter
