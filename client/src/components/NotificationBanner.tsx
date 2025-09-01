@@ -31,9 +31,9 @@ export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProp
     })
     .sort((a, b) => a.daysUntil - b.daysUntil);
 
-  // Start collapsed if there are more than 3 upcoming payments
-  const [isUpcomingPaymentsExpanded, setIsUpcomingPaymentsExpanded] = useState(upcomingPayments.length <= 3);
-  const [isExpiredContractsExpanded, setIsExpiredContractsExpanded] = useState(true);
+  // Start collapsed by default to save space
+  const [isUpcomingPaymentsExpanded, setIsUpcomingPaymentsExpanded] = useState(false);
+  const [isExpiredContractsExpanded, setIsExpiredContractsExpanded] = useState(false);
 
   const expiredContracts = contracts.filter(c => c.status === 'expired');
 
