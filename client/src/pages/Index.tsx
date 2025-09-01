@@ -84,10 +84,13 @@ const Index = () => {
     const searchParam = searchParams.get('search');
     const sortByParam = searchParams.get('sortBy');
     const sortOrderParam = searchParams.get('sortOrder');
+    // New
+    const hasConnectionsParam = searchParams.get('hasConnections');
+    const connectedToParam = searchParams.get('connectedTo');
     
     if (statusParam || categoryParam || familyMemberParam || companyParam || frequencyParam || 
         tagsParam || needsMoreInfoParam !== null || pinnedParam !== null || 
-        hasAdditionalFieldsParam || searchParam || sortByParam || sortOrderParam) {
+        hasAdditionalFieldsParam || searchParam || sortByParam || sortOrderParam || hasConnectionsParam !== null || connectedToParam) {
       
       setFilters(prev => ({
         ...prev,
@@ -102,7 +105,9 @@ const Index = () => {
         ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' }),
         ...(searchParam && { searchTerm: searchParam }),
         ...(sortByParam && { sortBy: sortByParam as 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference' }),
-        ...(sortOrderParam && { sortOrder: sortOrderParam as 'asc' | 'desc' })
+        ...(sortOrderParam && { sortOrder: sortOrderParam as 'asc' | 'desc' }),
+        ...(hasConnectionsParam !== null && { hasConnections: hasConnectionsParam === 'true' ? true : hasConnectionsParam === 'false' ? false : undefined }),
+        ...(connectedToParam && { connectedTo: connectedToParam })
       }));
       
       // Don't clear URL parameters - keep them for navigation context
@@ -128,6 +133,9 @@ const Index = () => {
       if (filters.searchTerm) params.set('search', filters.searchTerm);
       if (filters.sortBy) params.set('sortBy', filters.sortBy);
       if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
+      // New
+      if (filters.hasConnections !== undefined) params.set('hasConnections', filters.hasConnections.toString());
+      if (filters.connectedTo) params.set('connectedTo', filters.connectedTo);
       
       // Use setSearchParams to properly update React Router's search params state
       setSearchParams(params);
@@ -221,6 +229,22 @@ const Index = () => {
       }
     }
 
+    // New: apply connections filters
+    if (filters.hasConnections !== undefined) {
+      filtered = filtered.filter(c => {
+        const count = c.connections?.length || 0;
+        return filters.hasConnections ? count > 0 : count === 0;
+      });
+    }
+    if (filters.connectedTo) {
+      const targetId = filters.connectedTo;
+      const target = contracts.find(c => c.contractId === targetId);
+      filtered = filtered.filter(c => {
+        const direct = (c.connections || []).includes(targetId);
+        const reverse = target ? (target.connections || []).includes(c.contractId) : false;
+        return direct || reverse;
+      });
+    }
 
 
     // Apply sorting

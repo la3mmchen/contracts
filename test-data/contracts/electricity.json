@@ -21,6 +21,7 @@
   "notes": "Standard residential electricity service. Meter reading required monthly.",
   "tags": ["utilities", "electricity", "residential"],
   "pinned": false,
+  "connections": ["RENT-2024-007"],
   "priceChanges": [
     {
       "date": "2024-06-01",

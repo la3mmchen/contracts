@@ -36,6 +36,7 @@ import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { DataQualityScore } from '@/components/DataQualityScore';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Helper function to get the correct base path
 const getBasePath = () => {
@@ -63,12 +64,12 @@ const ContractDetail = () => {
   const [isInlineEditing, setIsInlineEditing] = useState(false);
   const [showInlineEditingWarning, setShowInlineEditingWarning] = useState(false);
 
-
-
-
-
-
-
+  // Derived: connected contracts by user-defined contractId
+  const connectedContracts = React.useMemo(() => {
+    if (!contract?.connections || contract.connections.length === 0) return [] as Contract[];
+    const ids = new Set(contract.connections);
+    return contracts.filter(c => ids.has(c.contractId));
+  }, [contract, contracts]);
 
 
   // Handle unsaved changes confirmation
@@ -704,6 +705,74 @@ const ContractDetail = () => {
 
               </CardContent>
             </Card>
+
+            {/* Connected Contracts */}
+            {connectedContracts.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Connected Contracts</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {connectedContracts.map(cc => (
+                      <Link key={cc.id} to={`${getBasePath()}/contract/${cc.id}${location.search}`} className="px-2 py-1 text-sm rounded border bg-muted hover:bg-accent transition-colors">
+                        {cc.contractId} — {cc.name}
+                      </Link>
+                    ))}
+                  </div>
+                  {/* Back-link suggestions */}
+                  {contract?.connections && connectedContracts.length > 0 && (
+                    <div className="text-xs text-muted-foreground">
+                      {connectedContracts.filter(cc => !(cc.connections || []).includes(contract!.contractId)).length > 0 && (
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <span>Missing back-links for:</span>
+                          {connectedContracts.filter(cc => !(cc.connections || []).includes(contract!.contractId)).map(cc => (
+                            <Button key={cc.id} variant="outline" size="sm" className="h-6 px-2" onClick={() => updateContract(cc.id, { connections: Array.from(new Set([...(cc.connections || []), contract!.contractId])) })}>
+                              Add to {cc.contractId}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {/* Inline editor */}
+                  <div className="pt-2 border-t">
+                    <div className="text-sm font-medium mb-2">Edit Connections</div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {(contract?.connections || []).map(cid => (
+                        <div key={cid} className="flex items-center gap-1 px-2 py-1 bg-muted rounded border">
+                          <span className="text-xs">{cid}</span>
+                          <Button type="button" variant="ghost" size="sm" className="h-5 px-1" onClick={() => contract && updateContract(contract.id, { connections: (contract.connections || []).filter(x => x !== cid) })}>
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Select onValueChange={(value) => {
+                        if (!value || !contract) return;
+                        const next = new Set(contract.connections || []);
+                        next.add(value);
+                        updateContract(contract.id, { connections: Array.from(next) });
+                      }}>
+                        <SelectTrigger className="w-full h-8 text-sm">
+                          <SelectValue placeholder="Add connection by Contract ID" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {contracts
+                            .map(c => c.contractId)
+                            .filter(id => id && id !== contract?.contractId)
+                            .sort()
+                            .map(id => (
+                              <SelectItem key={id} value={id}>{id}</SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Data Quality Score */}
             <DataQualityScore 

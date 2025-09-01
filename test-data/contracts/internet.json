@@ -26,6 +26,7 @@
   },
   "notes": "Includes unlimited data. Router included. Installation fee waived.",
   "tags": ["internet", "utilities", "technology"],
+  "connections": ["RENT-2024-007"],
   "customFields": {
     "Account Number": "987654321",
     "Login URL": "https://customer.xfinity.com",

@@ -47,6 +47,8 @@ export interface Contract {
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
+  // New: loosely coupled connections to other contracts via user-created contractId
+  connections?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -83,6 +85,9 @@ export interface ContractFilters {
     start?: string;
     end?: string;
   };
+  // New: connection-based filtering
+  hasConnections?: boolean; // true -> only with connections; false -> only without; undefined -> any
+  connectedTo?: string; // show contracts connected to this contractId
 }
 
 export interface ContractStats {
@@ -120,6 +125,8 @@ export interface CreateContractRequest {
   familyMember?: string; // Which family member the contract is for
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
+  // New: connections by user-managed contractId
+  connections?: string[];
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

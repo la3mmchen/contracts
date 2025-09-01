@@ -21,6 +21,7 @@
   "notes": "Includes utilities. Parking space #12. Pet deposit paid.",
   "familyMember": "Mike",
   "tags": ["rent", "housing", "apartment"],
+  "connections": ["ELEC-2024-001", "SERV-2024-008"],
   "priceChanges": [
     {
       "date": "2024-01-01",

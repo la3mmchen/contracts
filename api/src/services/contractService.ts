@@ -156,6 +156,7 @@ class ContractService {
       customFields: data.customFields,
       attachments: [],
       documentLink: data.documentLink,
+      connections: data.connections,
       createdAt: now,
       updatedAt: now,
     };

@@ -200,6 +200,7 @@ export const demoContracts: Contract[] = [
       }
     ],
     tags: ['internet', 'fiber', 'TV'],
+    connections: ['NFLX-2024-002'],
     customFields: {
       'Connection Type': 'Fiber',
       'Speed': '1Gbps',

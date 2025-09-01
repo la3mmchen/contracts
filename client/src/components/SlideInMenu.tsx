@@ -606,6 +606,37 @@ export const SlideInMenu = ({
                           </SelectContent>
                         </Select>
                       </div>
+
+                      {/* New: Has Connections */}
+                      <div>
+                        <Label htmlFor="has-connections-filter" className="text-xs font-medium">Has Connections</Label>
+                        <Select value={filters.hasConnections === undefined ? 'all' : filters.hasConnections ? 'true' : 'false'} onValueChange={(value) => updateFilter('hasConnections', value === 'all' ? undefined : value === 'true')}>
+                          <SelectTrigger id="has-connections-filter" className="w-full h-8 text-xs">
+                            <SelectValue placeholder="All" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="true">With Connections</SelectItem>
+                            <SelectItem value="false">Without Connections</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* New: Connected To */}
+                      <div>
+                        <Label htmlFor="connected-to-filter" className="text-xs font-medium">Connected To (Contract ID)</Label>
+                        <Select value={filters.connectedTo || 'all'} onValueChange={(value) => updateFilter('connectedTo', value === 'all' ? undefined : value)}>
+                          <SelectTrigger id="connected-to-filter" className="w-full h-8 text-xs">
+                            <SelectValue placeholder="Any" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Any</SelectItem>
+                            {existingContracts && Array.from(new Set(existingContracts.map(c => c.contractId))).sort().map(id => (
+                              <SelectItem key={id} value={id}>{id}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                 </div>

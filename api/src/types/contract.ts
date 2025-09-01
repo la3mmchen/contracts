@@ -45,6 +45,7 @@ export interface Contract {
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
+  connections?: string[]; // Array of contractIds for connected contracts
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +85,7 @@ export interface CreateContractRequest {
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
   documentLink?: string;
+  connections?: string[]; // Array of contractIds for connected contracts
 }
 
 export interface UpdateContractRequest extends Partial<CreateContractRequest> {

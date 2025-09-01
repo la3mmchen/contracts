@@ -79,6 +79,8 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
+    // New: connections by contractId
+    connections: contract?.connections || [],
   });
 
   // Track initial form data for dirty state detection
@@ -111,6 +113,8 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     priceChangeReason: '',
+    // New
+    connections: contract?.connections || [],
   });
 
   const [isDirty, setIsDirty] = useState(false);
@@ -155,6 +159,8 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
         customFields: contract.customFields || {},
         documentLink: contract.documentLink || '',
         priceChangeReason: '',
+        // New: connections
+        connections: contract.connections || [],
       };
       
       setFormData(newFormData);
@@ -635,6 +641,52 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
               onChange={(e) => updateFormData({ documentLink: e.target.value })}
               placeholder="https://docs.company.com/contract/123 or https://drive.google.com/file/..."
             />
+          </div>
+
+          {/* New: Connections */}
+          <div>
+            <Label>Connections (by Contract ID)</Label>
+            <div className="text-xs text-muted-foreground mb-2">Link related contracts using their user-defined Contract IDs.</div>
+            <div className="space-y-2">
+              <Input
+                placeholder="Type a contract ID and press Enter"
+                value={''}
+                onChange={() => { /* noop typed via below controls only */ }}
+                className="hidden"
+              />
+              <div className="flex flex-wrap gap-2">
+                {(formData.connections || []).map(cid => (
+                  <div key={cid} className="flex items-center gap-1 px-2 py-1 bg-muted rounded border">
+                    <span className="text-xs">{cid}</span>
+                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1" onClick={() => updateFormData({ connections: (formData.connections || []).filter(x => x !== cid) })}>
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <Label className="text-xs">Add connection</Label>
+                <Select onValueChange={(value) => {
+                  if (!value) return;
+                  const next = new Set(formData.connections || []);
+                  next.add(value);
+                  updateFormData({ connections: Array.from(next) });
+                }}>
+                  <SelectTrigger className="w-full h-8 text-sm">
+                    <SelectValue placeholder="Select existing Contract ID" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(existingContracts || [])
+                      .map(c => c.contractId)
+                      .filter(id => id && id !== formData.contractId)
+                      .sort()
+                      .map(id => (
+                        <SelectItem key={id} value={id}>{id}</SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
           <div>
