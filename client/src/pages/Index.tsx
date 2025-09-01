@@ -4,30 +4,22 @@ import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractForm } from '@/components/ContractForm';
+import { SlideInMenu } from '@/components/SlideInMenu';
 
-import { ContractStats } from '@/components/ContractStats';
 import { NotificationBanner } from '@/components/NotificationBanner';
 
-
-import { ThemeToggle } from '@/components/ThemeToggle';
-
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   Plus, 
-  Download, 
-  Upload, 
   Loader2,
   FileText,
   AlertTriangle,
-  Search,
-  X,
-  Info
+  Info,
+  X
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
@@ -121,22 +113,27 @@ const Index = () => {
 
   // Store current filter state in URL for navigation context
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (filters.status) params.set('status', filters.status);
-    if (filters.category) params.set('category', filters.category);
-    if (filters.familyMember) params.set('familyMember', filters.familyMember);
-    if (filters.company) params.set('company', filters.company);
-    if (filters.frequency) params.set('frequency', filters.frequency);
-    if (filters.tags?.length) params.set('tags', filters.tags.join(','));
-    if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
-    if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
-    if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
-    if (filters.searchTerm) params.set('search', filters.searchTerm);
-    if (filters.sortBy) params.set('sortBy', filters.sortBy);
-    if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-    
-    // Use setSearchParams to properly update React Router's search params state
-    setSearchParams(params);
+    // Debounce URL updates to prevent too many calls
+    const timeoutId = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (filters.status) params.set('status', filters.status);
+      if (filters.category) params.set('category', filters.category);
+      if (filters.familyMember) params.set('familyMember', filters.familyMember);
+      if (filters.company) params.set('company', filters.company);
+      if (filters.frequency) params.set('frequency', filters.frequency);
+      if (filters.tags?.length) params.set('tags', filters.tags.join(','));
+      if (filters.needsMoreInfo !== undefined) params.set('needsMoreInfo', filters.needsMoreInfo.toString());
+      if (filters.pinned !== undefined) params.set('pinned', filters.pinned.toString());
+      if (filters.hasAdditionalFields !== undefined) params.set('hasAdditionalFields', filters.hasAdditionalFields.toString());
+      if (filters.searchTerm) params.set('search', filters.searchTerm);
+      if (filters.sortBy) params.set('sortBy', filters.sortBy);
+      if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
+      
+      // Use setSearchParams to properly update React Router's search params state
+      setSearchParams(params);
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [filters, setSearchParams]);
 
   // Filter and sort contracts based on current filters
@@ -465,172 +462,70 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-black text-white border-b border-gray-700 shadow-sm">
-        <div className="container mx-auto px-4 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">{appConfig.name}</h1>
-              
-              {/* Overview Stats */}
-              <div className="flex flex-wrap items-center gap-4 mt-2 text-xs sm:text-sm">
-                {(() => {
-                  // Generate the same stats that were in ContractStats
-                  const activeContracts = contracts.filter(c => c.status === 'active');
-                  const monthlySpend = contracts
-                    .filter(c => c.status === 'active')
-                    .reduce((total, contract) => {
-                      switch (contract.frequency) {
-                        case 'monthly': return total + contract.amount;
-                        case 'quarterly': return total + (contract.amount / 3);
-                        case 'yearly': return total + (contract.amount / 12);
-                        case 'weekly': return total + (contract.amount * 4.33);
-                        case 'bi-weekly': return total + (contract.amount * 2.17);
-                        case 'one-time': return total + (contract.amount / 12);
-                        default: return total;
-                      }
-                    }, 0);
-                  
-                  return (
-                    <>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-primary-foreground/70">Total:</span>
-                        <span className="text-white font-medium">{contracts.length}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                        <span className="text-primary-foreground/70">Active:</span>
-                        <span className="text-white font-medium">{activeContracts.length}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                        <span className="text-primary-foreground/70">Monthly:</span>
-                        <span className="text-white font-medium">${monthlySpend.toFixed(0)}</span>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-              {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60" />
-                <Input
-                  ref={searchInputRef}
-                  placeholder="Search contracts..."
-                  value={filters.searchTerm || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                  className="pl-10 w-64 bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 transition-all duration-200 hover:bg-white/15 focus:bg-white/20"
-                />
-                {filters.searchTerm && (
-                  <button
-                    onClick={() => setFilters(prev => ({ ...prev, searchTerm: '' }))}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60 hover:text-white transition-colors"
-                    title="Clear search"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-              
-              {/* Sort Dropdown */}
-              <Select value={filters.sortBy || 'name'} onValueChange={(value) => {
-                const newSortBy = value as any;
-                const newSortOrder = (newSortBy === 'updatedAt' || newSortBy === 'createdAt' || newSortBy === 'nextPaymentDate') ? 'desc' : 'asc';
-                setFilters(prev => ({ ...prev, sortBy: newSortBy, sortOrder: newSortOrder }));
-              }}>
-                <SelectTrigger className="w-32 bg-white/10 border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="name">Name</SelectItem>
-                  <SelectItem value="amount">Amount</SelectItem>
-                  <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
-                  <SelectItem value="createdAt">Created Date</SelectItem>
-                  <SelectItem value="updatedAt">Last Updated</SelectItem>
-                </SelectContent>
-              </Select>
-
-
-
-              <Button
-                variant="secondary"
-                onClick={exportContracts}
-                size="sm"
-                className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm transition-all duration-200"
-              >
-                <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Export
-              </Button>
-              <Button 
-                variant="secondary" 
-                size="sm"
-                className="bg-white/10 text-white border-white/20 hover:bg-white/30 hover:border-white/40 transition-all duration-200 text-xs sm:text-sm"
-                onClick={() => document.getElementById('file-upload')?.click()}
-              >
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Import
-              </Button>
-              <ThemeToggle />
-              <Dialog open={isFormOpen} onOpenChange={handleDialogClose}>
-                <DialogTrigger asChild>
-                  <Button onClick={openAddForm} size="sm" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 hover:scale-105 text-xs sm:text-sm transition-all duration-200">
-                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                    Add Contract
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto scrollbar-thin">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingContract && editingContract.id ? 'Edit Contract' : editingContract ? 'Copy Contract' : 'Add New Contract'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <ContractForm
-                    contract={editingContract}
-                    isCopying={isCopying}
-                    existingContracts={contracts}
-                    onSubmit={editingContract && editingContract.id ? handleEditContract : handleAddContract}
-                    onCancel={() => handleDialogClose(false)}
-                    onDirtyStateChange={setIsFormDirty}
-                  />
-                </DialogContent>
-              </Dialog>
-
-              {/* Unsaved Changes Confirmation Dialog */}
-              <AlertDialog open={showUnsavedChangesDialog} onOpenChange={setShowUnsavedChangesDialog}>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      You have unsaved changes in the form. Are you sure you want to close without saving? All changes will be lost.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleUnsavedChangesCancel}>
-                      Continue Editing
-                    </AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleUnsavedChangesConfirm}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Discard Changes
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
-        </div>
+      {/* Floating Menu Button */}
+      <div className="fixed top-4 left-4 sm:top-8 sm:left-4 z-50">
+        <SlideInMenu
+          filters={filters}
+          onFiltersChange={setFilters}
+          availableTags={availableTags}
+          existingContracts={contracts}
+          onExport={exportContracts}
+          onImport={() => document.getElementById('file-upload')?.click()}
+          onAddContract={openAddForm}
+          contracts={contracts}
+        />
       </div>
+
+      {/* Hidden file input for import */}
+      <input
+        type="file"
+        accept=".json"
+        onChange={handleFileUpload}
+        className="hidden"
+        id="file-upload"
+      />
+      
+      {/* Add Contract Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={handleDialogClose}>
+        <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto scrollbar-thin">
+          <DialogHeader>
+            <DialogTitle>
+              {editingContract && editingContract.id ? 'Edit Contract' : editingContract ? 'Copy Contract' : 'Add New Contract'}
+            </DialogTitle>
+          </DialogHeader>
+          <ContractForm
+            contract={editingContract}
+            isCopying={isCopying}
+            existingContracts={contracts}
+            onSubmit={editingContract && editingContract.id ? handleEditContract : handleAddContract}
+            onCancel={() => handleDialogClose(false)}
+            onDirtyStateChange={setIsFormDirty}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Unsaved Changes Confirmation Dialog */}
+      <AlertDialog open={showUnsavedChangesDialog} onOpenChange={setShowUnsavedChangesDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+          <AlertDialogDescription>
+            You have unsaved changes in the form. Are you sure you want to close without saving? All changes will be lost.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={handleUnsavedChangesCancel}>
+            Continue Editing
+          </AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={handleUnsavedChangesConfirm}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Discard Changes
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
       <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Demo Mode Banner */}
@@ -646,10 +541,22 @@ const Index = () => {
         )}
         
         {/* Active Filters Display */}
-        {(filters.status || filters.category || filters.company || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
+        {(filters.searchTerm || filters.status || filters.category || filters.company || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
           <div className="flex items-center gap-2 text-sm mb-6">
             <span className="text-muted-foreground font-medium">Active Filters:</span>
             <div className="flex flex-wrap items-center gap-2">
+              {filters.searchTerm && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#01A5E1]/10 text-[#01A5E1] rounded-md border border-[#01A5E1]/20">
+                  <span className="text-xs font-medium">Search: {filters.searchTerm}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, searchTerm: '' }))}
+                    className="ml-1 text-[#01A5E1]/70 hover:text-[#01A5E1] transition-colors"
+                    title="Clear search"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
               {filters.status && (
                 <div className="flex items-center gap-1 px-2 py-1 bg-[#A7E459]/10 text-[#A7E459] rounded-md border border-[#A7E459]/20">
                   <span className="text-xs font-medium">Status: {filters.status}</span>
@@ -791,147 +698,7 @@ const Index = () => {
           </div>
         )}
 
-        {/* Statistics */}
-        <ContractStats 
-          contracts={contracts} 
-          onFilter={(filterType, value) => {
-            if (filterType === 'reset') {
-              // Reset all filters when switching tabs
-              setFilters({
-                searchTerm: '',
-                sortBy: 'updatedAt',
-                sortOrder: 'desc'
-              });
-            } else if (filterType === 'viewMode') {
-              // Handle view mode as mutually exclusive options
-              if (value === 'all') {
-                // Reset all filters to show all contracts
-                setFilters(prev => ({ 
-                  ...prev,
-                  status: undefined,
-                  needsMoreInfo: undefined,
-                  searchTerm: ''
-                }));
-              } else if (value === 'active') {
-                // Show only active contracts
-                setFilters(prev => ({ 
-                  ...prev,
-                  status: 'active',
-                  needsMoreInfo: undefined,
-                  searchTerm: ''
-                }));
-              } else if (value === 'needsAttention') {
-                // Show only contracts that need attention
-                setFilters(prev => ({ 
-                  ...prev,
-                  status: undefined,
-                  needsMoreInfo: true,
-                  searchTerm: ''
-                }));
-              }
-            } else if (filterType === 'category') {
-              // If clicking the same category filter, reset it
-              if (filters.category === value) {
-                setFilters(prev => ({ ...prev, category: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a category filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  category: value as Contract['category'],
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'familyMember') {
-              // If clicking the same family member filter, reset it
-              if (filters.familyMember === value) {
-                setFilters(prev => ({ ...prev, familyMember: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a family member filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  familyMember: value,
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'company') {
-              // If clicking the same company filter, reset it
-              if (filters.company === value) {
-                setFilters(prev => ({ ...prev, company: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a company filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  company: value,
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'tags') {
-              // If clicking the same tag filter, reset it
-              if (filters.tags?.includes(value)) {
-                setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a tag filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  tags: [value],
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'pinned') {
-              // If clicking the same pinned filter, reset it
-              if (filters.pinned === (value === 'true')) {
-                setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a pinned filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  pinned: value === 'true',
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'hasAdditionalFields') {
-              // If clicking the same hasAdditionalFields filter, reset it
-              if (filters.hasAdditionalFields === (value === 'true')) {
-                setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }));
-              } else {
-                // Clear search when applying a hasAdditionalFields filter
-                setFilters(prev => ({ 
-                  ...prev,
-                  hasAdditionalFields: value === 'true',
-                  searchTerm: '' // Clear search when filtering
-                }));
-              }
-            } else if (filterType === 'invalidCategories') {
-              // Filter to show only contracts with invalid categories
-              const invalidCategoryContracts = contracts.filter(contract => !isValidCategory(contract.category));
-              const invalidCategories = [...new Set(invalidCategoryContracts.map(c => c.category))];
-              setFilters(prev => ({ 
-                ...prev,
-                searchTerm: invalidCategories.join(' '),
-                category: undefined,
-                status: undefined,
-                tags: undefined,
-                needsMoreInfo: undefined,
-                pinned: undefined,
-                hasAdditionalFields: undefined
-              }));
-            }
-          }}
-          activeFilters={{
-            status: filters.status,
-            category: filters.category,
-            familyMember: filters.familyMember,
-            company: filters.company,
-            needsMoreInfo: filters.needsMoreInfo,
-            pinned: filters.pinned,
-            optimizable: filters.optimizable,
-            hasAdditionalFields: filters.hasAdditionalFields
-          }}
-          filters={filters}
-          onFiltersChange={setFilters}
-          availableTags={availableTags}
-          filteredContracts={filteredContracts}
-        />
+
 
         {/* Notifications */}
         <NotificationBanner contracts={contracts} onEdit={scrollToContract} />
