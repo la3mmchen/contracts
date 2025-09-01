@@ -371,6 +371,38 @@ export const SlideInMenu = ({
                 </button>
               )}
             </div>
+            
+            {/* Order By Section */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Order by</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={filters.sortBy} onValueChange={(value) => updateFilter('sortBy', value)}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Sort by..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="amount">Amount</SelectItem>
+                    <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
+                    <SelectItem value="createdAt">Created</SelectItem>
+                    <SelectItem value="updatedAt">Updated</SelectItem>
+                    <SelectItem value="company">Company</SelectItem>
+                    <SelectItem value="endDate">End Date</SelectItem>
+                    <SelectItem value="reference">Reference</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={filters.sortOrder} onValueChange={(value) => updateFilter('sortOrder', value)}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Order..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                    <SelectItem value="desc">Descending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
           <Separator />

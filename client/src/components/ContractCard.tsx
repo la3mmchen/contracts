@@ -243,6 +243,35 @@ export const ContractCard = ({
       
       {/* Header Section */}
       <CardHeader className="pb-4">
+        {/* Status Indicators - Above the title */}
+        <div className="flex items-center gap-2 mb-3">
+          {/* Priority Warnings (Draft/Needs Info) */}
+          {contract.draft && (
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 text-xs whitespace-nowrap border border-blue-200">
+              <FileText className="h-3 w-3 mr-1" />
+              Draft
+            </Badge>
+          )}
+          {contract.needsMoreInfo && (
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 text-xs whitespace-nowrap border border-yellow-200">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Needs Info
+            </Badge>
+          )}
+          
+          {/* Contract Status - Only show non-active states */}
+          {contract.status !== 'active' && (
+            <Badge 
+              className={`${statusColors[contract.status]} text-xs whitespace-nowrap border ${
+                onFilter ? 'cursor-pointer hover:opacity-80' : ''
+              }`}
+              onClick={onFilter ? () => onFilter('status', contract.status) : undefined}
+            >
+              {contract.status}
+            </Badge>
+          )}
+        </div>
+        
         <div className="flex items-start justify-between gap-3">
           {/* Main Contract Info */}
           <div className="flex-1 min-w-0">
@@ -250,6 +279,7 @@ export const ContractCard = ({
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
               {isDetailPage && isEditingName ? (
                 <div className="flex items-center gap-2">
+                  {contract.pinned && <Star className="h-5 w-5 text-yellow-500 fill-current" />}
                   <Input
                     type="text"
                     value={editingName}
@@ -271,13 +301,15 @@ export const ContractCard = ({
                   onClick={() => setIsEditingName(true)}
                   title="Click to edit contract name"
                 >
+                  {contract.pinned && <Star className="h-5 w-5 text-yellow-500 fill-current mr-2" />}
                   {contract.name}
                 </div>
               ) : (
                 <Link 
                   to={`/contract/${contract.id}${currentSearchParams ? `?${currentSearchParams}` : ''}`}
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
+                  {contract.pinned && <Star className="h-5 w-5 text-yellow-500 fill-current" />}
                   {contract.name}
                 </Link>
               )}
@@ -311,41 +343,22 @@ export const ContractCard = ({
                   {contract.company || 'Click to add company...'}
                 </div>
               ) : (
-                contract.company
+                contract.company ? (
+                  <button
+                    onClick={() => onFilter && onFilter('company', contract.company)}
+                    className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors cursor-pointer"
+                    title={`Filter by company: ${contract.company}`}
+                  >
+                    {contract.company}
+                  </button>
+                ) : null
               )}
             </div>
             
-                        {/* Essential Badges - Only show the most important ones */}
-            <div className="flex items-center gap-2 mb-3 flex-nowrap">
-              {/* Priority Badges (Draft/Needs Info) */}
-              {contract.draft && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 text-xs whitespace-nowrap">
-                  <FileText className="h-3 w-3 mr-1" />
-                  Draft
-                </Badge>
-              )}
-              {contract.needsMoreInfo && (
-                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 text-xs whitespace-nowrap">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Needs Info
-                </Badge>
-              )}
-              
-              {/* Status Badge - Only show when NOT active */}
-              {contract.status !== 'active' && (
-                <Badge 
-                  className={`${statusColors[contract.status]} text-xs whitespace-nowrap ${
-                    onFilter ? 'cursor-pointer hover:opacity-80' : ''
-                  }`}
-                  onClick={onFilter ? () => onFilter('status', contract.status) : undefined}
-                >
-                  {contract.status}
-                </Badge>
-              )}
-              
-              {/* Category Badge */}
+                        {/* Category Badge */}
+            <div className="mb-3">
               <Badge 
-                className={`${categoryColor} text-xs whitespace-nowrap ${
+                className={`${categoryColor} text-xs ${
                   onFilter ? 'cursor-pointer hover:opacity-80' : ''
                 }`}
                 onClick={onFilter ? () => onFilter('category', contract.category) : undefined}
@@ -357,83 +370,65 @@ export const ContractCard = ({
 
           </div>
           
-          {/* Action Buttons */}
-          <div className="flex gap-1">
-            {/* Star Button - Always visible when pinned */}
-            {contract.pinned && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  if (onUpdate) {
-                    onUpdate(contract.id, { pinned: !contract.pinned });
-                  }
-                }}
-                className="h-8 w-8 p-0 bg-yellow-100 border-yellow-300 text-yellow-700 hover:bg-yellow-200"
-                title="Unpin contract"
-              >
-                <Star className="h-4 w-4 fill-yellow-500" />
-              </Button>
-            )}
+          {/* Action Buttons - Hidden by default, visible on hover */}
+          <div className={`flex gap-1 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="h-8 w-8 p-0"
+              title="View details"
+            >
+              <Link to={`${getBasePath()}/contract/${contract.id}${currentSearchParams ? `?${currentSearchParams}` : ''}`}>
+                <Eye className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(contract)}
+              className="h-8 w-8 p-0"
+              title="Edit contract"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopyContract}
+              className="h-8 w-8 p-0"
+              title="Copy contract"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(contract.id)}
+              className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200"
+              title="Delete contract"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
             
-            {/* Other Action Buttons - Hidden by default, visible on hover */}
-            <div className={`flex gap-1 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="h-8 w-8 p-0"
-                title="View details"
-              >
-                <Link to={`${getBasePath()}/contract/${contract.id}${currentSearchParams ? `?${currentSearchParams}` : ''}`}>
-                  <Eye className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(contract)}
-                className="h-8 w-8 p-0"
-                title="Edit contract"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopyContract}
-                className="h-8 w-8 p-0"
-                title="Copy contract"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onDelete(contract.id)}
-                className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200"
-                title="Delete contract"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-              
-              {/* Pin/Star Button - Only visible on hover for non-starred contracts */}
-              {!contract.pinned && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (onUpdate) {
-                      onUpdate(contract.id, { pinned: !contract.pinned });
-                    }
-                  }}
-                  className="h-8 w-8 p-0 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600"
-                  title="Pin contract"
-                >
-                  <Star className="h-4 w-4 text-gray-600" />
-                </Button>
-              )}
-            </div>
+            {/* Simple Star Toggle Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (onUpdate) {
+                  onUpdate(contract.id, { pinned: !contract.pinned });
+                }
+              }}
+              className={`h-8 w-8 p-0 ${
+                contract.pinned 
+                  ? 'bg-yellow-50 border-yellow-200 text-yellow-600 hover:bg-yellow-100' 
+                  : 'hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600'
+              }`}
+              title={contract.pinned ? 'Unpin contract' : 'Pin contract'}
+            >
+              <Star className={`h-4 w-4 ${contract.pinned ? 'fill-current text-yellow-500' : 'text-yellow-500'}`} />
+            </Button>
           </div>
         </div>
       </CardHeader>

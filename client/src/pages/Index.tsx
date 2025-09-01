@@ -891,6 +891,17 @@ const Index = () => {
                             searchTerm: '' // Clear search when filtering
                           }));
                         }
+                      } else if (filterType === 'company') {
+                        // If clicking the same company filter, reset it
+                        if (filters.company === value) {
+                          setFilters(prev => ({ ...prev, company: undefined, searchTerm: '' }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev,
+                            company: value,
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
                       }
                     }}
                   />
