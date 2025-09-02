@@ -20,7 +20,6 @@ class ContractService {
       await fs.access(this.contractsDir);
     } catch {
       await fs.mkdir(this.contractsDir, { recursive: true });
-      console.log(`Created contracts directory: ${this.contractsDir}`);
     }
   }
 
@@ -78,7 +77,7 @@ class ContractService {
           const contract = JSON.parse(data);
           contracts.push(contract);
         } catch (error) {
-          console.warn(`Failed to load contract from ${file}:`, error);
+          // Contract file could not be loaded, skipping
         }
       }
 
@@ -109,7 +108,6 @@ class ContractService {
     );
 
     if (existingContractById) {
-      console.log(`Contract with ID already exists: ${data.contractId} (${existingContractById.id})`);
       return { contract: existingContractById, created: false };
     }
 
@@ -120,7 +118,6 @@ class ContractService {
       );
 
       if (existingContract) {
-        console.log(`Contract already exists: ${data.name} (${existingContract.id})`);
         return { contract: existingContract, created: false };
       }
     }
@@ -162,7 +159,6 @@ class ContractService {
     };
 
     await this.saveContractToFile(contract);
-    console.log(`Created contract: ${contract.name} (${contract.id})`);
     return { contract, created: true };
   }
 
@@ -206,7 +202,6 @@ class ContractService {
     });
 
     await this.saveContractToFile(updatedContract);
-    console.log(`Updated contract: ${updatedContract.name} (${id})${isOnlyNotesUpdate ? ' (notes only)' : ''}`);
     
     return updatedContract;
   }
@@ -218,7 +213,6 @@ class ContractService {
     }
 
     await this.deleteContractFile(id);
-    console.log(`Deleted contract: ${existingContract.name} (${id})`);
     return true;
   }
 
@@ -259,16 +253,7 @@ class ContractService {
     };
   }
 
-  async exportAllContracts(): Promise<Contract[]> {
-    return await this.getAllContracts();
-  }
 
-  async importContracts(contracts: Contract[]): Promise<void> {
-    for (const contract of contracts) {
-      const { id, createdAt, updatedAt, ...contractData } = contract;
-      await this.createContract(contractData);
-    }
-  }
 
   async getContractStats(): Promise<{ totalFiles: number; totalSize: number; averageSize: number }> {
     const files = await this.getAllContractFiles();
@@ -281,9 +266,9 @@ class ContractService {
         const stats = await fs.stat(filePath);
         totalSize += stats.size;
         fileCount++;
-      } catch (error) {
-        console.warn(`Failed to get stats for ${file}:`, error);
-      }
+              } catch (error) {
+          // File stats could not be retrieved, skipping
+        }
     }
 
     return {
@@ -313,109 +298,7 @@ class ContractService {
     return { contractsUpdated, totalEntriesRemoved };
   }
 
-  async exportToMarkdown(contracts: Contract[]): Promise<string> {
-    const now = new Date();
-    const date = now.toLocaleDateString();
-    const time = now.toLocaleTimeString();
 
-    let markdown = `# Contracts Export\n\n`;
-    markdown += `**Generated:** ${date} at ${time}\n\n`;
-    markdown += `**Total Contracts:** ${contracts.length}\n\n`;
-    markdown += `---\n\n`;
-
-    // Group contracts by status
-    const contractsByStatus = contracts.reduce((acc, contract) => {
-      const status = contract.status;
-      if (!acc[status]) {
-        acc[status] = [];
-      }
-      acc[status].push(contract);
-      return acc;
-    }, {} as Record<string, Contract[]>);
-
-    // Export contracts grouped by status
-    for (const [status, statusContracts] of Object.entries(contractsByStatus)) {
-      const statusDisplay = status.charAt(0).toUpperCase() + status.slice(1);
-      markdown += `## ${statusDisplay} Contracts (${statusContracts.length})\n\n`;
-
-      for (const contract of statusContracts) {
-        markdown += `### ${contract.name}\n\n`;
-        markdown += `**Contract ID:** ${contract.contractId}\n\n`;
-        if (contract.reference) {
-          markdown += `**Reference:** ${contract.reference}\n\n`;
-        }
-        markdown += `**Company:** ${contract.company}\n\n`;
-        markdown += `**Status:** ${contract.status}\n\n`;
-        markdown += `**Category:** ${contract.category}\n\n`;
-        markdown += `**Amount:** ${contract.currency} ${contract.amount.toFixed(2)}\n\n`;
-        markdown += `**Frequency:** ${contract.frequency}\n\n`;
-        markdown += `**Start Date:** ${contract.startDate}\n\n`;
-        
-        if (contract.endDate) {
-          markdown += `**End Date:** ${contract.endDate}\n\n`;
-        }
-        
-        if (contract.payDate) {
-          markdown += `**Pay Date:** ${contract.payDate}\n\n`;
-        }
-        
-        if (contract.description) {
-          markdown += `**Description:** ${contract.description}\n\n`;
-        }
-
-        if (contract.contactInfo) {
-          markdown += `**Contact Information:**\n`;
-          if (contract.contactInfo.email) {
-            markdown += `- Email: ${contract.contactInfo.email}\n`;
-          }
-          if (contract.contactInfo.phone) {
-            markdown += `- Phone: ${contract.contactInfo.phone}\n`;
-          }
-          if (contract.contactInfo.website) {
-            markdown += `- Website: ${contract.contactInfo.website}\n`;
-          }
-          if (contract.contactInfo.address) {
-            markdown += `- Address: ${contract.contactInfo.address}\n`;
-          }
-          if (contract.contactInfo.contactPerson) {
-            markdown += `- Contact Person: ${contract.contactInfo.contactPerson}\n`;
-          }
-          markdown += `\n`;
-        }
-
-        if (contract.tags && contract.tags.length > 0) {
-          markdown += `**Tags:** ${contract.tags.join(', ')}\n\n`;
-        }
-
-        if (contract.notes) {
-          markdown += `**Notes:** ${contract.notes}\n\n`;
-        }
-
-        if (contract.documentLink) {
-          markdown += `**Document Link:** ${contract.documentLink}\n\n`;
-        }
-
-        markdown += `**Created:** ${contract.createdAt}\n\n`;
-        markdown += `**Last Updated:** ${contract.updatedAt}\n\n`;
-        markdown += `---\n\n`;
-      }
-    }
-
-    // Add summary at the end
-    markdown += `## Summary\n\n`;
-    markdown += `| Status | Count |\n`;
-    markdown += `|--------|-------|\n`;
-    
-    for (const [status, statusContracts] of Object.entries(contractsByStatus)) {
-      const statusDisplay = status.charAt(0).toUpperCase() + status.slice(1);
-      markdown += `| ${statusDisplay} | ${statusContracts.length} |\n`;
-    }
-
-    markdown += `\n**Total Value:** ${contracts.reduce((sum, contract) => sum + contract.amount, 0).toFixed(2)}\n\n`;
-    markdown += `**Export completed successfully.**\n`;
-
-    return markdown;
-  }
 
   async exportContractsToSeparateFiles(contracts: Contract[]): Promise<Array<{ filename: string; content: string }>> {
     const exportResults: Array<{ filename: string; content: string }> = [];

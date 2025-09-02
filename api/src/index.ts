@@ -40,8 +40,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Contracts API server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`📋 Contracts API: http://localhost:${PORT}/api/contracts`);
-  console.log(`📁 Data directory: ${process.env.CONTRACTS_DATA_DIR || './data'}`);
+  // Server started successfully
 }); 
