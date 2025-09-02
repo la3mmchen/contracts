@@ -573,7 +573,7 @@ const Index = () => {
         )}
         
         {/* Active Filters Display */}
-        {(filters.searchTerm || filters.status || filters.category || filters.company || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
+        {(filters.searchTerm || filters.status || filters.category || filters.company || filters.familyMember || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.draft !== undefined || filters.optimizable !== undefined || filters.hasAdditionalFields !== undefined || filters.dataQualityGrade) && (
           <div className="flex items-center gap-2 text-sm mb-6">
             <span className="text-muted-foreground font-medium">Active Filters:</span>
             <div className="flex flex-wrap items-center gap-2">
@@ -673,6 +673,18 @@ const Index = () => {
                   </button>
                 </div>
               )}
+              {filters.draft !== undefined && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-[#3B82F6]/10 text-[#3B82F6] rounded-md border border-[#3B82F6]/20">
+                  <span className="text-xs font-medium">Draft: {filters.draft ? 'Yes' : 'No'}</span>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, draft: undefined, searchTerm: '' }))}
+                    className="ml-1 text-[#3B82F6]/70 hover:text-[#3B82F6] transition-colors"
+                    title="Remove draft filter"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
               {filters.pinned !== undefined && (
                 <div className="flex items-center gap-1 px-2 py-1 bg-[#01A5E1]/10 text-[#01A5E1] rounded-md border border-[#01A5E1]/20">
                   <span className="text-xs font-medium">Pinned: {filters.pinned ? 'Yes' : 'No'}</span>
@@ -711,7 +723,7 @@ const Index = () => {
               )}
 
               {/* Clear All Filters Button */}
-              {(filters.status || filters.category || filters.familyMember || filters.company || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.pinned !== undefined || filters.optimizable !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
+              {(filters.status || filters.category || filters.familyMember || filters.company || filters.frequency || filters.tags?.length || filters.needsMoreInfo !== undefined || filters.draft !== undefined || filters.pinned !== undefined || filters.optimizable !== undefined || filters.hasAdditionalFields !== undefined || filters.searchTerm) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -899,6 +911,39 @@ const Index = () => {
                           setFilters(prev => ({ 
                             ...prev,
                             company: value,
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
+                      } else if (filterType === 'draft') {
+                        // If clicking the same draft filter, reset it
+                        if (filters.draft === (value === 'true')) {
+                          setFilters(prev => ({ ...prev, draft: undefined, searchTerm: '' }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev,
+                            draft: value === 'true',
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
+                      } else if (filterType === 'needsMoreInfo') {
+                        // If clicking the same needsMoreInfo filter, reset it
+                        if (filters.needsMoreInfo === (value === 'true')) {
+                          setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev,
+                            needsMoreInfo: value === 'true',
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
+                      } else if (filterType === 'optimizable') {
+                        // If clicking the same optimizable filter, reset it
+                        if (filters.optimizable === (value === 'true')) {
+                          setFilters(prev => ({ ...prev, optimizable: undefined, searchTerm: '' }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev,
+                            optimizable: value === 'true',
                             searchTerm: '' // Clear search when filtering
                           }));
                         }

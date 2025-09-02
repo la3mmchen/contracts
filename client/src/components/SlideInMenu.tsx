@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp } from 'lucide-react';
+import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetPortal, SheetOverlay } from '@/components/ui/sheet';
@@ -529,6 +529,45 @@ export const SlideInMenu = ({
                         <span>Draft</span>
                         <span className="ml-auto text-xs text-muted-foreground">
                           {contracts.filter(c => c.draft).length}
+                        </span>
+                      </div>
+                    </Button>
+
+                    {/* Optimization Filter */}
+                    <Button
+                      variant={filters.optimizable === true ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (filters.optimizable === true) {
+                          // If already active, clear just this filter
+                          updateFilter('optimizable', undefined);
+                        } else {
+                          // Clear all other filters and set this one
+                          onFiltersChange({
+                            searchTerm: '',
+                            status: undefined,
+                            category: undefined,
+                            company: undefined,
+                            frequency: undefined,
+                            tags: undefined,
+                            needsMoreInfo: undefined,
+                            pinned: undefined,
+                            draft: undefined,
+                            hasAdditionalFields: undefined,
+                            optimizable: true,
+                            hasConnections: undefined,
+                            connectedTo: undefined,
+                            sortBy: 'name'
+                          });
+                        }
+                      }}
+                      className="w-full h-8 text-xs justify-start"
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <Coins className="h-3 w-3 text-purple-500" />
+                        <span>Optimization</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {contracts.filter(c => c.optimizable).length}
                         </span>
                       </div>
                     </Button>

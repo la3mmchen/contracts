@@ -247,15 +247,42 @@ export const ContractCard = ({
         <div className="flex items-center gap-2 mb-3">
           {/* Priority Warnings (Draft/Needs Info) */}
           {contract.draft && (
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 text-xs whitespace-nowrap border border-blue-200">
+            <Badge 
+              variant="secondary" 
+              className={`bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 text-xs whitespace-nowrap border border-blue-200 ${
+                onFilter ? 'cursor-pointer hover:opacity-80' : ''
+              }`}
+              onClick={onFilter ? () => onFilter('draft', 'true') : undefined}
+              title="Click to filter by draft status"
+            >
               <FileText className="h-3 w-3 mr-1" />
               Draft
             </Badge>
           )}
           {contract.needsMoreInfo && (
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 text-xs whitespace-nowrap border border-yellow-200">
+            <Badge 
+              variant="secondary" 
+              className={`bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 text-xs whitespace-nowrap border border-yellow-200 ${
+                onFilter ? 'cursor-pointer hover:opacity-80' : ''
+              }`}
+              onClick={onFilter ? () => onFilter('needsMoreInfo', 'true') : undefined}
+              title="Click to filter by needs info status"
+            >
               <AlertTriangle className="h-3 w-3 mr-1" />
               Needs Info
+            </Badge>
+          )}
+          {contract.optimizable && (
+            <Badge 
+              variant="secondary" 
+              className={`bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200 text-xs whitespace-nowrap border border-purple-200 ${
+                onFilter ? 'cursor-pointer hover:opacity-80' : ''
+              }`}
+              onClick={onFilter ? () => onFilter('optimizable', 'true') : undefined}
+              title="Click to filter by optimization"
+            >
+              <Coins className="h-3 w-3 mr-1" />
+              Optimization
             </Badge>
           )}
           
