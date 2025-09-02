@@ -26,7 +26,6 @@ export const useContractStorage = () => {
         if (needsMigration(contract)) {
           const result = migrateContract(contract);
           if (result.wasMigrated) {
-            console.log(`Migrated contract ${contract.contractId}:`, result.migrationNotes);
             contractsToUpdate.push(result.contract);
           }
           migratedContracts.push(result.contract);
@@ -37,7 +36,6 @@ export const useContractStorage = () => {
       
       // Save migrated contracts back to the API
       if (contractsToUpdate.length > 0) {
-        console.log(`Saving ${contractsToUpdate.length} migrated contracts back to API...`);
         for (const contract of contractsToUpdate) {
           try {
             const { id, createdAt, updatedAt, ...updateData } = contract;
@@ -51,7 +49,6 @@ export const useContractStorage = () => {
             console.error(`Failed to save migrated contract ${contract.contractId}:`, updateError);
           }
         }
-        console.log('Migration complete - contracts saved to disk');
       }
       
       setContracts(migratedContracts);

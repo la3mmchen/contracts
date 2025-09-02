@@ -45,7 +45,7 @@ import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalc
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
 import { isValidCategory, formatRelativeTime, getCategoryBadgeColor } from '@/lib/utils';
-import { calculateDataQualityScore, getGradeColor } from '@/lib/dataQualityCalculator';
+
 import { useState, useMemo, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -55,9 +55,7 @@ interface ContractCardProps {
   onDelete: (id: string) => void;
   onCopy?: (contract: Contract) => void;
   onFilter?: (filterType: string, value: string) => void;
-  defaultExpandCustomFields?: boolean;
-  defaultExpandPriceChanges?: boolean;
-  defaultExpandPayments?: boolean;
+
   onUpdate?: (id: string, updates: Partial<Contract>) => Promise<void>;
   isDetailPage?: boolean;
   onInlineEditingChange?: (isEditing: boolean) => void;
@@ -82,18 +80,12 @@ export const ContractCard = ({
   onDelete, 
   onCopy, 
   onFilter, 
-  defaultExpandCustomFields = false, 
-  defaultExpandPriceChanges = false, 
-  defaultExpandPayments = false, 
   onUpdate, 
   isDetailPage = false, 
   onInlineEditingChange, 
   currentSearchParams 
 }: ContractCardProps) => {
   const [isExpanded, setIsExpanded] = useState(isDetailPage);
-  const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(defaultExpandCustomFields);
-  const [isPriceChangesOpen, setIsPriceChangesOpen] = useState(defaultExpandPriceChanges);
-  const [isPaymentsOpen, setIsPaymentsOpen] = useState(defaultExpandPayments);
   
   // Inline editing states
   const [isEditingAmount, setIsEditingAmount] = useState(false);

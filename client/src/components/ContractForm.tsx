@@ -37,16 +37,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
   const smartDefaultStatus = availableStatuses.length > 0 ? availableStatuses[0] : 'active';
   const smartDefaultFrequency = availableFrequencies.length > 0 ? availableFrequencies[0] : 'monthly';
   
-  // Debug warnings if no options are available
-  if (availableCategories.length === 0) {
-    console.warn('ContractForm: No categories available, using fallback "other"');
-  }
-  if (availableStatuses.length === 0) {
-    console.warn('ContractForm: No statuses available, using fallback "active"');
-  }
-  if (availableFrequencies.length === 0) {
-    console.warn('ContractForm: No frequencies available, using fallback "monthly"');
-  }
+
   
   const [formData, setFormData] = useState({
     contractId: contract?.contractId || '',

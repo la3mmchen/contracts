@@ -24,7 +24,7 @@ import {
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { isValidCategory } from '@/lib/utils';
-import { calculateDataQualityScore } from '@/lib/dataQualityCalculator';
+
 import { useIsMobile } from '@/hooks/use-mobile';
 import { smartApi } from '@/services/smartApi';
 
