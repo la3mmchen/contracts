@@ -36,8 +36,8 @@ jobs:
           rm -rf node_modules package-lock.json
           # Clear npm cache
           npm cache clean --force
-          # Install with specific flags to handle native dependencies
-          npm install --no-optional --ignore-scripts
+          # Install with specific flags to handle native dependencies and React 19 compatibility
+          npm install --no-optional --ignore-scripts --legacy-peer-deps
           # Force reinstall of problematic packages
           npm rebuild
           
@@ -45,11 +45,11 @@ jobs:
         run: |
           cd client
           # Ensure we have the right Rollup version for the platform
-          npm install rollup@latest --save-dev
+          npm install rollup@latest --save-dev --legacy-peer-deps
           # Remove problematic native dependencies
           npm uninstall @rollup/rollup-linux-x64-gnu @rollup/rollup-darwin-x64 @rollup/rollup-win32-x64 || true
           # Reinstall Rollup without native dependencies
-          npm install rollup@latest --save-dev --force
+          npm install rollup@latest --save-dev --force --legacy-peer-deps
           
       - name: Verify dependencies
         run: |
