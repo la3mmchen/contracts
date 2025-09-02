@@ -300,7 +300,7 @@ const Index = () => {
     return filtered;
   }, [contracts, filters]);
 
-  // Handle Ctrl+F (or Cmd+F on Mac) to focus search field
+  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check for Ctrl+F (Windows/Linux) or Cmd+F (Mac)
@@ -316,11 +316,29 @@ const Index = () => {
         // Optionally select all text for easy replacement
         searchInputRef.current?.select();
       }
+      
+      // Check for ESC key to reset filters when there are active filters
+      if (event.key === 'Escape') {
+        const hasActiveFilters = filters.searchTerm || filters.status || filters.category || 
+          filters.company || filters.familyMember || filters.frequency || filters.tags?.length || 
+          filters.needsMoreInfo !== undefined || filters.pinned !== undefined || 
+          filters.draft !== undefined || filters.optimizable !== undefined || 
+          filters.hasAdditionalFields !== undefined || filters.dataQualityGrade;
+        
+        if (hasActiveFilters) {
+          event.preventDefault();
+          setFilters({
+            searchTerm: '',
+            sortBy: 'updatedAt',
+            sortOrder: 'desc'
+          });
+        }
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [filters]);
 
   // Extract all available tags from contracts
   const availableTags = useMemo(() => {
