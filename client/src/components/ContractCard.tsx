@@ -384,6 +384,16 @@ export const ContractCard = ({
               >
                 {contract.category}
               </Badge>
+              
+              {/* Family Member Badge */}
+              {contract.familyMember && (
+                <Badge 
+                  className="ml-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 text-xs border border-green-200"
+                >
+                  <User className="h-3 w-3 mr-1" />
+                  {contract.familyMember}
+                </Badge>
+              )}
             </div>
             
 
@@ -596,6 +606,18 @@ export const ContractCard = ({
                       </a>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Reference Number */}
+            {contract.reference && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Contract Details</h4>
+                <div className="flex items-center gap-2 text-sm">
+                  <Tag className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">Reference:</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{contract.reference}</span>
                 </div>
               </div>
             )}
