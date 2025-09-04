@@ -888,6 +888,17 @@ const Index = () => {
                             searchTerm: '' // Clear search when filtering
                           }));
                         }
+                      } else if (filterType === 'familyMember') {
+                        // If clicking the same family member filter, reset it
+                        if (filters.familyMember === value) {
+                          setFilters(prev => ({ ...prev, familyMember: undefined, searchTerm: '' }));
+                        } else {
+                          setFilters(prev => ({ 
+                            ...prev,
+                            familyMember: value,
+                            searchTerm: '' // Clear search when filtering
+                          }));
+                        }
                       } else if (filterType === 'tags') {
                         // If clicking the same tag filter, reset it
                         if (filters.tags?.includes(value)) {

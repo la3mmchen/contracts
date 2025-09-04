@@ -49,6 +49,32 @@ import { isValidCategory, formatRelativeTime, getCategoryBadgeColor } from '@/li
 import { useState, useMemo, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Generate consistent color for family member based on name
+const getFamilyMemberColor = (name: string) => {
+  const colors = [
+    'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border-blue-200',
+    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200',
+    'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200 border-purple-200',
+    'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-200 border-pink-200',
+    'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border-orange-200',
+    'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-200 border-teal-200',
+    'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200 border-indigo-200',
+    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200',
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 border-yellow-200',
+    'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-200 border-cyan-200',
+  ];
+  
+  // Simple hash function to get consistent color for same name
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  return colors[Math.abs(hash) % colors.length];
+};
+
 interface ContractCardProps {
   contract: Contract;
   onEdit: (contract: Contract) => void;
@@ -374,13 +400,20 @@ export const ContractCard = ({
               )}
             </div>
             
-                        {/* Category Badge */}
-            <div className="mb-3">
+                        {/* Category and Family Member Badges */}
+            <div className="mb-3 flex items-center gap-2 flex-wrap">
               <Badge 
+                variant="outline"
                 className={`${categoryColor} text-xs ${
-                  onFilter ? 'cursor-pointer hover:opacity-80' : ''
+                  onFilter ? 'cursor-pointer hover:scale-110 hover:shadow-md transition-all duration-200' : ''
                 }`}
-                onClick={onFilter ? () => onFilter('category', contract.category) : undefined}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (onFilter) {
+                    onFilter('category', contract.category);
+                  }
+                }}
               >
                 {contract.category}
               </Badge>
@@ -388,7 +421,16 @@ export const ContractCard = ({
               {/* Family Member Badge */}
               {contract.familyMember && (
                 <Badge 
-                  className="ml-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 text-xs border border-green-200"
+                  variant="outline"
+                  className={`text-xs cursor-pointer hover:scale-110 hover:shadow-md transition-all duration-200 ${getFamilyMemberColor(contract.familyMember)}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (onFilter) {
+                      onFilter('familyMember', contract.familyMember!);
+                    }
+                  }}
+                  title={`Filter by ${contract.familyMember}`}
                 >
                   <User className="h-3 w-3 mr-1" />
                   {contract.familyMember}
@@ -465,7 +507,13 @@ export const ContractCard = ({
       {/* Content Section */}
       <CardContent className="space-y-4">
         {/* Key Information Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+        <div className={`grid grid-cols-1 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg ${
+          contract.reference && nextPayment 
+            ? 'md:grid-cols-4' 
+            : contract.reference || nextPayment 
+              ? 'md:grid-cols-3' 
+              : 'md:grid-cols-2'
+        }`}>
           {/* Amount */}
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -507,6 +555,16 @@ export const ContractCard = ({
               {contract.endDate && <div>End: {formatDate(contract.endDate)}</div>}
             </div>
           </div>
+          
+          {/* Reference Number - Only show if there's a reference */}
+          {contract.reference && (
+            <div className="text-center">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Reference</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {contract.reference}
+              </div>
+            </div>
+          )}
           
           {/* Next Payment - Only show if there's a payment */}
           {nextPayment && (
