@@ -587,7 +587,7 @@ export const ContractCard = ({
               <Clock className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <div className="text-xs text-blue-700 dark:text-blue-300 font-medium mb-1">Latest Note</div>
-                <div className="text-sm text-blue-800 dark:text-blue-200">
+                <div className="text-sm text-blue-800 dark:text-blue-200 whitespace-pre-wrap">
                   {contract.notes.length > 120 
                     ? `${contract.notes.substring(0, 120)}...` 
                     : contract.notes
@@ -684,7 +684,7 @@ export const ContractCard = ({
             {contract.description && (
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Description</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
                   {contract.description}
                 </p>
               </div>
@@ -733,7 +733,7 @@ export const ContractCard = ({
                   {Object.entries(contract.customFields).map(([key, value]) => (
                     <div key={key} className="text-sm">
                       <span className="font-medium text-gray-700 dark:text-gray-300">{key}:</span>
-                      <span className="ml-2 text-gray-600 dark:text-gray-400">
+                      <span className="ml-2 text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                         {value.startsWith('http') ? (
                           <a 
                             href={value.startsWith('http') ? value : `https://${value}`}
