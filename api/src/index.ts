@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { contractRoutes } from './routes/contracts';
+import { paperlessRoutes } from './routes/paperless';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api/contracts', contractRoutes);
+app.use('/api/paperless', paperlessRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -34,7 +36,10 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/api/health',
       contracts: '/api/contracts',
-      dataInfo: '/api/contracts/info/data'
+      dataInfo: '/api/contracts/info/data',
+      paperless: '/api/paperless',
+      paperlessStatus: '/api/paperless/status',
+      paperlessDocuments: '/api/paperless/documents/:contractId'
     }
   });
 });

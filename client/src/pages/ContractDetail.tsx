@@ -8,6 +8,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { ContractNavigation } from '@/components/ContractNavigation';
 import { NotesSection } from '@/components/NotesSection';
 import { PriceOverTimeChart } from '@/components/PriceOverTimeChart';
+import { PaperlessDocuments } from '@/components/PaperlessDocuments';
 import { PriceChangesSection } from '@/components/PriceChangesSection';
 import { useContractNavigation } from '@/hooks/useContractNavigation';
 import { Button } from '@/components/ui/button';
@@ -472,6 +473,9 @@ const ContractDetail = () => {
               isDetailPage={true}
               onInlineEditingChange={setIsInlineEditing}
             />
+            
+            {/* Paperless Documents */}
+            <PaperlessDocuments contractId={contract.id} />
             
             {/* Price Changes Section */}
             <PriceChangesSection contract={contract} />

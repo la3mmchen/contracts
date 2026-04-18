@@ -9,6 +9,10 @@ services:
     environment:
       - PORT=3001
       - CONTRACTS_DATA_DIR=/app/data
+      - PAPERLESS_URL=${PAPERLESS_URL:-}
+      - PAPERLESS_API_TOKEN=${PAPERLESS_API_TOKEN:-}
+      - PAPERLESS_URL=https://your-paperless-instance.com
+      - PAPERLESS_API_TOKEN=your-api-token
     volumes:
       - ./data:/app/data
     container_name: contracts-api
