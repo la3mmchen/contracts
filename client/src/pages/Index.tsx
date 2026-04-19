@@ -19,7 +19,8 @@ import {
   FileText,
   AlertTriangle,
   Info,
-  X
+  X,
+  CheckCircle
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
@@ -513,7 +514,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Floating Menu Button */}
-      <div className="fixed top-4 left-4 sm:top-8 sm:left-4 z-50">
+      <div className="fixed top-4 left-4 sm:top-8 sm:left-4 z-50 flex items-center gap-2">
         <SlideInMenu
           filters={filters}
           onFiltersChange={setFilters}
@@ -524,6 +525,25 @@ const Index = () => {
           onAddContract={openAddForm}
           contracts={contracts}
         />
+        <Button
+          variant={filters.status === 'active' ? 'default' : 'secondary'}
+          size="sm"
+          onClick={() => {
+            if (filters.status === 'active') {
+              setFilters(prev => ({ ...prev, status: undefined }));
+            } else {
+              setFilters(prev => ({ ...prev, status: 'active' }));
+            }
+          }}
+          className={`h-10 sm:h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border hover:scale-105 px-4 ${
+            filters.status === 'active' 
+              ? 'bg-primary text-primary-foreground border-primary' 
+              : 'bg-background/80 backdrop-blur-sm border-border hover:bg-background/90'
+          }`}
+        >
+          <CheckCircle className="h-4 w-4 mr-2" />
+          <span className="text-xs sm:text-sm">Active Only</span>
+        </Button>
       </div>
 
       {/* Hidden file input for import */}
