@@ -118,10 +118,10 @@ class PaperlessService {
   }
 
   async getTagByName(name: string): Promise<PaperlessTag | null> {
-    // Check cache first
+    // Check cache first - but only for positive results (tag found)
     const cached = this.tagCache.get(name);
-    if (this.isCacheValid(cached)) {
-      console.log(`[Paperless] Cache hit: tag "${name}" -> ${cached.data ? `id=${cached.data.id}` : 'null'}`);
+    if (this.isCacheValid(cached) && cached.data !== null) {
+      console.log(`[Paperless] Cache hit: tag "${name}" -> id=${cached.data.id}`);
       return cached.data;
     }
 
@@ -129,9 +129,12 @@ class PaperlessService {
       `/tags/?name__iexact=${encodeURIComponent(name)}`
     );
     const tag = response.results.length > 0 ? response.results[0] : null;
-    console.log(`[Paperless] Tag lookup: "${name}" -> ${tag ? `found (id=${tag.id})` : 'NOT FOUND'}`);
+    console.log(`[Paperless] Tag lookup: "${name}" -> ${tag ? `found (id=${tag.id})` : 'NOT FOUND (not cached)'}`);
     
-    this.setCacheEntry(this.tagCache, name, tag);
+    // Only cache positive results - don't cache "not found" so new tags are discovered
+    if (tag) {
+      this.setCacheEntry(this.tagCache, name, tag);
+    }
     return tag;
   }
 

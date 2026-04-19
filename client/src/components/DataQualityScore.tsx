@@ -14,21 +14,29 @@ import {
 } from 'lucide-react';
 import { 
   calculateDataQualityScore, 
-  type DataQualityScore as DataQualityScoreType 
+  type DataQualityScore as DataQualityScoreType,
+  type DataQualityOptions
 } from '@/lib/dataQualityCalculator';
 import { Contract } from '@/types/contract';
 
 interface DataQualityScoreProps {
   contract: Contract;
   onEdit?: () => void;
+  paperlessDocumentCount?: number;
+  paperlessConfigured?: boolean;
 }
 
 export const DataQualityScore: React.FC<DataQualityScoreProps> = ({ 
   contract, 
-  onEdit 
+  onEdit,
+  paperlessDocumentCount,
+  paperlessConfigured
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const qualityScore = calculateDataQualityScore(contract);
+  const qualityScore = calculateDataQualityScore(contract, {
+    paperlessDocumentCount,
+    paperlessConfigured
+  });
 
 
 

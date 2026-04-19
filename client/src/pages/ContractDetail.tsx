@@ -11,6 +11,7 @@ import { PriceOverTimeChart } from '@/components/PriceOverTimeChart';
 import { PaperlessDocuments } from '@/components/PaperlessDocuments';
 import { PriceChangesSection } from '@/components/PriceChangesSection';
 import { useContractNavigation } from '@/hooks/useContractNavigation';
+import { usePaperlessDocuments } from '@/hooks/usePaperlessDocuments';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -64,6 +65,12 @@ const ContractDetail = () => {
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isInlineEditing, setIsInlineEditing] = useState(false);
   const [showInlineEditingWarning, setShowInlineEditingWarning] = useState(false);
+
+  // Paperless documents for data quality score
+  const { 
+    documents: paperlessDocuments, 
+    isConfigured: paperlessConfigured 
+  } = usePaperlessDocuments(contract?.id);
 
   // Derived: connected contracts by user-defined contractId
   const connectedContracts = React.useMemo(() => {
@@ -782,6 +789,8 @@ const ContractDetail = () => {
             <DataQualityScore 
               contract={contract} 
               onEdit={() => setIsEditFormOpen(true)}
+              paperlessDocumentCount={paperlessDocuments.length}
+              paperlessConfigured={paperlessConfigured}
             />
 
             {/* Contract Overview */}

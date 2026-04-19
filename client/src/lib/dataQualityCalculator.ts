@@ -9,9 +9,17 @@ export interface DataQualityScore {
   suggestions: string[];
 }
 
-export const calculateDataQualityScore = (contract: Contract): DataQualityScore => {
+export interface DataQualityOptions {
+  paperlessDocumentCount?: number;
+  paperlessConfigured?: boolean;
+}
+
+export const calculateDataQualityScore = (
+  contract: Contract, 
+  options: DataQualityOptions = {}
+): DataQualityScore => {
   let score = 0;
-  const maxScore = 67; // Reduced from 75 since we removed end date field (8 points)
+  const maxScore = 70; // Increased from 67 to include Paperless bonus
   const missingFields: string[] = [];
   const suggestions: string[] = [];
 
@@ -117,6 +125,16 @@ export const calculateDataQualityScore = (contract: Contract): DataQualityScore 
 
   if (contract.notesHistory && contract.notesHistory.length > 0) {
     score += 2;
+  }
+
+  // Paperless Documents Bonus (3 points) - Only if Paperless is configured
+  if (options.paperlessConfigured) {
+    if (options.paperlessDocumentCount && options.paperlessDocumentCount > 0) {
+      score += 3;
+    } else {
+      missingFields.push('Linked Documents');
+      suggestions.push('Link documents in Paperless with tag c:' + contract.id.substring(0, 8));
+    }
   }
 
   // Cap the score at maxScore to prevent percentages over 100%
