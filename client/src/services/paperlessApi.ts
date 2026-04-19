@@ -124,7 +124,9 @@ export const paperlessApi = {
     }
   },
 
-  async getDocuments(contractId: string): Promise<PaperlessDocumentsResponse> {
+  async getDocuments(contractId: string, customTag?: string): Promise<PaperlessDocumentsResponse> {
+    const effectiveTag = customTag?.trim() || `c:${contractId.substring(0, 8)}`;
+    
     // In demo mode, return fake documents
     const isDemoMode = await smartApi.isDemoMode();
     if (isDemoMode) {
@@ -132,12 +134,15 @@ export const paperlessApi = {
       return {
         documents,
         count: documents.length,
-        tagName: `c:${contractId.substring(0, 8)}`,
+        tagName: effectiveTag,
       };
     }
 
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/paperless/documents/${contractId}`);
+    const url = customTag?.trim() 
+      ? `${API_BASE}/paperless/documents/${contractId}?tag=${encodeURIComponent(customTag.trim())}`
+      : `${API_BASE}/paperless/documents/${contractId}`;
+    const response = await fetch(url);
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Failed to fetch documents' }));
       throw new Error(error.error || 'Failed to fetch documents');

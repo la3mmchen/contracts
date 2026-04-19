@@ -187,13 +187,13 @@ class PaperlessService {
   }
 
   // Generate short tag from contract ID (first 8 chars of UUID)
-  private getShortTag(contractId: string): string {
+  private getDefaultTag(contractId: string): string {
     return `c:${contractId.substring(0, 8)}`;
   }
 
-  async getDocumentsForContract(contractId: string): Promise<ContractDocumentsResponse> {
-    const tagName = this.getShortTag(contractId);
-    console.log(`[Paperless] Fetching documents for contract: ${contractId} (tag: ${tagName})`);
+  async getDocumentsForContract(contractId: string, customTag?: string): Promise<ContractDocumentsResponse> {
+    const tagName = customTag?.trim() || this.getDefaultTag(contractId);
+    console.log(`[Paperless] Fetching documents for contract: ${contractId} (tag: ${tagName}${customTag ? ' [custom]' : ' [default]'})`);
     
     const response = await this.getDocumentsByTag(tagName);
     console.log(`[Paperless] Found ${response.count} documents for tag: ${tagName}`);

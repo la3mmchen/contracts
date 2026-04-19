@@ -103,6 +103,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     optimizable: contract?.optimizable || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
+    paperlessTag: contract?.paperlessTag || '',
     priceChangeReason: '',
     // New
     connections: contract?.connections || [],
@@ -149,6 +150,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
         optimizable: contract.optimizable || false,
         customFields: contract.customFields || {},
         documentLink: contract.documentLink || '',
+        paperlessTag: contract.paperlessTag || '',
         priceChangeReason: '',
         // New: connections
         connections: contract.connections || [],
@@ -632,6 +634,19 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
               onChange={(e) => updateFormData({ documentLink: e.target.value })}
               placeholder="https://docs.company.com/contract/123 or https://drive.google.com/file/..."
             />
+          </div>
+
+          <div>
+            <Label htmlFor="paperlessTag">Paperless Tag</Label>
+            <Input
+              id="paperlessTag"
+              value={formData.paperlessTag || ''}
+              onChange={(e) => updateFormData({ paperlessTag: e.target.value })}
+              placeholder={`Leave empty for default: c:${contract?.id?.substring(0, 8) || 'xxxxxxxx'}`}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Custom tag to link documents in Paperless. Leave empty to use auto-generated tag.
+            </p>
           </div>
 
           {/* New: Connections */}

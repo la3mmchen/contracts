@@ -18,9 +18,10 @@ import {
 
 interface PaperlessDocumentsProps {
   contractId: string;
+  paperlessTag?: string; // Custom tag, falls back to c:<short-uuid> if not set
 }
 
-export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contractId }) => {
+export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contractId, paperlessTag: customTag }) => {
   const { toast } = useToast();
   const {
     documents,
@@ -31,9 +32,9 @@ export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contract
     isConfigured,
     isAvailable,
     statusLoading,
-  } = usePaperlessDocuments(contractId);
+  } = usePaperlessDocuments(contractId, customTag);
 
-  const paperlessTag = tagName || `c:${contractId.substring(0, 8)}`;
+  const paperlessTag = tagName || customTag?.trim() || `c:${contractId.substring(0, 8)}`;
 
   const copyTagToClipboard = () => {
     navigator.clipboard.writeText(paperlessTag);

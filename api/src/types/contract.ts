@@ -45,6 +45,7 @@ export interface Contract {
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
+  paperlessTag?: string; // Custom Paperless tag (falls back to c:<short-uuid> if not set)
   connections?: string[]; // Array of contractIds for connected contracts
   createdAt: string;
   updatedAt: string;
@@ -85,6 +86,7 @@ export interface CreateContractRequest {
   priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
   documentLink?: string;
+  paperlessTag?: string; // Custom Paperless tag (falls back to c:<short-uuid> if not set)
   connections?: string[]; // Array of contractIds for connected contracts
 }
 
