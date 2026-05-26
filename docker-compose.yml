@@ -11,8 +11,6 @@ services:
       - CONTRACTS_DATA_DIR=/app/data
       - PAPERLESS_URL=${PAPERLESS_URL:-}
       - PAPERLESS_API_TOKEN=${PAPERLESS_API_TOKEN:-}
-      - PAPERLESS_URL=https://documents.la3mmchen.de
-      - PAPERLESS_API_TOKEN=9304ecc0aa9a1564efae55d967925484ac6098c9
     volumes:
       - ./data:/app/data
     container_name: contracts-api
