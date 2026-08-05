@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
+import { ContractListRow } from '@/components/ContractListRow';
+import { ViewModeToggle, type ContractLayout } from '@/components/ViewModeToggle';
 import { ContractForm } from '@/components/ContractForm';
 import { SlideInMenu } from '@/components/SlideInMenu';
 
@@ -53,9 +55,29 @@ const Index = () => {
 
   const [filters, setFilters] = useState<FilterType>({
     searchTerm: '',
+    status: 'active',
     sortBy: 'updatedAt',
     sortOrder: 'desc'
   });
+
+  const LAYOUT_STORAGE_KEY = 'contracts:layout';
+  const [layout, setLayout] = useState<ContractLayout>(() => {
+    try {
+      const stored = localStorage.getItem(LAYOUT_STORAGE_KEY);
+      return stored === 'list' ? 'list' : 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
+
+  const handleLayoutChange = (next: ContractLayout) => {
+    setLayout(next);
+    try {
+      localStorage.setItem(LAYOUT_STORAGE_KEY, next);
+    } catch {
+      // Ignore storage failures (e.g. private mode); layout still works for the session.
+    }
+  };
 
 
 
@@ -500,6 +522,137 @@ const Index = () => {
     }
   };
 
+  // Shared filter handler used by both the grid (ContractCard) and list (ContractListRow) views.
+  const handleContractFilter = (filterType: string, value: string) => {
+    if (filterType === 'viewMode') {
+      // Handle view mode as mutually exclusive options
+      if (value === 'all') {
+        // Reset all filters to show all contracts
+        setFilters(prev => ({
+          ...prev,
+          status: undefined,
+          needsMoreInfo: undefined,
+          searchTerm: ''
+        }));
+      } else if (value === 'active') {
+        // Show only active contracts
+        setFilters(prev => ({
+          ...prev,
+          status: 'active',
+          needsMoreInfo: undefined,
+          searchTerm: ''
+        }));
+      } else if (value === 'needsAttention') {
+        // Show only contracts that need attention
+        setFilters(prev => ({
+          ...prev,
+          status: undefined,
+          needsMoreInfo: true,
+          searchTerm: ''
+        }));
+      }
+    } else if (filterType === 'category') {
+      // If clicking the same category filter, reset it
+      if (filters.category === value) {
+        setFilters(prev => ({ ...prev, category: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          category: value as Contract['category'],
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'familyMember') {
+      // If clicking the same family member filter, reset it
+      if (filters.familyMember === value) {
+        setFilters(prev => ({ ...prev, familyMember: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          familyMember: value,
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'tags') {
+      // If clicking the same tag filter, reset it
+      if (filters.tags?.includes(value)) {
+        setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          tags: [value],
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'pinned') {
+      // If clicking the same pinned filter, reset it
+      if (filters.pinned === (value === 'true')) {
+        setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          pinned: value === 'true',
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'hasAdditionalFields') {
+      // If clicking the same hasAdditionalFields filter, reset it
+      if (filters.hasAdditionalFields === (value === 'true')) {
+        setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          hasAdditionalFields: value === 'true',
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'company') {
+      // If clicking the same company filter, reset it
+      if (filters.company === value) {
+        setFilters(prev => ({ ...prev, company: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          company: value,
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'draft') {
+      // If clicking the same draft filter, reset it
+      if (filters.draft === (value === 'true')) {
+        setFilters(prev => ({ ...prev, draft: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          draft: value === 'true',
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'needsMoreInfo') {
+      // If clicking the same needsMoreInfo filter, reset it
+      if (filters.needsMoreInfo === (value === 'true')) {
+        setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          needsMoreInfo: value === 'true',
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    } else if (filterType === 'optimizable') {
+      // If clicking the same optimizable filter, reset it
+      if (filters.optimizable === (value === 'true')) {
+        setFilters(prev => ({ ...prev, optimizable: undefined, searchTerm: '' }));
+      } else {
+        setFilters(prev => ({
+          ...prev,
+          optimizable: value === 'true',
+          searchTerm: '' // Clear search when filtering
+        }));
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -544,6 +697,7 @@ const Index = () => {
           <CheckCircle className="h-4 w-4 mr-2" />
           <span className="text-xs sm:text-sm">Active Only</span>
         </Button>
+        <ViewModeToggle layout={layout} onLayoutChange={handleLayoutChange} />
       </div>
 
       {/* Hidden file input for import */}
@@ -829,7 +983,7 @@ const Index = () => {
 
 
 
-        {/* Contracts Grid */}
+        {/* Contracts */}
         <div className="mt-8">
           {filteredContracts.length === 0 ? (
             <div className="text-center py-8 sm:py-12 px-4">
@@ -859,149 +1013,46 @@ const Index = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredContracts.map((contract, index) => (
-                <div key={contract.id} style={{ animationDelay: `${index * 0.1}s` }}>
-                  <ContractCard
-                    contract={contract}
-                    onEdit={openEditForm}
-                    onDelete={(id) => setDeleteConfirmId(id)}
-                    onCopy={handleCopyContract}
-                    onUpdate={updateContract}
-                    currentSearchParams={searchParams.toString()}
-                    onFilter={(filterType, value) => {
-                      if (filterType === 'viewMode') {
-                        // Handle view mode as mutually exclusive options
-                        if (value === 'all') {
-                          // Reset all filters to show all contracts
-                          setFilters(prev => ({ 
-                            ...prev,
-                            status: undefined,
-                            needsMoreInfo: undefined,
-                            searchTerm: ''
-                          }));
-                        } else if (value === 'active') {
-                          // Show only active contracts
-                          setFilters(prev => ({ 
-                            ...prev,
-                            status: 'active',
-                            needsMoreInfo: undefined,
-                            searchTerm: ''
-                          }));
-                        } else if (value === 'needsAttention') {
-                          // Show only contracts that need attention
-                          setFilters(prev => ({ 
-                            ...prev,
-                            status: undefined,
-                            needsMoreInfo: true,
-                            searchTerm: ''
-                          }));
-                        }
-                      } else if (filterType === 'category') {
-                        // If clicking the same category filter, reset it
-                        if (filters.category === value) {
-                          setFilters(prev => ({ ...prev, category: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            category: value as Contract['category'],
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'familyMember') {
-                        // If clicking the same family member filter, reset it
-                        if (filters.familyMember === value) {
-                          setFilters(prev => ({ ...prev, familyMember: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            familyMember: value,
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'tags') {
-                        // If clicking the same tag filter, reset it
-                        if (filters.tags?.includes(value)) {
-                          setFilters(prev => ({ ...prev, tags: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            tags: [value],
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'pinned') {
-                        // If clicking the same pinned filter, reset it
-                        if (filters.pinned === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, pinned: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            pinned: value === 'true',
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'hasAdditionalFields') {
-                        // If clicking the same hasAdditionalFields filter, reset it
-                        if (filters.hasAdditionalFields === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, hasAdditionalFields: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            hasAdditionalFields: value === 'true',
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'company') {
-                        // If clicking the same company filter, reset it
-                        if (filters.company === value) {
-                          setFilters(prev => ({ ...prev, company: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            company: value,
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'draft') {
-                        // If clicking the same draft filter, reset it
-                        if (filters.draft === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, draft: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            draft: value === 'true',
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'needsMoreInfo') {
-                        // If clicking the same needsMoreInfo filter, reset it
-                        if (filters.needsMoreInfo === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, needsMoreInfo: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            needsMoreInfo: value === 'true',
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      } else if (filterType === 'optimizable') {
-                        // If clicking the same optimizable filter, reset it
-                        if (filters.optimizable === (value === 'true')) {
-                          setFilters(prev => ({ ...prev, optimizable: undefined, searchTerm: '' }));
-                        } else {
-                          setFilters(prev => ({ 
-                            ...prev,
-                            optimizable: value === 'true',
-                            searchTerm: '' // Clear search when filtering
-                          }));
-                        }
-                      }
-                    }}
-                  />
+            <>
+              {/* Result count */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-muted-foreground">
+                  {filteredContracts.length} contract{filteredContracts.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {layout === 'list' ? (
+                <div className="flex flex-col gap-2">
+                  {filteredContracts.map((contract) => (
+                    <ContractListRow
+                      key={contract.id}
+                      contract={contract}
+                      onEdit={openEditForm}
+                      onDelete={(id) => setDeleteConfirmId(id)}
+                      onCopy={handleCopyContract}
+                      onFilter={handleContractFilter}
+                      currentSearchParams={searchParams.toString()}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredContracts.map((contract, index) => (
+                    <div key={contract.id} style={{ animationDelay: `${index * 0.1}s` }}>
+                      <ContractCard
+                        contract={contract}
+                        onEdit={openEditForm}
+                        onDelete={(id) => setDeleteConfirmId(id)}
+                        onCopy={handleCopyContract}
+                        onUpdate={updateContract}
+                        currentSearchParams={searchParams.toString()}
+                        onFilter={handleContractFilter}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
