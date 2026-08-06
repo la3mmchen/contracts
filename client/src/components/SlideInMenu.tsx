@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins } from 'lucide-react';
+import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetPortal, SheetOverlay } from '@/components/ui/sheet';
@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SlideInMenuProps {
   filters: FilterType;
@@ -40,6 +41,7 @@ export const SlideInMenu = ({
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('quickFilters');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { authEnabled, logout } = useAuth();
 
   // Focus search input when sheet opens
   useEffect(() => {
@@ -832,6 +834,27 @@ export const SlideInMenu = ({
               <ThemeToggle />
             </div>
           </div>
+
+          {authEnabled && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold">Account</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    setIsOpen(false);
+                    void logout();
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log out
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </SheetContent>
       </SheetPortal>

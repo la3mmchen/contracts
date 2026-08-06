@@ -2,6 +2,7 @@
 
 import { loadConfig } from './config';
 import { smartApi } from './smartApi';
+import { notifyUnauthorized } from './authEvents';
 
 let API_BASE = 'http://localhost:3001/api';
 let configLoaded = false;
@@ -114,7 +115,11 @@ export const paperlessApi = {
 
     await ensureConfigLoaded();
     try {
-      const response = await fetch(`${API_BASE}/paperless/status`);
+      const response = await fetch(`${API_BASE}/paperless/status`, { credentials: 'include' });
+      if (response.status === 401) {
+        notifyUnauthorized();
+        return { configured: false, available: false };
+      }
       if (!response.ok) {
         return { configured: false, available: false };
       }
@@ -142,7 +147,11 @@ export const paperlessApi = {
     const url = customTag?.trim() 
       ? `${API_BASE}/paperless/documents/${contractId}?tag=${encodeURIComponent(customTag.trim())}`
       : `${API_BASE}/paperless/documents/${contractId}`;
-    const response = await fetch(url);
+    const response = await fetch(url, { credentials: 'include' });
+    if (response.status === 401) {
+      notifyUnauthorized();
+      throw new Error('Authentication required');
+    }
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Failed to fetch documents' }));
       throw new Error(error.error || 'Failed to fetch documents');

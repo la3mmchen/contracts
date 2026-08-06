@@ -17,6 +17,14 @@ services:
     environment:
       PORT: 3001
       CONTRACTS_DATA_DIR: "/data"
+      # Optional: enable the app's built-in single shared-password auth as an
+      # alternative to the nginx basic auth below. When set, the frontend shows
+      # a login screen. Since this example serves frontend and API behind one
+      # nginx (same site), the SameSite=Lax session cookie works correctly.
+      # APP_PASSWORD: "change-me"
+      # SESSION_SECRET: "a-long-random-string"
+      # NODE_ENV: "production"   # served over HTTPS -> Secure cookies
+      # APP_ORIGIN: "https://contracts.yourdomain.com"
     volumes:
       - "/data/contracts:/data"
     restart: unless-stopped

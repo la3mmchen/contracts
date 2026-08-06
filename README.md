@@ -58,6 +58,19 @@ services:
     environment:
       PORT: 3001
       CONTRACTS_DATA_DIR: "/data"
+      # Authentication (optional): set a single shared password to require
+      # login. Leave empty to disable app-level auth (e.g. when relying on
+      # reverse-proxy basic auth).
+      APP_PASSWORD: "change-me"
+      # Secret used to sign session cookies. Use a long random string.
+      # If unset, it is derived from APP_PASSWORD.
+      SESSION_SECRET: "a-long-random-string"
+      # Set to "production" when served over HTTPS so session cookies get the
+      # Secure flag.
+      NODE_ENV: "production"
+      # Comma-separated list of allowed browser origins for CORS with
+      # credentials. Empty reflects the request origin.
+      APP_ORIGIN: "https://contracts.yourdomain.com"
     volumes:
       - "/data/contracts:/data"
     restart: unless-stopped
@@ -96,9 +109,25 @@ CONTRACTS_CURRENCIES="EUR,USD,GBP,JPY,CNY,INR,BRL"
 - **EUR Default Currency**: New contracts default to EUR instead of USD
 - **Enhanced Search**: Search now includes reference numbers for better contract discovery
 
-We don't bring any authentication in the app or api yet, so help yourself with basic auth if you want to use this over the internet.
+## 🔐 Authentication
 
-A comprehensive example is [here](.docs/example).
+The app has optional built-in authentication using a **single shared password**.
+
+- **Disabled by default.** If `APP_PASSWORD` is not set on the API, the app behaves as before with no login screen. This keeps local development and the GitHub Pages demo working, and remains compatible with reverse-proxy basic auth.
+- **To enable**, set `APP_PASSWORD` on the API (and ideally a long random `SESSION_SECRET`). The frontend then shows a login screen, and all API routes except `/api/health` and `/api/auth/*` require a valid session.
+
+How it works: submitting the password to `POST /api/auth/login` returns an `HttpOnly`, `SameSite=Lax` session cookie holding an HMAC-signed token (stateless, 7-day expiry — no server-side session store). The browser sends it automatically on subsequent requests; a "Log out" action is available in the app menu.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `APP_PASSWORD` | Shared login password. Empty disables auth. | *(unset — auth disabled)* |
+| `SESSION_SECRET` | Secret used to sign session cookies. Use a long random value. | *(derived from `APP_PASSWORD`)* |
+| `NODE_ENV` | Set to `production` (served over HTTPS) to add the `Secure` cookie flag. | *(unset)* |
+| `APP_ORIGIN` | Comma-separated allowed browser origins for CORS with credentials. Empty reflects the request origin. | *(unset)* |
+
+> **Note:** Because the cookie uses `SameSite=Lax`, the frontend and API should be served under the same site (e.g. both behind one reverse proxy, `/` → frontend and `/api` → backend — the documented production setup). If you must serve them on genuinely different domains, `SameSite=Lax` cookies won't be sent cross-site.
+
+For a reverse-proxy example (nginx + SSL), see the [example configuration](docs/example/).
 
 ### Use locally
 
@@ -212,6 +241,10 @@ The API provides endpoints for:
 |----------|---------|-------------|
 | `CONTRACTS_DATA_DIR` | `/app/data` | Directory for storing contract JSON files |
 | `PORT` | `3001` | API server port |
+| `APP_PASSWORD` | *(unset — auth disabled)* | Shared login password. When set, enables app-level authentication |
+| `SESSION_SECRET` | *(derived from `APP_PASSWORD`)* | Secret used to sign session cookies. Use a long random value |
+| `NODE_ENV` | *(unset)* | Set to `production` (HTTPS) to add the `Secure` flag to session cookies |
+| `APP_ORIGIN` | *(unset — reflects origin)* | Comma-separated allowed browser origins for CORS with credentials |
 
 **Example custom configuration:**
 ```yaml
@@ -244,7 +277,8 @@ The frontend uses runtime configuration loaded from environment variables. Confi
 - Ensure proper permissions: `chmod 755 /data/contracts`
 
 **3. Security:**
-- Use basic authentication with nginx
+- Enable the built-in authentication by setting `APP_PASSWORD` (and a random `SESSION_SECRET`) on the API; set `NODE_ENV=production` and `APP_ORIGIN` when served over HTTPS. See [Authentication](#-authentication).
+- Alternatively (or additionally) use basic authentication with nginx
 - Enable SSL/TLS encryption
 - Consider using environment-specific `.env` files
 

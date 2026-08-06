@@ -1,5 +1,6 @@
 import { Contract, CreateContractRequest } from '../types/contract';
 import { loadConfig } from './config';
+import { notifyUnauthorized } from './authEvents';
 
 let API_BASE = 'http://localhost:3001/api'; // Default fallback
 let configLoaded = false;
@@ -26,12 +27,26 @@ const ensureConfigLoaded = async () => {
   }
 };
 
+/**
+ * Wrapper around fetch that always sends session credentials and surfaces
+ * 401 responses to the auth layer (which shows the login screen).
+ */
+const apiFetch = async (input: string, init: RequestInit = {}): Promise<Response> => {
+  const response = await fetch(input, { ...init, credentials: 'include' });
+  if (response.status === 401) {
+    notifyUnauthorized();
+    throw new Error('Authentication required');
+  }
+  return response;
+};
+
 export const api = {
   async checkApiHealth(): Promise<{ status: 'ok' | 'error'; message?: string; details?: unknown }> {
     await ensureConfigLoaded();
     try {
       const response = await fetch(`${API_BASE}/health`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -66,21 +81,21 @@ export const api = {
     if (search) params.append('search', search);
     if (status) params.append('status', status);
     
-    const response = await fetch(`${API_BASE}/contracts?${params.toString()}`);
+    const response = await apiFetch(`${API_BASE}/contracts?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to fetch contracts');
     return response.json();
   },
 
   async getContract(id: string): Promise<Contract> {
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/contracts/${id}`);
+    const response = await apiFetch(`${API_BASE}/contracts/${id}`);
     if (!response.ok) throw new Error('Failed to fetch contract');
     return response.json();
   },
 
   async createContract(data: CreateContractRequest): Promise<{ contract: Contract; created: boolean }> {
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/contracts`, {
+    const response = await apiFetch(`${API_BASE}/contracts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +109,7 @@ export const api = {
     async updateContract(id: string, data: Partial<Contract>): Promise<Contract> {
     await ensureConfigLoaded();
 
-    const response = await fetch(`${API_BASE}/contracts/${id}`, {
+    const response = await apiFetch(`${API_BASE}/contracts/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -114,7 +129,7 @@ export const api = {
 
   async deleteContract(id: string): Promise<void> {
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/contracts/${id}`, {
+    const response = await apiFetch(`${API_BASE}/contracts/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error('Failed to delete contract');
@@ -122,14 +137,14 @@ export const api = {
 
   async getDataInfo(): Promise<{ dataDir: string; contractsDir: string; contractCount: number; fileStructure: string }> {
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/contracts/info/data`);
+    const response = await apiFetch(`${API_BASE}/contracts/info/data`);
     if (!response.ok) throw new Error('Failed to get data info');
     return response.json();
   },
 
   async getFileStats(): Promise<{ totalFiles: number; totalSize: number; averageSize: number }> {
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/contracts/info/stats`);
+    const response = await apiFetch(`${API_BASE}/contracts/info/stats`);
     if (!response.ok) throw new Error('Failed to get file stats');
     return response.json();
   },
@@ -140,7 +155,7 @@ export const api = {
 
   async exportContractToMarkdown(id: string): Promise<void> {
     await ensureConfigLoaded();
-    const response = await fetch(`${API_BASE}/contracts/${id}/export/markdown`);
+    const response = await apiFetch(`${API_BASE}/contracts/${id}/export/markdown`);
     if (!response.ok) throw new Error('Failed to export contract to markdown');
     
     // Create a blob and download it
@@ -164,4 +179,4 @@ export const api = {
       await this.createContract(contractData);
     }
   },
-}; 
+};

@@ -11,6 +11,18 @@ services:
       - CONTRACTS_DATA_DIR=/app/data
       - PAPERLESS_URL=${PAPERLESS_URL:-}
       - PAPERLESS_API_TOKEN=${PAPERLESS_API_TOKEN:-}
+      # Authentication (single shared password). Leave APP_PASSWORD empty to
+      # disable app-level auth (e.g. when using reverse-proxy basic-auth).
+      - APP_PASSWORD=${APP_PASSWORD:-}
+      # Secret used to sign session cookies. Set to a long random string.
+      # If unset, it is derived from APP_PASSWORD.
+      - SESSION_SECRET=${SESSION_SECRET:-}
+      # Comma-separated list of allowed browser origins for CORS with
+      # credentials (e.g. https://contracts.example.com). Empty = reflect origin.
+      - APP_ORIGIN=${APP_ORIGIN:-}
+      # Enables the Secure flag on session cookies (set to "production" when
+      # served over HTTPS).
+      - NODE_ENV=${NODE_ENV:-}
     volumes:
       - ./data:/app/data
     container_name: contracts-api

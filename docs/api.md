@@ -4,6 +4,13 @@ The contracts application provides a comprehensive REST API for managing contrac
 
 ## 📡 API Endpoints
 
+### Authentication
+- `GET /api/auth/status` - Report whether auth is enabled and if the caller is authenticated (public)
+- `POST /api/auth/login` - Exchange the shared password (`{ "password": "..." }`) for a session cookie (public)
+- `POST /api/auth/logout` - Clear the session cookie (public)
+
+When `APP_PASSWORD` is set on the API, all endpoints below (except `/api/health` and `/api/auth/*`) require a valid session cookie and return `401 Unauthorized` otherwise. When `APP_PASSWORD` is unset, authentication is disabled and all endpoints are open. See the [Security](#-security) section for details.
+
 ### Core Contract Operations
 - `GET /api/contracts` - Get all contracts
 - `GET /api/contracts/:id` - Get contract by ID
@@ -316,11 +323,36 @@ No rate limiting is currently implemented. Consider implementing rate limiting f
 ## 🔐 Security
 
 ### **Authentication**
-The API currently doesn't implement authentication. Consider implementing:
-- API key authentication
-- JWT tokens
-- OAuth 2.0
-- Basic authentication
+The API supports optional **single shared-password** authentication, enabled by setting the `APP_PASSWORD` environment variable.
+
+- **Disabled by default** (`APP_PASSWORD` unset): all endpoints are open. Suitable for local use or when a reverse proxy (e.g. nginx basic auth) protects the app.
+- **Enabled** (`APP_PASSWORD` set): clients authenticate via `POST /api/auth/login` with `{ "password": "..." }`. On success the server sets an `HttpOnly`, `SameSite=Lax` session cookie containing an HMAC-signed, stateless token (7-day expiry, no server-side session store). All routes except `/api/health` and `/api/auth/*` then require this cookie and return `401 Unauthorized` without it.
+
+Relevant environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `APP_PASSWORD` | Shared login password. Empty disables auth. |
+| `SESSION_SECRET` | Secret used to sign session cookies (falls back to a value derived from `APP_PASSWORD`). Use a long random string. |
+| `NODE_ENV` | Set to `production` to add the `Secure` flag to cookies (use over HTTPS). |
+| `APP_ORIGIN` | Comma-separated allowed browser origins for CORS with credentials. Empty reflects the request origin. |
+
+Example:
+```bash
+# Check status
+curl -s http://localhost:3001/api/auth/status
+
+# Log in and store the session cookie
+curl -s -c cookies.txt -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"password":"your-password"}' \
+  http://localhost:3001/api/auth/login
+
+# Use the cookie on subsequent requests
+curl -s -b cookies.txt http://localhost:3001/api/contracts
+```
+
+For multi-user accounts, JWTs, or OAuth 2.0 / OIDC, consider extending this mechanism.
 
 ### **HTTPS**
 Always use HTTPS in production to encrypt data in transit.
