@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut } from 'lucide-react';
+import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, Pin, PinOff } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetPortal, SheetOverlay } from '@/components/ui/sheet';
@@ -38,10 +38,53 @@ export const SlideInMenu = ({
   onAddContract,
   contracts
 }: SlideInMenuProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('quickFilters');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { authEnabled, logout } = useAuth();
+
+  // When "kept open" (pinned), the menu will not auto-close on outside click,
+  // Escape, or focus changes. Persisted so the choice survives reloads.
+  // Defaults to pinned on non-mobile viewports when the user has no saved choice.
+  const KEEP_OPEN_STORAGE_KEY = 'contracts:menuKeepOpen';
+  const [keepOpen, setKeepOpen] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem(KEEP_OPEN_STORAGE_KEY);
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    } catch {
+      // Ignore storage access failures.
+    }
+    // No saved preference: pin by default on non-mobile viewports.
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768;
+    }
+    return false;
+  });
+
+  // When defaulting to pinned (desktop, no saved choice), also open the menu.
+  const [isOpen, setIsOpen] = useState<boolean>(() => {
+    try {
+      if (localStorage.getItem(KEEP_OPEN_STORAGE_KEY) !== null) {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+    return typeof window !== 'undefined' && window.innerWidth >= 768;
+  });
+
+  const toggleKeepOpen = () => {
+    setKeepOpen(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem(KEEP_OPEN_STORAGE_KEY, String(next));
+      } catch {
+        // Ignore storage failures (e.g. private mode).
+      }
+      return next;
+    });
+  };
 
   // Focus search input when sheet opens
   useEffect(() => {
@@ -300,7 +343,7 @@ export const SlideInMenu = ({
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen} modal={!keepOpen}>
       <SheetTrigger asChild>
         <Button 
           variant="secondary" 
@@ -312,15 +355,38 @@ export const SlideInMenu = ({
         </Button>
       </SheetTrigger>
       <SheetPortal>
-        <SheetOverlay className="bg-black/10 backdrop-blur-[1px]" />
+        <SheetOverlay
+          className={
+            keepOpen
+              ? 'bg-transparent pointer-events-none'
+              : 'bg-black/10 backdrop-blur-[1px]'
+          }
+        />
         <SheetContent 
           side="left" 
           className="w-[90vw] max-w-[400px] sm:w-[500px] overflow-y-auto"
+          onInteractOutside={(e) => {
+            if (keepOpen) e.preventDefault();
+          }}
+          onEscapeKeyDown={(e) => {
+            if (keepOpen) e.preventDefault();
+          }}
         >
           <SheetHeader className="pb-4">
             <SheetTitle className="text-left">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-2">
                 <h1 className="text-2xl font-bold">{appConfig.name}</h1>
+                <Button
+                  variant={keepOpen ? 'default' : 'ghost'}
+                  size="icon"
+                  className="h-8 w-8 mr-8 shrink-0"
+                  onClick={toggleKeepOpen}
+                  title={keepOpen ? 'Menu stays open (click to allow closing)' : 'Keep menu open'}
+                  aria-label={keepOpen ? 'Unpin menu' : 'Keep menu open'}
+                  aria-pressed={keepOpen}
+                >
+                  {keepOpen ? <Pin className="h-4 w-4" /> : <PinOff className="h-4 w-4" />}
+                </Button>
               </div>
               {/* Overview Stats */}
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
