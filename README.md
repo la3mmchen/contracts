@@ -118,10 +118,19 @@ The app has optional built-in authentication using a **single shared password**.
 
 How it works: submitting the password to `POST /api/auth/login` returns an `HttpOnly`, `SameSite=Lax` session cookie holding an HMAC-signed token (stateless, 7-day expiry — no server-side session store). The browser sends it automatically on subsequent requests; a "Log out" action is available in the app menu.
 
+**Machine clients (backup cron, CI, scripts):** set `API_TOKEN` and send it as `Authorization: Bearer <token>` (or `X-API-Key: <token>`). This is a separate credential from `APP_PASSWORD` so it can be rotated independently, and avoids the login round-trip:
+
+```bash
+curl -fsSLo backup.json \
+  -H "Authorization: Bearer ${API_TOKEN}" \
+  "https://contracts.yourdomain.com/api/contracts/export/json"
+```
+
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `APP_PASSWORD` | Shared login password. Empty disables auth. | *(unset — auth disabled)* |
 | `SESSION_SECRET` | Secret used to sign session cookies. Use a long random value. | *(derived from `APP_PASSWORD`)* |
+| `API_TOKEN` | Token for machine clients via `Authorization: Bearer` / `X-API-Key`. Only enforced when `APP_PASSWORD` is set. | *(unset)* |
 | `NODE_ENV` | Set to `production` (served over HTTPS) to add the `Secure` cookie flag. | *(unset)* |
 | `APP_ORIGIN` | Comma-separated allowed browser origins for CORS with credentials. Empty reflects the request origin. | *(unset)* |
 
@@ -243,6 +252,7 @@ The API provides endpoints for:
 | `PORT` | `3001` | API server port |
 | `APP_PASSWORD` | *(unset — auth disabled)* | Shared login password. When set, enables app-level authentication |
 | `SESSION_SECRET` | *(derived from `APP_PASSWORD`)* | Secret used to sign session cookies. Use a long random value |
+| `API_TOKEN` | *(unset)* | Token for machine clients via `Authorization: Bearer` / `X-API-Key`. Only enforced when `APP_PASSWORD` is set |
 | `NODE_ENV` | *(unset)* | Set to `production` (HTTPS) to add the `Secure` flag to session cookies |
 | `APP_ORIGIN` | *(unset — reflects origin)* | Comma-separated allowed browser origins for CORS with credentials |
 

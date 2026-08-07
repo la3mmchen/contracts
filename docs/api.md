@@ -9,7 +9,7 @@ The contracts application provides a comprehensive REST API for managing contrac
 - `POST /api/auth/login` - Exchange the shared password (`{ "password": "..." }`) for a session cookie (public)
 - `POST /api/auth/logout` - Clear the session cookie (public)
 
-When `APP_PASSWORD` is set on the API, all endpoints below (except `/api/health` and `/api/auth/*`) require a valid session cookie and return `401 Unauthorized` otherwise. When `APP_PASSWORD` is unset, authentication is disabled and all endpoints are open. See the [Security](#-security) section for details.
+When `APP_PASSWORD` is set on the API, all endpoints below (except `/api/health` and `/api/auth/*`) require authentication and return `401 Unauthorized` otherwise. Browsers use the session cookie from `/api/auth/login`; machine clients can instead send an `API_TOKEN` via `Authorization: Bearer <token>` or `X-API-Key: <token>`. When `APP_PASSWORD` is unset, authentication is disabled and all endpoints are open. See the [Security](#-security) section for details.
 
 ### Core Contract Operations
 - `GET /api/contracts` - Get all contracts
@@ -328,16 +328,19 @@ The API supports optional **single shared-password** authentication, enabled by 
 - **Disabled by default** (`APP_PASSWORD` unset): all endpoints are open. Suitable for local use or when a reverse proxy (e.g. nginx basic auth) protects the app.
 - **Enabled** (`APP_PASSWORD` set): clients authenticate via `POST /api/auth/login` with `{ "password": "..." }`. On success the server sets an `HttpOnly`, `SameSite=Lax` session cookie containing an HMAC-signed, stateless token (7-day expiry, no server-side session store). All routes except `/api/health` and `/api/auth/*` then require this cookie and return `401 Unauthorized` without it.
 
+**Machine clients** (backup cron, CI, scripts) can authenticate without the login round-trip by setting `API_TOKEN` and sending it as `Authorization: Bearer <token>` or `X-API-Key: <token>`. This is a separate credential from `APP_PASSWORD` and can be rotated independently. It is only enforced when `APP_PASSWORD` is also set.
+
 Relevant environment variables:
 
 | Variable | Description |
 |----------|-------------|
 | `APP_PASSWORD` | Shared login password. Empty disables auth. |
 | `SESSION_SECRET` | Secret used to sign session cookies (falls back to a value derived from `APP_PASSWORD`). Use a long random string. |
+| `API_TOKEN` | Token for machine clients via `Authorization: Bearer` / `X-API-Key`. Only enforced when `APP_PASSWORD` is set. |
 | `NODE_ENV` | Set to `production` to add the `Secure` flag to cookies (use over HTTPS). |
 | `APP_ORIGIN` | Comma-separated allowed browser origins for CORS with credentials. Empty reflects the request origin. |
 
-Example:
+Example (browser-style, session cookie):
 ```bash
 # Check status
 curl -s http://localhost:3001/api/auth/status
@@ -350,6 +353,14 @@ curl -s -c cookies.txt -X POST \
 
 # Use the cookie on subsequent requests
 curl -s -b cookies.txt http://localhost:3001/api/contracts
+```
+
+Example (machine client, API token):
+```bash
+# One-shot request with a bearer token (e.g. a backup cron)
+curl -fsSLo backup.json \
+  -H "Authorization: Bearer ${API_TOKEN}" \
+  https://contracts.yourdomain.com/api/contracts/export/json
 ```
 
 For multi-user accounts, JWTs, or OAuth 2.0 / OIDC, consider extending this mechanism.

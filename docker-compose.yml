@@ -17,6 +17,11 @@ services:
       # Secret used to sign session cookies. Set to a long random string.
       # If unset, it is derived from APP_PASSWORD.
       - SESSION_SECRET=${SESSION_SECRET:-}
+      # Token for machine clients (backup cron, CI, scripts). Sent as
+      # "Authorization: Bearer <token>" or "X-API-Key: <token>". Independent of
+      # APP_PASSWORD so it can be rotated separately. Only enforced when
+      # APP_PASSWORD is also set.
+      - API_TOKEN=${API_TOKEN:-}
       # Comma-separated list of allowed browser origins for CORS with
       # credentials (e.g. https://contracts.example.com). Empty = reflect origin.
       - APP_ORIGIN=${APP_ORIGIN:-}

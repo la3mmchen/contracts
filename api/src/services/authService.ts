@@ -67,6 +67,21 @@ export const verifyPassword = (candidate: string): boolean => {
   return timingSafeEqual(candidate, expected);
 };
 
+/**
+ * Verify a machine-client API token against API_TOKEN.
+ *
+ * This is a separate credential from the interactive APP_PASSWORD so that
+ * automation (backup cron, CI, scripts) can authenticate with a token that can
+ * be rotated independently of the human login password. Sent as
+ * `Authorization: Bearer <token>` or the `X-API-Key` header.
+ */
+export const verifyApiToken = (candidate: string): boolean => {
+  const expected = process.env.API_TOKEN || '';
+  if (!expected || !candidate) return false;
+  return timingSafeEqual(candidate, expected);
+};
+
+
 /** Create a signed session token valid for maxAgeSeconds. */
 export const createToken = (maxAgeSeconds: number = DEFAULT_MAX_AGE_SECONDS): string => {
   const now = Math.floor(Date.now() / 1000);

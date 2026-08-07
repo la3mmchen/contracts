@@ -25,6 +25,9 @@ services:
       # SESSION_SECRET: "a-long-random-string"
       # NODE_ENV: "production"   # served over HTTPS -> Secure cookies
       # APP_ORIGIN: "https://contracts.yourdomain.com"
+      # Token for automation (backup cron, CI); sent as
+      # "Authorization: Bearer <token>" or "X-API-Key: <token>".
+      # API_TOKEN: "another-long-random-string"
     volumes:
       - "/data/contracts:/data"
     restart: unless-stopped
