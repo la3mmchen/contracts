@@ -4,7 +4,7 @@ import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractListRow } from '@/components/ContractListRow';
-import { ViewModeToggle, type ContractLayout } from '@/components/ViewModeToggle';
+import { type ContractLayout } from '@/components/ViewModeToggle';
 import { ContractForm } from '@/components/ContractForm';
 import { SlideInMenu } from '@/components/SlideInMenu';
 
@@ -22,7 +22,7 @@ import {
   AlertTriangle,
   Info,
   X,
-  CheckCircle
+  PanelLeft
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
@@ -64,11 +64,34 @@ const Index = () => {
   const [layout, setLayout] = useState<ContractLayout>(() => {
     try {
       const stored = localStorage.getItem(LAYOUT_STORAGE_KEY);
-      return stored === 'list' ? 'list' : 'grid';
+      return stored === 'grid' ? 'grid' : 'list';
     } catch {
-      return 'grid';
+      return 'list';
     }
   });
+
+  const MENU_OPEN_STORAGE_KEY = 'contracts:menuOpen';
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem(MENU_OPEN_STORAGE_KEY);
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    } catch {
+      // Ignore storage access failures.
+    }
+    // No saved preference: open by default on non-mobile viewports.
+    return typeof window !== 'undefined' ? window.innerWidth >= 768 : true;
+  });
+
+  const handleMenuOpenChange = (next: boolean) => {
+    setIsMenuOpen(next);
+    try {
+      localStorage.setItem(MENU_OPEN_STORAGE_KEY, String(next));
+    } catch {
+      // Ignore storage failures (e.g. private mode).
+    }
+  };
 
   const handleLayoutChange = (next: ContractLayout) => {
     setLayout(next);
@@ -666,39 +689,41 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Floating Menu Button */}
-      <div className="fixed top-4 left-4 sm:top-8 sm:left-4 z-50 flex items-center gap-2">
-        <SlideInMenu
-          filters={filters}
-          onFiltersChange={setFilters}
-          availableTags={availableTags}
-          existingContracts={contracts}
-          onExport={exportContracts}
-          onImport={() => document.getElementById('file-upload')?.click()}
-          onAddContract={openAddForm}
-          contracts={contracts}
-        />
-        <Button
-          variant={filters.status === 'active' ? 'default' : 'secondary'}
-          size="sm"
-          onClick={() => {
-            if (filters.status === 'active') {
-              setFilters(prev => ({ ...prev, status: undefined }));
-            } else {
-              setFilters(prev => ({ ...prev, status: 'active' }));
-            }
-          }}
-          className={`h-10 sm:h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border hover:scale-105 px-4 ${
-            filters.status === 'active' 
-              ? 'bg-primary text-primary-foreground border-primary' 
-              : 'bg-background/80 backdrop-blur-sm border-border hover:bg-background/90'
-          }`}
-        >
-          <CheckCircle className="h-4 w-4 mr-2" />
-          <span className="text-xs sm:text-sm">Active Only</span>
-        </Button>
-        <ViewModeToggle layout={layout} onLayoutChange={handleLayoutChange} />
-      </div>
+      <SlideInMenu
+        filters={filters}
+        onFiltersChange={setFilters}
+        availableTags={availableTags}
+        existingContracts={contracts}
+        onExport={exportContracts}
+        onImport={() => document.getElementById('file-upload')?.click()}
+        onAddContract={openAddForm}
+        contracts={contracts}
+        isOpen={isMenuOpen}
+        onOpenChange={handleMenuOpenChange}
+        layout={layout}
+        onLayoutChange={handleLayoutChange}
+      />
+
+      <div
+        className={`transition-[padding] duration-300 ease-in-out ${
+          isMenuOpen ? 'sm:pl-[420px]' : 'sm:pl-0'
+        }`}
+      >
+      {/* Floating Menu Button (shown when the side menu is collapsed) */}
+      {!isMenuOpen && (
+        <div className="fixed top-4 left-4 sm:top-8 z-50 flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => handleMenuOpenChange(true)}
+            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-background/80 backdrop-blur-sm border border-border hover:bg-background/90 hover:scale-105"
+            title="Open menu"
+            aria-label="Open menu"
+          >
+            <PanelLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
 
       {/* Hidden file input for import */}
       <input
@@ -1074,6 +1099,7 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
     </div>
   );
 };

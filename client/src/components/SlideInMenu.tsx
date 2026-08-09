@@ -7,15 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Menu, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, Pin, PinOff } from 'lucide-react';
+import { X, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, PanelLeftClose, CheckCircle, LayoutGrid, List } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetPortal, SheetOverlay } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import type { ContractLayout } from '@/components/ViewModeToggle';
 
 interface SlideInMenuProps {
   filters: FilterType;
@@ -26,6 +26,10 @@ interface SlideInMenuProps {
   onImport: () => void;
   onAddContract: () => void;
   contracts: Contract[];
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  layout: ContractLayout;
+  onLayoutChange: (layout: ContractLayout) => void;
 }
 
 export const SlideInMenu = ({ 
@@ -36,55 +40,17 @@ export const SlideInMenu = ({
   onExport,
   onImport,
   onAddContract,
-  contracts
+  contracts,
+  isOpen,
+  onOpenChange,
+  layout,
+  onLayoutChange
 }: SlideInMenuProps) => {
   const [activeTab, setActiveTab] = useState('quickFilters');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { authEnabled, logout } = useAuth();
 
-  // When "kept open" (pinned), the menu will not auto-close on outside click,
-  // Escape, or focus changes. Persisted so the choice survives reloads.
-  // Defaults to pinned on non-mobile viewports when the user has no saved choice.
-  const KEEP_OPEN_STORAGE_KEY = 'contracts:menuKeepOpen';
-  const [keepOpen, setKeepOpen] = useState<boolean>(() => {
-    try {
-      const stored = localStorage.getItem(KEEP_OPEN_STORAGE_KEY);
-      if (stored !== null) {
-        return stored === 'true';
-      }
-    } catch {
-      // Ignore storage access failures.
-    }
-    // No saved preference: pin by default on non-mobile viewports.
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 768;
-    }
-    return false;
-  });
-
-  // When defaulting to pinned (desktop, no saved choice), also open the menu.
-  const [isOpen, setIsOpen] = useState<boolean>(() => {
-    try {
-      if (localStorage.getItem(KEEP_OPEN_STORAGE_KEY) !== null) {
-        return false;
-      }
-    } catch {
-      return false;
-    }
-    return typeof window !== 'undefined' && window.innerWidth >= 768;
-  });
-
-  const toggleKeepOpen = () => {
-    setKeepOpen(prev => {
-      const next = !prev;
-      try {
-        localStorage.setItem(KEEP_OPEN_STORAGE_KEY, String(next));
-      } catch {
-        // Ignore storage failures (e.g. private mode).
-      }
-      return next;
-    });
-  };
+  const setIsOpen = onOpenChange;
 
   // Focus search input when sheet opens
   useEffect(() => {
@@ -343,49 +309,34 @@ export const SlideInMenu = ({
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen} modal={!keepOpen}>
-      <SheetTrigger asChild>
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          className="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-background/80 backdrop-blur-sm border border-border hover:bg-background/90 hover:scale-105"
-        >
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetPortal>
-        <SheetOverlay
-          className={
-            keepOpen
-              ? 'bg-transparent pointer-events-none'
-              : 'bg-black/10 backdrop-blur-[1px]'
-          }
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/30 sm:hidden"
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
         />
-        <SheetContent 
-          side="left" 
-          className="w-[90vw] max-w-[400px] sm:w-[500px] overflow-y-auto"
-          onInteractOutside={(e) => {
-            if (keepOpen) e.preventDefault();
-          }}
-          onEscapeKeyDown={(e) => {
-            if (keepOpen) e.preventDefault();
-          }}
-        >
-          <SheetHeader className="pb-4">
-            <SheetTitle className="text-left">
+      )}
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 w-[85vw] max-w-[400px] sm:w-[420px] border-r border-border bg-background overflow-y-auto transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
+      aria-hidden={!isOpen}
+    >
+      <div className="p-6">
+          <div className="pb-4">
+            <div className="text-left">
               <div className="flex items-center justify-between gap-2">
                 <h1 className="text-2xl font-bold">{appConfig.name}</h1>
                 <Button
-                  variant={keepOpen ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="icon"
-                  className="h-8 w-8 mr-8 shrink-0"
-                  onClick={toggleKeepOpen}
-                  title={keepOpen ? 'Menu stays open (click to allow closing)' : 'Keep menu open'}
-                  aria-label={keepOpen ? 'Unpin menu' : 'Keep menu open'}
-                  aria-pressed={keepOpen}
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => setIsOpen(false)}
+                  title="Collapse menu"
+                  aria-label="Collapse menu"
                 >
-                  {keepOpen ? <Pin className="h-4 w-4" /> : <PinOff className="h-4 w-4" />}
+                  <PanelLeftClose className="h-4 w-4" />
                 </Button>
               </div>
               {/* Overview Stats */}
@@ -403,8 +354,8 @@ export const SlideInMenu = ({
                   <span>Monthly: ${monthlySpend.toFixed(0)}</span>
                 </div>
               </div>
-            </SheetTitle>
-          </SheetHeader>
+            </div>
+          </div>
 
         <div className="space-y-6">
           {/* Add Contract Button */}
@@ -413,6 +364,45 @@ export const SlideInMenu = ({
               <Plus className="h-5 w-5 mr-2" />
               Add Contract
             </Button>
+          </div>
+
+          <Separator />
+
+          {/* View Section */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold">View</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant={filters.status === 'active' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() =>
+                  updateFilter('status', filters.status === 'active' ? undefined : 'active')
+                }
+                aria-pressed={filters.status === 'active'}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Active Only
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onLayoutChange(layout === 'list' ? 'grid' : 'list')}
+                title={layout === 'list' ? 'Switch to grid view' : 'Switch to list view'}
+                aria-label={layout === 'list' ? 'Switch to grid view' : 'Switch to list view'}
+              >
+                {layout === 'list' ? (
+                  <>
+                    <LayoutGrid className="h-4 w-4 mr-2" />
+                    Grid
+                  </>
+                ) : (
+                  <>
+                    <List className="h-4 w-4 mr-2" />
+                    List
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           <Separator />
@@ -922,8 +912,8 @@ export const SlideInMenu = ({
             </>
           )}
         </div>
-      </SheetContent>
-      </SheetPortal>
-    </Sheet>
+      </div>
+    </aside>
+    </>
   );
 };
