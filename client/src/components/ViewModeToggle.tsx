@@ -2,6 +2,7 @@ import { LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export type ContractLayout = 'grid' | 'list';
+export type ContractGroupBy = 'category' | 'person';
 
 interface ViewModeToggleProps {
   layout: ContractLayout;

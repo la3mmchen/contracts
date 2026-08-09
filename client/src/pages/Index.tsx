@@ -4,7 +4,7 @@ import { Contract, ContractFilters as FilterType } from '@/types/contract';
 import { useContractStorage } from '@/hooks/useContractStorage';
 import { ContractCard } from '@/components/ContractCard';
 import { ContractListRow } from '@/components/ContractListRow';
-import { type ContractLayout } from '@/components/ViewModeToggle';
+import { type ContractLayout, type ContractGroupBy } from '@/components/ViewModeToggle';
 import { ContractForm } from '@/components/ContractForm';
 import { SlideInMenu } from '@/components/SlideInMenu';
 
@@ -71,6 +71,25 @@ const Index = () => {
       return 'list';
     }
   });
+
+  const GROUP_BY_STORAGE_KEY = 'contracts:groupBy';
+  const [groupBy, setGroupBy] = useState<ContractGroupBy>(() => {
+    try {
+      const stored = localStorage.getItem(GROUP_BY_STORAGE_KEY);
+      return stored === 'person' ? 'person' : 'category';
+    } catch {
+      return 'category';
+    }
+  });
+
+  const handleGroupByChange = (next: ContractGroupBy) => {
+    setGroupBy(next);
+    try {
+      localStorage.setItem(GROUP_BY_STORAGE_KEY, next);
+    } catch {
+      // Ignore storage failures (e.g. private mode).
+    }
+  };
 
   const MENU_OPEN_STORAGE_KEY = 'contracts:menuOpen';
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(() => {
@@ -379,14 +398,24 @@ const Index = () => {
     return filtered;
   }, [contracts, filters]);
 
-  // Group the (already filtered + sorted) contracts by category for the list view.
-  // Groups follow the configured category order; unknown/invalid categories are
-  // collected into a trailing "Uncategorized" group.
+  // Group the (already filtered + sorted) contracts for the list view. Grouping
+  // is by category (config order, invalid -> "Uncategorized") or by person /
+  // familyMember (alphabetical, unassigned -> trailing "Unassigned" group).
   const UNCATEGORIZED_KEY = '__uncategorized__';
+  const UNASSIGNED_KEY = '__unassigned__';
   const groupedContracts = useMemo(() => {
     const groups = new Map<string, Contract[]>();
+
+    const keyFor = (contract: Contract): string => {
+      if (groupBy === 'person') {
+        const person = contract.familyMember?.trim();
+        return person ? person : UNASSIGNED_KEY;
+      }
+      return isValidCategory(contract.category) ? contract.category : UNCATEGORIZED_KEY;
+    };
+
     for (const contract of filteredContracts) {
-      const key = isValidCategory(contract.category) ? contract.category : UNCATEGORIZED_KEY;
+      const key = keyFor(contract);
       const existing = groups.get(key);
       if (existing) {
         existing.push(contract);
@@ -396,20 +425,35 @@ const Index = () => {
     }
 
     const categoryOrder = getCategories();
-    const orderIndex = (key: string) => {
-      if (key === UNCATEGORIZED_KEY) return Number.MAX_SAFE_INTEGER;
-      const idx = categoryOrder.indexOf(key);
-      return idx === -1 ? Number.MAX_SAFE_INTEGER - 1 : idx;
+    const compare = (a: string, b: string): number => {
+      if (groupBy === 'person') {
+        // Unassigned always last; otherwise alphabetical.
+        if (a === UNASSIGNED_KEY) return 1;
+        if (b === UNASSIGNED_KEY) return -1;
+        return a.localeCompare(b);
+      }
+      const orderIndex = (key: string) => {
+        if (key === UNCATEGORIZED_KEY) return Number.MAX_SAFE_INTEGER;
+        const idx = categoryOrder.indexOf(key);
+        return idx === -1 ? Number.MAX_SAFE_INTEGER - 1 : idx;
+      };
+      return orderIndex(a) - orderIndex(b);
+    };
+
+    const labelFor = (key: string): string => {
+      if (key === UNASSIGNED_KEY) return 'Unassigned';
+      if (key === UNCATEGORIZED_KEY) return 'Uncategorized';
+      return groupBy === 'person' ? key : getCategoryDisplayName(key);
     };
 
     return Array.from(groups.entries())
-      .sort(([a], [b]) => orderIndex(a) - orderIndex(b))
+      .sort(([a], [b]) => compare(a, b))
       .map(([key, items]) => ({
         key,
-        label: key === UNCATEGORIZED_KEY ? 'Uncategorized' : getCategoryDisplayName(key),
+        label: labelFor(key),
         contracts: items,
       }));
-  }, [filteredContracts]);
+  }, [filteredContracts, groupBy]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -767,6 +811,8 @@ const Index = () => {
         onOpenChange={handleMenuOpenChange}
         layout={layout}
         onLayoutChange={handleLayoutChange}
+        groupBy={groupBy}
+        onGroupByChange={handleGroupByChange}
       />
 
       <div

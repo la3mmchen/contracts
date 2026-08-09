@@ -15,7 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { isValidCategory, getCategoryStatsColor } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ContractLayout } from '@/components/ViewModeToggle';
+import type { ContractLayout, ContractGroupBy } from '@/components/ViewModeToggle';
 
 interface SlideInMenuProps {
   filters: FilterType;
@@ -30,6 +30,8 @@ interface SlideInMenuProps {
   onOpenChange: (open: boolean) => void;
   layout: ContractLayout;
   onLayoutChange: (layout: ContractLayout) => void;
+  groupBy: ContractGroupBy;
+  onGroupByChange: (groupBy: ContractGroupBy) => void;
 }
 
 export const SlideInMenu = ({ 
@@ -44,7 +46,9 @@ export const SlideInMenu = ({
   isOpen,
   onOpenChange,
   layout,
-  onLayoutChange
+  onLayoutChange,
+  groupBy,
+  onGroupByChange
 }: SlideInMenuProps) => {
   const [activeTab, setActiveTab] = useState('quickFilters');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -403,6 +407,32 @@ export const SlideInMenu = ({
                 )}
               </Button>
             </div>
+
+            {layout === 'list' && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Group by</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant={groupBy === 'category' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onGroupByChange('category')}
+                    aria-pressed={groupBy === 'category'}
+                  >
+                    <Tag className="h-4 w-4 mr-2" />
+                    Category
+                  </Button>
+                  <Button
+                    variant={groupBy === 'person' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onGroupByChange('person')}
+                    aria-pressed={groupBy === 'person'}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Person
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />
