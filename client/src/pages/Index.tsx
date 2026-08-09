@@ -22,11 +22,13 @@ import {
   AlertTriangle,
   Info,
   X,
-  PanelLeft
+  PanelLeft,
+  ChevronDown
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { isValidCategory } from '@/lib/utils';
+import { getCategories, getCategoryDisplayName } from '@/config/categories';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { smartApi } from '@/services/smartApi';
@@ -91,6 +93,37 @@ const Index = () => {
     } catch {
       // Ignore storage failures (e.g. private mode).
     }
+  };
+
+  // Collapsed category groups in the list view. Persisted so the choice survives reloads.
+  const COLLAPSED_CATEGORIES_STORAGE_KEY = 'contracts:collapsedCategories';
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem(COLLAPSED_CATEGORIES_STORAGE_KEY);
+      if (stored) {
+        return new Set(JSON.parse(stored) as string[]);
+      }
+    } catch {
+      // Ignore storage/parse failures.
+    }
+    return new Set();
+  });
+
+  const toggleCategoryCollapsed = (key: string) => {
+    setCollapsedCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      try {
+        localStorage.setItem(COLLAPSED_CATEGORIES_STORAGE_KEY, JSON.stringify([...next]));
+      } catch {
+        // Ignore storage failures (e.g. private mode).
+      }
+      return next;
+    });
   };
 
   const handleLayoutChange = (next: ContractLayout) => {
@@ -345,6 +378,38 @@ const Index = () => {
 
     return filtered;
   }, [contracts, filters]);
+
+  // Group the (already filtered + sorted) contracts by category for the list view.
+  // Groups follow the configured category order; unknown/invalid categories are
+  // collected into a trailing "Uncategorized" group.
+  const UNCATEGORIZED_KEY = '__uncategorized__';
+  const groupedContracts = useMemo(() => {
+    const groups = new Map<string, Contract[]>();
+    for (const contract of filteredContracts) {
+      const key = isValidCategory(contract.category) ? contract.category : UNCATEGORIZED_KEY;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.push(contract);
+      } else {
+        groups.set(key, [contract]);
+      }
+    }
+
+    const categoryOrder = getCategories();
+    const orderIndex = (key: string) => {
+      if (key === UNCATEGORIZED_KEY) return Number.MAX_SAFE_INTEGER;
+      const idx = categoryOrder.indexOf(key);
+      return idx === -1 ? Number.MAX_SAFE_INTEGER - 1 : idx;
+    };
+
+    return Array.from(groups.entries())
+      .sort(([a], [b]) => orderIndex(a) - orderIndex(b))
+      .map(([key, items]) => ({
+        key,
+        label: key === UNCATEGORIZED_KEY ? 'Uncategorized' : getCategoryDisplayName(key),
+        contracts: items,
+      }));
+  }, [filteredContracts]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -1047,18 +1112,44 @@ const Index = () => {
               </div>
 
               {layout === 'list' ? (
-                <div className="flex flex-col gap-2">
-                  {filteredContracts.map((contract) => (
-                    <ContractListRow
-                      key={contract.id}
-                      contract={contract}
-                      onEdit={openEditForm}
-                      onDelete={(id) => setDeleteConfirmId(id)}
-                      onCopy={handleCopyContract}
-                      onFilter={handleContractFilter}
-                      currentSearchParams={searchParams.toString()}
-                    />
-                  ))}
+                <div className="flex flex-col gap-6">
+                  {groupedContracts.map((group) => {
+                    const isCollapsed = collapsedCategories.has(group.key);
+                    return (
+                    <div key={group.key} className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleCategoryCollapsed(group.key)}
+                        className="flex items-center gap-3 px-1 py-1 w-full text-left group/category hover:opacity-80 transition-opacity"
+                        aria-expanded={!isCollapsed}
+                      >
+                        <ChevronDown
+                          className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${
+                            isCollapsed ? '-rotate-90' : ''
+                          }`}
+                        />
+                        <h2 className="text-sm font-semibold text-foreground">
+                          {group.label}
+                        </h2>
+                        <span className="text-xs text-muted-foreground">
+                          {group.contracts.length}
+                        </span>
+                        <div className="flex-1 h-px bg-border" />
+                      </button>
+                      {!isCollapsed && group.contracts.map((contract) => (
+                        <ContractListRow
+                          key={contract.id}
+                          contract={contract}
+                          onEdit={openEditForm}
+                          onDelete={(id) => setDeleteConfirmId(id)}
+                          onCopy={handleCopyContract}
+                          onFilter={handleContractFilter}
+                          currentSearchParams={searchParams.toString()}
+                        />
+                      ))}
+                    </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
