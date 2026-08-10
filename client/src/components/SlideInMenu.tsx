@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, PanelLeftClose, CheckCircle, LayoutGrid, List } from 'lucide-react';
+import { X, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, PanelLeftClose, CheckCircle, LayoutGrid, List, Clock } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Separator } from '@/components/ui/separator';
@@ -411,24 +411,36 @@ export const SlideInMenu = ({
             {layout === 'list' && (
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">Group by</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={groupBy === 'category' ? 'default' : 'outline'}
                     size="sm"
+                    className="flex-col h-auto py-2 gap-1"
                     onClick={() => onGroupByChange('category')}
                     aria-pressed={groupBy === 'category'}
                   >
-                    <Tag className="h-4 w-4 mr-2" />
-                    Category
+                    <Tag className="h-4 w-4" />
+                    <span className="text-xs">Category</span>
                   </Button>
                   <Button
                     variant={groupBy === 'person' ? 'default' : 'outline'}
                     size="sm"
+                    className="flex-col h-auto py-2 gap-1"
                     onClick={() => onGroupByChange('person')}
                     aria-pressed={groupBy === 'person'}
                   >
-                    <User className="h-4 w-4 mr-2" />
-                    Person
+                    <User className="h-4 w-4" />
+                    <span className="text-xs">Person</span>
+                  </Button>
+                  <Button
+                    variant={groupBy === 'updated' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-col h-auto py-2 gap-1"
+                    onClick={() => onGroupByChange('updated')}
+                    aria-pressed={groupBy === 'updated'}
+                  >
+                    <Clock className="h-4 w-4" />
+                    <span className="text-xs">Updated</span>
                   </Button>
                 </div>
               </div>

@@ -76,7 +76,8 @@ const Index = () => {
   const [groupBy, setGroupBy] = useState<ContractGroupBy>(() => {
     try {
       const stored = localStorage.getItem(GROUP_BY_STORAGE_KEY);
-      return stored === 'person' ? 'person' : 'category';
+      if (stored === 'person' || stored === 'updated') return stored;
+      return 'category';
     } catch {
       return 'category';
     }
@@ -399,10 +400,34 @@ const Index = () => {
   }, [contracts, filters]);
 
   // Group the (already filtered + sorted) contracts for the list view. Grouping
-  // is by category (config order, invalid -> "Uncategorized") or by person /
-  // familyMember (alphabetical, unassigned -> trailing "Unassigned" group).
+  // is by category (config order, invalid -> "Uncategorized"), person /
+  // familyMember (alphabetical, unassigned -> trailing "Unassigned" group), or
+  // last-updated time (newest bucket first, unknown -> trailing "Unknown").
   const UNCATEGORIZED_KEY = '__uncategorized__';
   const UNASSIGNED_KEY = '__unassigned__';
+
+  // Ordered (newest -> oldest) last-updated time buckets. `maxMonths` is the
+  // exclusive upper bound in whole months since the update; the final bucket
+  // uses Infinity, and a trailing "unknown" bucket catches unparseable dates.
+  const UPDATED_BUCKETS: { key: string; label: string; maxMonths: number }[] = [
+    { key: 'updated:this-month', label: 'Updated this month', maxMonths: 1 },
+    { key: 'updated:last-month', label: 'Updated last month', maxMonths: 2 },
+    { key: 'updated:2-3-months', label: '2-3 months ago', maxMonths: 4 },
+    { key: 'updated:4-6-months', label: '4-6 months ago', maxMonths: 7 },
+    { key: 'updated:6-12-months', label: '6-12 months ago', maxMonths: 13 },
+    { key: 'updated:over-a-year', label: 'Over a year ago', maxMonths: Infinity },
+  ];
+  const UPDATED_UNKNOWN_KEY = 'updated:unknown';
+
+  const updatedBucketKey = (updatedAt?: string): string => {
+    if (!updatedAt) return UPDATED_UNKNOWN_KEY;
+    const updated = new Date(updatedAt).getTime();
+    if (Number.isNaN(updated)) return UPDATED_UNKNOWN_KEY;
+    const monthsAgo = (Date.now() - updated) / (1000 * 60 * 60 * 24 * 30.44);
+    const bucket = UPDATED_BUCKETS.find(b => monthsAgo < b.maxMonths);
+    return (bucket ?? UPDATED_BUCKETS[UPDATED_BUCKETS.length - 1]).key;
+  };
+
   const groupedContracts = useMemo(() => {
     const groups = new Map<string, Contract[]>();
 
@@ -410,6 +435,9 @@ const Index = () => {
       if (groupBy === 'person') {
         const person = contract.familyMember?.trim();
         return person ? person : UNASSIGNED_KEY;
+      }
+      if (groupBy === 'updated') {
+        return updatedBucketKey(contract.updatedAt);
       }
       return isValidCategory(contract.category) ? contract.category : UNCATEGORIZED_KEY;
     };
@@ -425,12 +453,16 @@ const Index = () => {
     }
 
     const categoryOrder = getCategories();
+    const updatedOrder = [...UPDATED_BUCKETS.map(b => b.key), UPDATED_UNKNOWN_KEY];
     const compare = (a: string, b: string): number => {
       if (groupBy === 'person') {
         // Unassigned always last; otherwise alphabetical.
         if (a === UNASSIGNED_KEY) return 1;
         if (b === UNASSIGNED_KEY) return -1;
         return a.localeCompare(b);
+      }
+      if (groupBy === 'updated') {
+        return updatedOrder.indexOf(a) - updatedOrder.indexOf(b);
       }
       const orderIndex = (key: string) => {
         if (key === UNCATEGORIZED_KEY) return Number.MAX_SAFE_INTEGER;
@@ -443,6 +475,9 @@ const Index = () => {
     const labelFor = (key: string): string => {
       if (key === UNASSIGNED_KEY) return 'Unassigned';
       if (key === UNCATEGORIZED_KEY) return 'Uncategorized';
+      if (key === UPDATED_UNKNOWN_KEY) return 'Unknown';
+      const updatedBucket = UPDATED_BUCKETS.find(b => b.key === key);
+      if (updatedBucket) return updatedBucket.label;
       return groupBy === 'person' ? key : getCategoryDisplayName(key);
     };
 
