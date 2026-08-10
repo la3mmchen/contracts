@@ -32,7 +32,8 @@ import {
   Copy,
   Star,
   X,
-  TrendingUp
+  TrendingUp,
+  CheckCircle2
 } from 'lucide-react';
 import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
@@ -599,6 +600,26 @@ const ContractDetail = () => {
                 >
                   <Copy className="h-4 w-4 mr-2" />
                   Copy Contract
+                </Button>
+
+                {/* Mark as Checked Button - refreshes the last-updated time without changing data */}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  size="sm"
+                  onClick={() => {
+                    if (contract) {
+                      updateContract(contract.id, {});
+                      toast({
+                        title: "Marked as Checked!",
+                        description: "Nothing to do — last-updated time refreshed.",
+                        variant: "default",
+                      });
+                    }
+                  }}
+                >
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Checked, Nothing To Do
                 </Button>
 
                 {/* Pin/Unpin Contract Button */}
