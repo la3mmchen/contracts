@@ -107,7 +107,6 @@ curl -s "http://localhost:3001/api/contracts/export/markdown/individual" | jq .
       "frequency": "monthly",
       "startDate": "2024-01-01",
       "endDate": null,
-      "payDate": "2024-01-15",
       "description": "Premium streaming subscription",
       "notes": "Family plan with 4 accounts",
       "tags": ["streaming", "entertainment", "family"],

@@ -16,14 +16,6 @@
     "website": "https://comcast.com",
     "address": "1701 John F Kennedy Boulevard, Philadelphia, PA 19103"
   },
-  "paymentInfo": {
-    "nextPaymentDate": "2024-09-15",
-    "lastPaymentDate": "2024-08-15",
-    "paymentMethod": "Auto Pay",
-    "accountNumber": "987654321",
-    "autoRenew": true,
-    "lateFees": 10.00
-  },
   "notes": "Includes unlimited data. Router included. Installation fee waived.",
   "tags": ["internet", "utilities", "technology"],
   "connections": ["RENT-2024-007"],

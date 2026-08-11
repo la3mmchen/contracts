@@ -1,5 +1,4 @@
 import { Contract } from '@/types/contract';
-import { calculateNextPaymentDate } from './paymentCalculator';
 
 // Legacy contract interface for backward compatibility
 interface LegacyContract {
@@ -15,21 +14,12 @@ interface LegacyContract {
   frequency: 'monthly' | 'quarterly' | 'yearly' | 'one-time' | 'weekly' | 'bi-weekly';
   status: 'active' | 'expired' | 'cancelled' | 'terminated' | 'closed' | 'pending' | 'draft';
   category: string;
-  payDate?: string;
   contactInfo?: {
     email?: string;
     phone?: string;
     address?: string;
     website?: string;
     contactPerson?: string;
-  };
-  paymentInfo?: {
-    nextPaymentDate?: string | null;
-    lastPaymentDate?: string;
-    paymentMethod?: string;
-    accountNumber?: string;
-    autoRenew?: boolean;
-    lateFees?: number;
   };
   notes?: string;
   tags?: string[];
@@ -66,7 +56,6 @@ export const migrateContract = (legacyContract: LegacyContract): MigrationResult
     frequency: legacyContract.frequency,
     status: migrateStatus(legacyContract.status, migrationNotes),
     category: migrateCategory(legacyContract.category),
-    payDate: legacyContract.payDate,
     contactInfo: migrateContactInfo(legacyContract, migrationNotes),
     notes: legacyContract.notes,
     tags: legacyContract.tags || [],
@@ -75,24 +64,6 @@ export const migrateContract = (legacyContract: LegacyContract): MigrationResult
     createdAt: legacyContract.createdAt || new Date().toISOString(),
     updatedAt: legacyContract.updatedAt || new Date().toISOString(),
   };
-
-  // Handle payment info migration
-  if (legacyContract.paymentInfo) {
-    wasMigrated = true;
-    migrationNotes.push('Migrated from paymentInfo object to calculated payDate');
-    
-    // If we have a nextPaymentDate, use it as payDate
-    if (legacyContract.paymentInfo.nextPaymentDate) {
-      migratedContract.payDate = legacyContract.paymentInfo.nextPaymentDate;
-    } else {
-      // Calculate the next payment date
-      migratedContract.payDate = calculateNextPaymentDate(
-        legacyContract.startDate,
-        legacyContract.frequency,
-        legacyContract.paymentInfo.lastPaymentDate
-      );
-    }
-  }
 
   // Handle missing contactInfo
   if (legacyContract.contactInfo === undefined) {

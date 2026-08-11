@@ -19,7 +19,6 @@ export interface Contract {
   frequency: 'monthly' | 'quarterly' | 'yearly' | 'one-time' | 'weekly' | 'bi-weekly';
   status: 'active' | 'expired' | 'cancelled' | 'terminated' | 'closed';
   category: Category;
-  payDate?: string; // Calculated payment date
   contactInfo: {
     email?: string;
     phone?: string;
@@ -69,7 +68,7 @@ export interface ContractFilters {
   optimizable?: boolean; // Filter contracts that could be optimized
   hasAdditionalFields?: boolean; // Filter contracts that have custom fields
   dataQualityGrade?: 'A' | 'B' | 'C' | 'D' | 'F'; // Filter by data quality grade
-  sortBy?: 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference';
+  sortBy?: 'name' | 'amount' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference';
   sortOrder?: 'asc' | 'desc';
   amountRange?: {
     min?: number;
@@ -89,7 +88,6 @@ export interface ContractStats {
   activeContracts: number;
   totalValue: number;
   monthlyExpenses: number;
-  upcomingPayments: number;
   expiredContracts: number;
   categoryBreakdown: Record<string, number>;
   statusBreakdown: Record<string, number>;
@@ -108,7 +106,6 @@ export interface CreateContractRequest {
   frequency?: Contract['frequency']; // Made optional for draft contracts
   status?: Contract['status']; // Made optional for draft contracts
   category?: Contract['category']; // Made optional for draft contracts
-  payDate?: string;
   contactInfo?: Contract['contactInfo']; // Made optional for draft contracts
   notes?: string;
   tags?: string[];

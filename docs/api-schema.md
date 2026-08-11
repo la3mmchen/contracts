@@ -26,7 +26,6 @@ interface Contract {
   frequency: ContractFrequency;  // Payment frequency
   status: ContractStatus;        // Current contract status
   category: ContractCategory;    // Contract category
-  payDate?: string;              // Calculated next payment date
   contactInfo: ContactInfo;      // Contact information
   notes?: string;                // Optional notes
   tags?: string[];               // Optional tags for categorization
@@ -117,7 +116,6 @@ interface CreateContractRequest {
   frequency: ContractFrequency;
   status: ContractStatus;
   category: ContractCategory;
-  payDate?: string;      // Calculated payment date
   contactInfo: ContactInfo;
   notes?: string;        // Optional notes
   tags?: string[];       // Optional tags

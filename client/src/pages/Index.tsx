@@ -26,7 +26,6 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
-import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { isValidCategory } from '@/lib/utils';
 import { getCategories, getCategoryDisplayName } from '@/config/categories';
 
@@ -205,7 +204,7 @@ const Index = () => {
         ...(draftParam !== null && { draft: draftParam === 'true' }),
         ...(hasAdditionalFieldsParam && { hasAdditionalFields: hasAdditionalFieldsParam === 'true' }),
         ...(searchParam && { searchTerm: searchParam }),
-        ...(sortByParam && { sortBy: sortByParam as 'name' | 'amount' | 'nextPaymentDate' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference' }),
+        ...(sortByParam && { sortBy: sortByParam as 'name' | 'amount' | 'createdAt' | 'updatedAt' | 'company' | 'endDate' | 'reference' }),
         ...(sortOrderParam && { sortOrder: sortOrderParam as 'asc' | 'desc' }),
         ...(hasConnectionsParam !== null && { hasConnections: hasConnectionsParam === 'true' ? true : hasConnectionsParam === 'false' ? false : undefined }),
         ...(connectedToParam && { connectedTo: connectedToParam })
@@ -374,13 +373,6 @@ const Index = () => {
           return direction * a.name.localeCompare(b.name);
         case 'amount':
           return direction * (a.amount - b.amount);
-        case 'nextPaymentDate': {
-          const aPayments = calculateNextThreePayments(a);
-          const bPayments = calculateNextThreePayments(b);
-          const aDate = aPayments[0] ? new Date(aPayments[0].date).getTime() : 0;
-          const bDate = bPayments[0] ? new Date(bPayments[0].date).getTime() : 0;
-          return direction * (aDate - bDate);
-        }
         case 'createdAt':
           return direction * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         case 'updatedAt':

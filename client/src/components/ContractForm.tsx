@@ -52,7 +52,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     frequency: contract?.frequency || smartDefaultFrequency as Contract['frequency'],
     status: contract?.status || smartDefaultStatus as Contract['status'],
     category: contract?.category || smartDefaultCategory as Contract['category'],
-    payDate: contract?.payDate || '',
     contactInfo: {
       email: contract?.contactInfo.email || '',
       phone: contract?.contactInfo.phone || '',
@@ -87,7 +86,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     frequency: contract?.frequency || smartDefaultFrequency as Contract['frequency'],
     status: contract?.status || smartDefaultStatus as Contract['status'],
     category: contract?.category || smartDefaultCategory as Contract['category'],
-    payDate: contract?.payDate || '',
     contactInfo: {
       email: contract?.contactInfo.email || '',
       phone: contract?.contactInfo.phone || '',
@@ -130,7 +128,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
         frequency: contract.frequency || smartDefaultFrequency as Contract['frequency'],
         status: contract.status || smartDefaultStatus as Contract['status'],
         category: contract.category || smartDefaultCategory as Contract['category'],
-        payDate: contract.payDate || '',
         contactInfo: {
           email: contract.contactInfo.email || '',
           phone: contract.contactInfo.phone || '',
@@ -513,20 +510,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="payDate">Pay Date (Optional)</Label>
-            <Input
-              id="payDate"
-              type="date"
-              value={formData.payDate}
-              onChange={(e) => updateFormData({ payDate: e.target.value })}
-              placeholder="Leave empty for auto-calculation"
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Leave empty to automatically calculate based on start date and frequency
-            </p>
           </div>
         </CardContent>
       </Card>

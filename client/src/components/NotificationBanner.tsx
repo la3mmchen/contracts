@@ -1,8 +1,6 @@
 import { Contract } from '@/types/contract';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Calendar, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
-import { calculateNextThreePayments } from '@/lib/paymentCalculator';
-import { formatCurrency } from '@/lib/currencyFormatter';
+import { AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 
 interface NotificationBannerProps {
@@ -11,88 +9,16 @@ interface NotificationBannerProps {
 }
 
 export const NotificationBanner = ({ contracts, onEdit }: NotificationBannerProps) => {
-  const now = new Date();
-
-  const upcomingPayments = contracts
-    .filter(c => c.status === 'active')
-    .flatMap(contract => {
-      const payments = calculateNextThreePayments(contract);
-      return payments
-        .filter(payment => {
-          const paymentDate = new Date(payment.date);
-          const daysUntil = Math.ceil((paymentDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-          return daysUntil >= 0 && daysUntil <= 7;
-        })
-        .map(payment => ({
-          ...contract,
-          paymentDate: payment.date,
-          daysUntil: Math.ceil((new Date(payment.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
-        }));
-    })
-    .sort((a, b) => a.daysUntil - b.daysUntil);
-
-  // Start collapsed by default to save space
-  const [isUpcomingPaymentsExpanded, setIsUpcomingPaymentsExpanded] = useState(false);
   const [isExpiredContractsExpanded, setIsExpiredContractsExpanded] = useState(false);
 
   const expiredContracts = contracts.filter(c => c.status === 'expired');
 
-  if (upcomingPayments.length === 0 && expiredContracts.length === 0) {
+  if (expiredContracts.length === 0) {
     return null;
   }
 
   return (
     <div className="space-y-4 mb-6">
-      {/* Upcoming Payments */}
-      {upcomingPayments.length > 0 && (
-        <Alert>
-          <Calendar className="h-4 w-4" />
-          <div className="flex items-center justify-between w-full">
-            <AlertTitle>{upcomingPayments.length} Upcoming Payments </AlertTitle>
-            <button
-              onClick={() => setIsUpcomingPaymentsExpanded(!isUpcomingPaymentsExpanded)}
-              className="p-1 hover:bg-muted rounded transition-colors"
-              title={isUpcomingPaymentsExpanded ? "Collapse" : "Expand"}
-            >
-              {isUpcomingPaymentsExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </button>
-          </div>
-          {isUpcomingPaymentsExpanded && (
-            <AlertDescription>
-              You have {upcomingPayments.length} payment{upcomingPayments.length > 1 ? 's' : ''} due in the next 7 days:
-              <div className="mt-2 space-y-2">
-                {upcomingPayments.map((contract) => (
-                  <div key={`${contract.id}-${contract.paymentDate}`} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 text-sm">
-                    <span 
-                      className={onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}
-                      onClick={onEdit ? () => onEdit(contract) : undefined}
-                    >
-                      {contract.name}
-                    </span>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                      <span className="font-medium text-xs">
-                        {formatCurrency(contract.amount, contract.currency)} - {contract.daysUntil === 0 ? 'Today' : 
-                        contract.daysUntil === 1 ? 'Tomorrow' : `${contract.daysUntil} days`}
-                      </span>
-                      <span 
-                        className={`font-mono text-xs ${onEdit ? "cursor-pointer hover:text-primary hover:underline" : ""}`}
-                        onClick={onEdit ? () => onEdit(contract) : undefined}
-                      >
-                        {contract.contractId}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </AlertDescription>
-          )}
-        </Alert>
-      )}
-
       {/* Expired Contracts */}
       {expiredContracts.length > 0 && (
         <Alert variant="destructive">

@@ -28,11 +28,14 @@ class ContractService {
   }
 
   // Strip fields from removed features so stale data in existing files is not
-  // surfaced in responses/exports and is not re-persisted on save. Currently
-  // drops the discontinued `priceChanges` field.
+  // surfaced in responses/exports and is not re-persisted on save. Drops the
+  // discontinued `priceChanges` field and the payment-date tracking fields
+  // (`payDate`, legacy `paymentInfo`).
   private stripLegacyFields(contract: any): Contract {
-    if (contract && typeof contract === 'object' && 'priceChanges' in contract) {
+    if (contract && typeof contract === 'object') {
       delete contract.priceChanges;
+      delete contract.payDate;
+      delete contract.paymentInfo;
     }
     return contract as Contract;
   }
@@ -149,7 +152,6 @@ class ContractService {
       frequency: data.frequency || 'monthly',
       status: data.status || 'active',
       category: data.category || 'other',
-      payDate: data.payDate,
       contactInfo: data.contactInfo || {},
       notes: data.notes,
       notesHistory: data.notesHistory,
@@ -345,9 +347,6 @@ class ContractService {
       markdown += `**End Date:** ${contract.endDate}\n\n`;
     }
     
-    if (contract.payDate) {
-      markdown += `**Pay Date:** ${contract.payDate}\n\n`;
-    }
     
     if (contract.description) {
       markdown += `**Description:** ${contract.description}\n\n`;

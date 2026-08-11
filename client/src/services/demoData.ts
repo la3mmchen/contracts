@@ -16,7 +16,6 @@ export const demoContracts: Contract[] = [
     frequency: 'monthly',
     status: 'active',
     category: 'subscription',
-    payDate: '2024-12-15',
     contactInfo: {
       email: 'help@netflix.com',
       phone: '+1-866-579-7172',
@@ -68,7 +67,6 @@ export const demoContracts: Contract[] = [
     frequency: 'monthly',
     status: 'active',
     category: 'subscription',
-    payDate: '2024-12-15',
     contactInfo: {
       email: 'support@spotify.com',
       phone: '+1-800-456-9374',
@@ -114,7 +112,6 @@ export const demoContracts: Contract[] = [
     frequency: 'monthly',
     status: 'active',
     category: 'services',
-    payDate: '2024-12-01',
     contactInfo: {
       email: 'membership@fitnessfirst.com',
       phone: '+49-30-12345678',
@@ -164,7 +161,6 @@ export const demoContracts: Contract[] = [
     frequency: 'monthly',
     status: 'active',
     category: 'utilities',
-    payDate: '2024-12-01',
     contactInfo: {
       email: 'service@telekom.de',
       phone: '+49-800-3301000',
@@ -330,7 +326,6 @@ export const demoApi = {
 **Frequency:** ${contract.frequency}
 **Start Date:** ${contract.startDate}
 **End Date:** ${contract.endDate || 'N/A'}
-**Pay Date:** ${contract.payDate || 'N/A'}
 **Reference:** ${contract.reference || 'N/A'}
 
 ## Notes

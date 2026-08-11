@@ -19,7 +19,7 @@ export const calculateDataQualityScore = (
   options: DataQualityOptions = {}
 ): DataQualityScore => {
   let score = 0;
-  const maxScore = 70; // Increased from 67 to include Paperless bonus
+  const maxScore = 62; // Reduced after removing the payment-date field
   const missingFields: string[] = [];
   const suggestions: string[] = [];
 
@@ -51,13 +51,6 @@ export const calculateDataQualityScore = (
   } else {
     missingFields.push('Description');
     suggestions.push('Add a contract description');
-  }
-
-  if (contract.payDate) {
-    score += 8;
-  } else {
-    missingFields.push('Next Payment Date');
-    suggestions.push('Set the next payment date');
   }
 
   if (contract.contactInfo?.email?.trim()) {

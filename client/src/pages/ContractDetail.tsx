@@ -35,7 +35,6 @@ import {
 } from 'lucide-react';
 import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
-import { calculateNextThreePayments } from '@/lib/paymentCalculator';
 import { DataQualityScore } from '@/components/DataQualityScore';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -171,13 +170,6 @@ const ContractDetail = () => {
           aValue = a.amount;
           bValue = b.amount;
           break;
-        case 'nextPaymentDate': {
-          const aPayments = calculateNextThreePayments(a);
-          const bPayments = calculateNextThreePayments(b);
-          aValue = aPayments[0] ? new Date(aPayments[0].date).getTime() : 0;
-          bValue = bPayments[0] ? new Date(bPayments[0].date).getTime() : 0;
-          break;
-        }
         case 'createdAt':
           aValue = a.createdAt;
           bValue = b.createdAt;

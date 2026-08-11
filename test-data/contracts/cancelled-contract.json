@@ -17,14 +17,6 @@
     "address": "123 Fitness Ave, San Francisco, CA 94102",
     "contactPerson": "Membership Services"
   },
-  "paymentInfo": {
-    "nextPaymentDate": null,
-    "lastPaymentDate": "2024-08-01",
-    "paymentMethod": "Credit Card",
-    "accountNumber": "****-****-****-3456",
-    "autoRenew": false,
-    "lateFees": 0
-  },
   "notes": "Cancelled due to relocation. No refund issued.",
   "tags": ["fitness", "cancelled", "membership"],
   "documentLink": "https://planetfitness.com/membership/cancelled-2024-001"

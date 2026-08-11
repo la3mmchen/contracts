@@ -2,7 +2,6 @@ import { Contract } from '@/types/contract';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Calendar,
   Edit,
   Trash2,
   Copy,
@@ -11,7 +10,6 @@ import {
   Pin,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { isValidCategory, getCategoryBadgeColor } from '@/lib/utils';
 import { getStatusDisplayName } from '@/config/statuses';
@@ -45,8 +43,6 @@ export const ContractListRow = ({
   onFilter,
   currentSearchParams,
 }: ContractListRowProps) => {
-  const payments = calculateNextThreePayments(contract);
-  const nextPayment = payments[0];
   const hasInvalidCategory = !isValidCategory(contract.category);
   const detailTo = `${getBasePath()}/contract/${contract.id}${currentSearchParams ? `?${currentSearchParams}` : ''}`;
 
@@ -136,18 +132,6 @@ export const ContractListRow = ({
           {formatCurrency(contract.amount, contract.currency)}
         </div>
         <div className="text-xs text-muted-foreground capitalize">{contract.frequency}</div>
-      </div>
-
-      {/* Next payment */}
-      <div className="hidden xl:block shrink-0 w-32 text-right">
-        {nextPayment ? (
-          <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            <span className="whitespace-nowrap">{formatPaymentDate(nextPayment.date)}</span>
-          </div>
-        ) : (
-          <span className="text-xs text-muted-foreground">—</span>
-        )}
       </div>
 
       {/* Actions */}

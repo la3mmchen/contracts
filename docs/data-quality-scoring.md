@@ -17,7 +17,6 @@ These are essential fields that every contract should have:
 ### Important Fields (Significant Value - 8 points each)
 These fields add significant value to contract management:
 - **Description** - Detailed contract description
-- **Next Payment Date** - When the next payment is due
 - **Contact Email** - Primary contact email
 - **Contact Phone** - Primary contact phone
 - **Notes** - Additional information and comments
@@ -37,7 +36,7 @@ These fields enhance contract details:
 ### Bonus Points (Recognition - 2 points each)
 - **Notes History** - Audit trail of notes modifications
 
-**Maximum Score: 65 points**
+**Maximum Score: 62 points**
 
 ## Grade System
 
@@ -49,10 +48,10 @@ These fields enhance contract details:
 
 ## Realistic Scoring Examples
 
-**Just a name**: 15/67 = **22%** (Grade F)  
-**Name + company**: 30/67 = **45%** (Grade D)  
-**Basic contract** (name, company, amount): 45/67 = **67%** (Grade D)  
-**Good contract** (all critical + some important): 60+/67 = **90%+** (Grade A)
+**Just a name**: 15/62 = **24%** (Grade F)  
+**Name + company**: 30/62 = **48%** (Grade F)  
+**Basic contract** (name, company, amount): 45/62 = **73%** (Grade C)  
+**Good contract** (all critical + some important): 56+/62 = **90%+** (Grade A)
 
 ## Features
 

@@ -41,7 +41,6 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { calculateNextThreePayments, formatPaymentDate } from '@/lib/paymentCalculator';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { CurrencyIcon } from '@/lib/currencyIcons';
 import { isValidCategory, formatRelativeTime, getCategoryBadgeColor } from '@/lib/utils';
@@ -222,8 +221,6 @@ export const ContractCard = ({
     }
   };
 
-  const payments = calculateNextThreePayments(contract);
-  const nextPayment = payments[0];
   const hasInvalidCategory = !isValidCategory(contract.category);
   const isRecentlyUpdated = new Date(contract.updatedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000;
   const isStale = new Date(contract.updatedAt).getTime() < Date.now() - 6 * 30 * 24 * 60 * 60 * 1000;
@@ -489,11 +486,9 @@ export const ContractCard = ({
       <CardContent className="space-y-4">
         {/* Key Information Row */}
         <div className={`grid grid-cols-1 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg ${
-          contract.reference && nextPayment 
-            ? 'md:grid-cols-4' 
-            : contract.reference || nextPayment 
-              ? 'md:grid-cols-3' 
-              : 'md:grid-cols-2'
+          contract.reference
+            ? 'md:grid-cols-3'
+            : 'md:grid-cols-2'
         }`}>
           {/* Amount */}
           <div className="text-center">
@@ -543,19 +538,6 @@ export const ContractCard = ({
               <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Reference</div>
               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {contract.reference}
-              </div>
-            </div>
-          )}
-          
-          {/* Next Payment - Only show if there's a payment */}
-          {nextPayment && (
-            <div className="text-center">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Next Payment</div>
-              <div className="text-sm font-medium">
-                <div>{formatPaymentDate(nextPayment.date)}</div>
-                <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                  {formatCurrency(nextPayment.amount, nextPayment.currency)}
-                </div>
               </div>
             </div>
           )}

@@ -17,14 +17,6 @@
     "address": "14455 N Hayden Rd, Scottsdale, AZ 85260",
     "contactPerson": "Domain Services"
   },
-  "paymentInfo": {
-    "nextPaymentDate": "2024-01-15",
-    "lastPaymentDate": "2023-01-15",
-    "paymentMethod": "Credit Card",
-    "accountNumber": "****-****-****-9012",
-    "autoRenew": false,
-    "lateFees": 0
-  },
   "notes": "Domain expired. Need to renew or transfer to new provider.",
   "tags": ["domain", "website", "expired"],
   "documentLink": "https://godaddy.com/domains/expired-2024-001"

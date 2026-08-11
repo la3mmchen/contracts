@@ -208,7 +208,6 @@ curl http://localhost:3001/api/contracts/info/stats
   "frequency": "weekly|bi-weekly|monthly|quarterly|yearly|one-time",
   "startDate": "2024-01-01",
   "endDate": "2024-12-31",
-  "payDate": "2024-01-15",
   "description": "Contract description",
   "notes": "Additional notes",
   "documentLink": "https://example.com/contract.pdf",

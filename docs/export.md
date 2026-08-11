@@ -29,7 +29,7 @@ Each exported markdown file includes:
 - Contract name, ID, and company
 - Status, category, and frequency
 - Amount and currency
-- Start/end dates and payment dates
+- Start/end dates
 - Description and notes
 
 ### **Contact Information**

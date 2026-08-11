@@ -213,8 +213,6 @@ export const useContractStorage = () => {
   };
 
   const getContractStats = (): ContractStats => {
-    const now = new Date();
-
     const stats = contracts.reduce((acc, contract) => {
       // Count by status
       acc.statusBreakdown[contract.status] = (acc.statusBreakdown[contract.status] || 0) + 1;
@@ -259,23 +257,12 @@ export const useContractStorage = () => {
         }
       }
       
-      // Upcoming payments (next 30 days) - using new payDate field
-      if (contract.payDate) {
-        const nextPayment = new Date(contract.payDate);
-        const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-        
-        if (nextPayment <= thirtyDaysFromNow && contract.status === 'active') {
-          acc.upcomingPayments++;
-        }
-      }
-      
       return acc;
     }, {
       totalContracts: 0,
       activeContracts: 0,
       totalValue: 0,
       monthlyExpenses: 0,
-      upcomingPayments: 0,
       expiredContracts: 0,
       categoryBreakdown: {} as Record<string, number>,
       statusBreakdown: {} as Record<string, number>,

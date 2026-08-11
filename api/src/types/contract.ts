@@ -17,7 +17,6 @@ export interface Contract {
   frequency: 'monthly' | 'quarterly' | 'yearly' | 'one-time' | 'weekly' | 'bi-weekly';
   status: 'active' | 'expired' | 'cancelled' | 'terminated' | 'closed';
   category: 'subscription' | 'insurance' | 'utilities' | 'rent' | 'services' | 'software' | 'maintenance' | 'other';
-  payDate?: string; // Calculated payment date
   contactInfo: {
     email?: string;
     phone?: string;
@@ -64,7 +63,6 @@ export interface CreateContractRequest {
   frequency?: Contract['frequency']; // Made optional for draft contracts
   status?: Contract['status']; // Made optional for draft contracts
   category?: Contract['category']; // Made optional for draft contracts
-  payDate?: string;
   contactInfo?: Contract['contactInfo']; // Made optional for draft contracts
   notes?: string;
   tags?: string[];

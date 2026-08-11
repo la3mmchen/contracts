@@ -483,7 +483,6 @@ export const SlideInMenu = ({
                   <SelectContent>
                     <SelectItem value="name">Name</SelectItem>
                     <SelectItem value="amount">Amount</SelectItem>
-                    <SelectItem value="nextPaymentDate">Next Payment</SelectItem>
                     <SelectItem value="createdAt">Created</SelectItem>
                     <SelectItem value="updatedAt">Updated</SelectItem>
                     <SelectItem value="company">Company</SelectItem>
