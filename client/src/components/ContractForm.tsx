@@ -101,6 +101,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     paperlessTag: contract?.paperlessTag || '',
+    paperlessCorrespondent: contract?.paperlessCorrespondent || '',
     // New
     connections: contract?.connections || [],
   });
@@ -146,6 +147,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
         customFields: contract.customFields || {},
         documentLink: contract.documentLink || '',
         paperlessTag: contract.paperlessTag || '',
+        paperlessCorrespondent: contract.paperlessCorrespondent || '',
         // New: connections
         connections: contract.connections || [],
       };
@@ -609,6 +611,19 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
             />
             <p className="text-xs text-muted-foreground mt-1">
               Custom tag to link documents in Paperless. Leave empty to use auto-generated tag.
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="paperlessCorrespondent">Paperless Correspondent</Label>
+            <Input
+              id="paperlessCorrespondent"
+              value={formData.paperlessCorrespondent || ''}
+              onChange={(e) => updateFormData({ paperlessCorrespondent: e.target.value })}
+              placeholder="e.g. the vendor as named in Paperless"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Also match documents by this Paperless correspondent. Leave empty to match by tag only.
             </p>
           </div>
 

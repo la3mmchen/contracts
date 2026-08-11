@@ -33,6 +33,7 @@ export interface PaperlessDocumentsResponse {
   documents: PaperlessDocument[];
   count: number;
   tagName: string;
+  correspondentName?: string | null;
 }
 
 export interface PaperlessStatusResponse {
@@ -129,7 +130,7 @@ export const paperlessApi = {
     }
   },
 
-  async getDocuments(contractId: string, customTag?: string): Promise<PaperlessDocumentsResponse> {
+  async getDocuments(contractId: string, customTag?: string, correspondent?: string): Promise<PaperlessDocumentsResponse> {
     const effectiveTag = customTag?.trim() || `c:${contractId.substring(0, 8)}`;
     
     // In demo mode, return fake documents
@@ -140,12 +141,21 @@ export const paperlessApi = {
         documents,
         count: documents.length,
         tagName: effectiveTag,
+        correspondentName: correspondent?.trim() || null,
       };
     }
 
     await ensureConfigLoaded();
-    const url = customTag?.trim() 
-      ? `${API_BASE}/paperless/documents/${contractId}?tag=${encodeURIComponent(customTag.trim())}`
+    const params = new URLSearchParams();
+    if (customTag?.trim()) {
+      params.set('tag', customTag.trim());
+    }
+    if (correspondent?.trim()) {
+      params.set('correspondent', correspondent.trim());
+    }
+    const query = params.toString();
+    const url = query
+      ? `${API_BASE}/paperless/documents/${contractId}?${query}`
       : `${API_BASE}/paperless/documents/${contractId}`;
     const response = await fetch(url, { credentials: 'include' });
     if (response.status === 401) {

@@ -39,6 +39,9 @@ export interface Contract {
   documentLink?: string;
   // Custom Paperless tag (falls back to c:<short-uuid> if not set)
   paperlessTag?: string;
+  // Custom Paperless correspondent name to also match documents by
+  // (falls back to the contract's company if not set)
+  paperlessCorrespondent?: string;
   // New: loosely coupled connections to other contracts via user-created contractId
   connections?: string[];
   createdAt: string;

@@ -68,7 +68,7 @@ const ContractDetail = () => {
   const { 
     documents: paperlessDocuments, 
     isConfigured: paperlessConfigured 
-  } = usePaperlessDocuments(contract?.id, contract?.paperlessTag);
+  } = usePaperlessDocuments(contract?.id, contract?.paperlessTag, contract?.paperlessCorrespondent);
 
   // Derived: connected contracts by user-defined contractId
   const connectedContracts = React.useMemo(() => {
@@ -472,7 +472,7 @@ const ContractDetail = () => {
             />
             
             {/* Paperless Documents */}
-            <PaperlessDocuments contractId={contract.id} paperlessTag={contract.paperlessTag} />
+            <PaperlessDocuments contractId={contract.id} paperlessTag={contract.paperlessTag} paperlessCorrespondent={contract.paperlessCorrespondent} />
           </div>
 
           {/* Sidebar */}

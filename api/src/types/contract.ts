@@ -36,6 +36,7 @@ export interface Contract {
   attachments?: ContractAttachment[];
   documentLink?: string;
   paperlessTag?: string; // Custom Paperless tag (falls back to c:<short-uuid> if not set)
+  paperlessCorrespondent?: string; // Custom Paperless correspondent name (falls back to company)
   connections?: string[]; // Array of contractIds for connected contracts
   createdAt: string;
   updatedAt: string;
@@ -75,6 +76,7 @@ export interface CreateContractRequest {
   customFields?: Record<string, string>;
   documentLink?: string;
   paperlessTag?: string; // Custom Paperless tag (falls back to c:<short-uuid> if not set)
+  paperlessCorrespondent?: string; // Custom Paperless correspondent name (falls back to company)
   connections?: string[]; // Array of contractIds for connected contracts
 }
 

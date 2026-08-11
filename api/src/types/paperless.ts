@@ -52,4 +52,5 @@ export interface ContractDocumentsResponse {
   documents: ContractDocument[];
   count: number;
   tagName: string;
+  correspondentName?: string | null;
 }

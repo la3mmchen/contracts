@@ -23,6 +23,7 @@ class PaperlessService {
   
   // Cache for metadata (correspondents, document types, tags)
   private correspondentCache: Map<number, CacheEntry<PaperlessCorrespondent>> = new Map();
+  private correspondentByNameCache: Map<string, CacheEntry<PaperlessCorrespondent | null>> = new Map();
   private documentTypeCache: Map<number, CacheEntry<PaperlessDocumentType>> = new Map();
   private tagCache: Map<string, CacheEntry<PaperlessTag | null>> = new Map();
   
@@ -62,6 +63,7 @@ class PaperlessService {
 
   clearCache(): void {
     this.correspondentCache.clear();
+    this.correspondentByNameCache.clear();
     this.documentTypeCache.clear();
     this.tagCache.clear();
     console.log('[Paperless] Cache cleared');
@@ -190,27 +192,84 @@ class PaperlessService {
     );
   }
 
+  async getCorrespondentByName(name: string): Promise<PaperlessCorrespondent | null> {
+    // Check cache first - but only for positive results (correspondent found)
+    const cached = this.correspondentByNameCache.get(name);
+    if (this.isCacheValid(cached) && cached.data !== null) {
+      console.log(`[Paperless] Cache hit: correspondent "${name}" -> id=${cached.data.id}`);
+      return cached.data;
+    }
+
+    const response = await this.fetchPaperless<{ results: PaperlessCorrespondent[] }>(
+      `/correspondents/?name__iexact=${encodeURIComponent(name)}`
+    );
+    const correspondent = response.results.length > 0 ? response.results[0] : null;
+    console.log(`[Paperless] Correspondent lookup: "${name}" -> ${correspondent ? `found (id=${correspondent.id})` : 'NOT FOUND (not cached)'}`);
+
+    // Only cache positive results so newly-created correspondents are discovered
+    if (correspondent) {
+      this.setCacheEntry(this.correspondentByNameCache, name, correspondent);
+    }
+    return correspondent;
+  }
+
+  async getDocumentsByCorrespondent(name: string): Promise<PaperlessDocumentsResponse> {
+    const correspondent = await this.getCorrespondentByName(name);
+
+    if (!correspondent) {
+      return { count: 0, next: null, previous: null, results: [] };
+    }
+
+    return this.fetchPaperless<PaperlessDocumentsResponse>(
+      `/documents/?correspondent__id=${correspondent.id}&ordering=-created`
+    );
+  }
+
   // Generate short tag from contract ID (first 8 chars of UUID)
   private getDefaultTag(contractId: string): string {
     return `c:${contractId.substring(0, 8)}`;
   }
 
-  async getDocumentsForContract(contractId: string, customTag?: string): Promise<ContractDocumentsResponse> {
+  async getDocumentsForContract(
+    contractId: string,
+    customTag?: string,
+    correspondentName?: string
+  ): Promise<ContractDocumentsResponse> {
     const tagName = customTag?.trim() || this.getDefaultTag(contractId);
-    console.log(`[Paperless] Fetching documents for contract: ${contractId} (tag: ${tagName}${customTag ? ' [custom]' : ' [default]'})`);
-    
-    const response = await this.getDocumentsByTag(tagName);
-    console.log(`[Paperless] Found ${response.count} documents for tag: ${tagName}`);
+    const correspondent = correspondentName?.trim() || undefined;
+    console.log(
+      `[Paperless] Fetching documents for contract: ${contractId} (tag: ${tagName}${customTag ? ' [custom]' : ' [default]'}` +
+      `${correspondent ? `, correspondent: ${correspondent}` : ''})`
+    );
+
+    // Union of documents matching the tag OR the correspondent. Paperless
+    // cannot OR a tag and a correspondent in a single query, so we fetch both
+    // and merge/dedupe by document id.
+    const [tagResponse, correspondentResponse] = await Promise.all([
+      this.getDocumentsByTag(tagName),
+      correspondent
+        ? this.getDocumentsByCorrespondent(correspondent)
+        : Promise.resolve<PaperlessDocumentsResponse>({ count: 0, next: null, previous: null, results: [] }),
+    ]);
+
+    const mergedById = new Map<number, PaperlessDocument>();
+    for (const doc of [...tagResponse.results, ...correspondentResponse.results]) {
+      mergedById.set(doc.id, doc);
+    }
+    const mergedResults = Array.from(mergedById.values()).sort(
+      (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
+    );
+    console.log(`[Paperless] Found ${mergedResults.length} documents (tag: ${tagResponse.count}, correspondent: ${correspondentResponse.count})`);
 
     // Fetch correspondent and document type names for each document
     const documents: ContractDocument[] = await Promise.all(
-      response.results.map(async (doc) => {
+      mergedResults.map(async (doc) => {
         let correspondentName: string | null = null;
         let documentTypeName: string | null = null;
 
         if (doc.correspondent) {
-          const correspondent = await this.getCorrespondent(doc.correspondent);
-          correspondentName = correspondent?.name || null;
+          const correspondentObj = await this.getCorrespondent(doc.correspondent);
+          correspondentName = correspondentObj?.name || null;
         }
 
         if (doc.document_type) {
@@ -232,8 +291,9 @@ class PaperlessService {
 
     return {
       documents,
-      count: response.count,
+      count: mergedResults.length,
       tagName,
+      correspondentName: correspondent || null,
     };
   }
 }

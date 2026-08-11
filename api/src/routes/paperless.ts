@@ -47,7 +47,8 @@ paperlessRoutes.get('/documents/:contractId', async (req: Request, res: Response
 
     const { contractId } = req.params;
     const customTag = req.query.tag as string | undefined;
-    const result = await paperlessService.getDocumentsForContract(contractId, customTag);
+    const correspondent = req.query.correspondent as string | undefined;
+    const result = await paperlessService.getDocumentsForContract(contractId, customTag, correspondent);
     res.json(result);
   } catch (error) {
     console.error('Error fetching Paperless documents:', error);

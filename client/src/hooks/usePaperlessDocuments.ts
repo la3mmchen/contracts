@@ -12,12 +12,12 @@ export const usePaperlessStatus = () => {
   });
 };
 
-export const usePaperlessDocuments = (contractId: string | undefined, customTag?: string) => {
+export const usePaperlessDocuments = (contractId: string | undefined, customTag?: string, correspondent?: string) => {
   const statusQuery = usePaperlessStatus();
 
   const documentsQuery = useQuery<PaperlessDocumentsResponse>({
-    queryKey: ['paperless', 'documents', contractId, customTag],
-    queryFn: () => paperlessApi.getDocuments(contractId!, customTag),
+    queryKey: ['paperless', 'documents', contractId, customTag, correspondent],
+    queryFn: () => paperlessApi.getDocuments(contractId!, customTag, correspondent),
     enabled: !!contractId && statusQuery.data?.configured && statusQuery.data?.available,
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 1,
@@ -30,6 +30,7 @@ export const usePaperlessDocuments = (contractId: string | undefined, customTag?
     documentsLoading: documentsQuery.isLoading,
     documentsError: documentsQuery.error,
     tagName: documentsQuery.data?.tagName,
+    correspondentName: documentsQuery.data?.correspondentName,
     refetch: documentsQuery.refetch,
     isConfigured: statusQuery.data?.configured ?? false,
     isAvailable: statusQuery.data?.available ?? false,
