@@ -12,7 +12,7 @@ export interface Contract {
   description?: string;
   startDate: string;
   endDate?: string;
-  amount: number;
+  amount?: number;
   currency: string;
   frequency: 'monthly' | 'quarterly' | 'yearly' | 'one-time' | 'weekly' | 'bi-weekly';
   status: 'active' | 'expired' | 'cancelled' | 'terminated' | 'closed';

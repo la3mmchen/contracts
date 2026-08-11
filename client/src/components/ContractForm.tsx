@@ -248,7 +248,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
   // Helper function to show required indicator
   const showRequired = (fieldName: string) => {
     if (formData.draft) return false;
-    const requiredFields = ['company', 'startDate', 'amount', 'currency', 'frequency', 'status', 'category'];
+    const requiredFields = ['company', 'startDate', 'currency', 'frequency', 'status', 'category'];
     return requiredFields.includes(fieldName);
   };
 
@@ -398,7 +398,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
                 value={formData.amount}
                 onChange={(e) => updateFormData({ amount: e.target.value || '' })}
                 placeholder="0.00"
-                required={!formData.draft}
               />
             </div>
             <div>

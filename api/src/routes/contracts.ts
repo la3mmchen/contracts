@@ -61,9 +61,6 @@ contractRoutes.post('/', async (req: Request, res: Response) => {
       if (!contractData.startDate) {
         return res.status(400).json({ error: 'Start date is required for non-draft contracts' });
       }
-      if (contractData.amount === undefined || contractData.amount === null) {
-        return res.status(400).json({ error: 'Amount is required for non-draft contracts' });
-      }
       if (!contractData.currency) {
         return res.status(400).json({ error: 'Currency is required for non-draft contracts' });
       }

@@ -19,7 +19,7 @@ export const calculateDataQualityScore = (
   options: DataQualityOptions = {}
 ): DataQualityScore => {
   let score = 0;
-  const maxScore = 62; // Reduced after removing the payment-date field
+  const maxScore = 47; // Reduced after making amount optional
   const missingFields: string[] = [];
   const suggestions: string[] = [];
 
@@ -36,13 +36,6 @@ export const calculateDataQualityScore = (
   } else {
     missingFields.push('Company Name');
     suggestions.push('Specify the company or vendor name');
-  }
-
-  if (contract.amount && contract.amount > 0) {
-    score += 15;
-  } else {
-    missingFields.push('Contract Amount');
-    suggestions.push('Enter the contract amount');
   }
 
   // Important Fields (8 points each) - Add significant value

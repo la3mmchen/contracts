@@ -3,7 +3,7 @@
  * Formats amounts based on currency code with appropriate symbols and formatting
  */
 
-export const formatCurrency = (amount: number, currency: string): string => {
+export const formatCurrency = (amount: number | undefined | null, currency: string): string => {
   // Currency symbol mapping
   const currencySymbols: Record<string, string> = {
     'USD': '$',
@@ -76,7 +76,7 @@ export const formatCurrency = (amount: number, currency: string): string => {
   const symbol = currencySymbols[currency.toUpperCase()] || currency;
   
   // Format the amount with appropriate decimal places
-  const formattedAmount = amount.toLocaleString('en-US', {
+  const formattedAmount = (amount ?? 0).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -87,8 +87,8 @@ export const formatCurrency = (amount: number, currency: string): string => {
 /**
  * Format currency amount without the currency symbol
  */
-export const formatAmount = (amount: number): string => {
-  return amount.toLocaleString('en-US', {
+export const formatAmount = (amount: number | undefined | null): string => {
+  return (amount ?? 0).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -97,7 +97,7 @@ export const formatAmount = (amount: number): string => {
 /**
  * Format currency for display in tooltips and other contexts
  */
-export const formatCurrencyForDisplay = (amount: number, currency: string): string => {
+export const formatCurrencyForDisplay = (amount: number | undefined | null, currency: string): string => {
   return formatCurrency(amount, currency);
 };
 

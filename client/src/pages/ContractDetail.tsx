@@ -166,8 +166,8 @@ const ContractDetail = () => {
           bValue = b.name.toLowerCase();
           break;
         case 'amount':
-          aValue = a.amount;
-          bValue = b.amount;
+          aValue = a.amount ?? 0;
+          bValue = b.amount ?? 0;
           break;
         case 'createdAt':
           aValue = a.createdAt;

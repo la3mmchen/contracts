@@ -114,7 +114,7 @@ export const ContractCard = ({
   
   // Inline editing states
   const [isEditingAmount, setIsEditingAmount] = useState(false);
-  const [editingAmount, setEditingAmount] = useState(contract.amount.toString());
+  const [editingAmount, setEditingAmount] = useState((contract.amount ?? 0).toString());
   const [isSaving, setIsSaving] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(contract.name || '');
@@ -140,7 +140,7 @@ export const ContractCard = ({
     setIsEditingAmount(false);
     setEditingName(contract.name || '');
     setEditingCompany(contract.company || '');
-    setEditingAmount(contract.amount.toString());
+    setEditingAmount((contract.amount ?? 0).toString());
   }, [contract]);
   
   const categoryColor = useMemo(() => getCategoryBadgeColor(contract.category), [contract.category]);
@@ -154,7 +154,7 @@ export const ContractCard = ({
     
     const newAmount = parseFloat(editingAmount);
     if (isNaN(newAmount) || newAmount < 0) {
-      setEditingAmount(contract.amount.toString());
+      setEditingAmount((contract.amount ?? 0).toString());
       setIsEditingAmount(false);
       return;
     }
@@ -171,7 +171,7 @@ export const ContractCard = ({
       setIsEditingAmount(false);
     } catch (error) {
       console.error('Failed to update amount:', error);
-      setEditingAmount(contract.amount.toString());
+      setEditingAmount((contract.amount ?? 0).toString());
       setIsEditingAmount(false);
     } finally {
       setIsSaving(false);
@@ -179,7 +179,7 @@ export const ContractCard = ({
   };
 
   const handleAmountCancel = () => {
-    setEditingAmount(contract.amount.toString());
+    setEditingAmount((contract.amount ?? 0).toString());
     setIsEditingAmount(false);
   };
 

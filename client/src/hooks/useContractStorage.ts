@@ -234,25 +234,26 @@ export const useContractStorage = () => {
       }
       
       // Total value
-      acc.totalValue += contract.amount;
+      const amount = contract.amount ?? 0;
+      acc.totalValue += amount;
       
       // Monthly expenses (only for active contracts)
       if (contract.status === 'active') {
         switch (contract.frequency) {
           case 'monthly':
-            acc.monthlyExpenses += contract.amount;
+            acc.monthlyExpenses += amount;
             break;
           case 'quarterly':
-            acc.monthlyExpenses += contract.amount / 3;
+            acc.monthlyExpenses += amount / 3;
             break;
           case 'yearly':
-            acc.monthlyExpenses += contract.amount / 12;
+            acc.monthlyExpenses += amount / 12;
             break;
           case 'weekly':
-            acc.monthlyExpenses += contract.amount * 4.33;
+            acc.monthlyExpenses += amount * 4.33;
             break;
           case 'bi-weekly':
-            acc.monthlyExpenses += contract.amount * 2.17;
+            acc.monthlyExpenses += amount * 2.17;
             break;
         }
       }

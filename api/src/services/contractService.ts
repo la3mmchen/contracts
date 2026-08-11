@@ -339,7 +339,7 @@ class ContractService {
     markdown += `**Company:** ${contract.company}\n\n`;
     markdown += `**Status:** ${contract.status}\n\n`;
     markdown += `**Category:** ${contract.category}\n\n`;
-    markdown += `**Amount:** ${contract.currency} ${contract.amount.toFixed(2)}\n\n`;
+    markdown += `**Amount:** ${contract.currency} ${(contract.amount ?? 0).toFixed(2)}\n\n`;
     markdown += `**Frequency:** ${contract.frequency}\n\n`;
     markdown += `**Start Date:** ${contract.startDate}\n\n`;
     

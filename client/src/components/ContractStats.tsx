@@ -94,19 +94,20 @@ export const ContractStats = ({
       value: `$${(filteredContracts ?? contracts)
         .filter(c => c.status === 'active')
         .reduce((total, contract) => {
+          const amount = contract.amount ?? 0;
           switch (contract.frequency) {
             case 'monthly':
-              return total + contract.amount;
+              return total + amount;
             case 'quarterly':
-              return total + (contract.amount / 3);
+              return total + (amount / 3);
             case 'yearly':
-              return total + (contract.amount / 12);
+              return total + (amount / 12);
             case 'weekly':
-              return total + (contract.amount * 4.33);
+              return total + (amount * 4.33);
             case 'bi-weekly':
-              return total + (contract.amount * 2.17);
+              return total + (amount * 2.17);
             case 'one-time':
-              return total + (contract.amount / 12); // Spread over a year
+              return total + (amount / 12); // Spread over a year
             default:
               return total;
           }

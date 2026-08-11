@@ -372,7 +372,7 @@ const Index = () => {
         case 'name':
           return direction * a.name.localeCompare(b.name);
         case 'amount':
-          return direction * (a.amount - b.amount);
+          return direction * ((a.amount ?? 0) - (b.amount ?? 0));
         case 'createdAt':
           return direction * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         case 'updatedAt':
