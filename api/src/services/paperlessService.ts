@@ -18,6 +18,7 @@ interface CacheEntry<T> {
 
 class PaperlessService {
   private baseUrl: string | undefined;
+  private publicUrl: string | undefined;
   private apiToken: string | undefined;
   
   // Cache for metadata (correspondents, document types, tags)
@@ -30,6 +31,9 @@ class PaperlessService {
 
   constructor() {
     this.baseUrl = process.env.PAPERLESS_URL;
+    // Public/external base URL used only for user-facing document links that
+    // the browser opens. Falls back to the internal PAPERLESS_URL when unset.
+    this.publicUrl = process.env.PAPERLESS_PUBLIC_URL || process.env.PAPERLESS_URL;
     this.apiToken = process.env.PAPERLESS_API_TOKEN;
   }
 
@@ -220,7 +224,7 @@ class PaperlessService {
           created: doc.created,
           correspondent: correspondentName,
           documentType: documentTypeName,
-          paperlessUrl: `${this.baseUrl}/documents/${doc.id}/details`,
+          paperlessUrl: `${this.publicUrl}/documents/${doc.id}/details`,
           downloadUrl: `${this.baseUrl}/api/documents/${doc.id}/download/`,
         };
       })

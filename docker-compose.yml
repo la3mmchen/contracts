@@ -9,7 +9,11 @@ services:
     environment:
       - PORT=3001
       - CONTRACTS_DATA_DIR=/app/data
+      # Internal Paperless base URL used server-side to fetch documents.
       - PAPERLESS_URL=${PAPERLESS_URL:-}
+      # Public/external Paperless base URL used only for user-facing document
+      # links opened in the browser. Falls back to PAPERLESS_URL when unset.
+      - PAPERLESS_PUBLIC_URL=${PAPERLESS_PUBLIC_URL:-}
       - PAPERLESS_API_TOKEN=${PAPERLESS_API_TOKEN:-}
       # Authentication (single shared password). Leave APP_PASSWORD empty to
       # disable app-level auth (e.g. when using reverse-proxy basic-auth).
