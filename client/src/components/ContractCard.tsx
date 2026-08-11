@@ -1,4 +1,4 @@
-import { Contract, PriceChange } from '@/types/contract';
+import { Contract } from '@/types/contract';
 import { 
   Card, 
   CardContent, 
@@ -116,7 +116,6 @@ export const ContractCard = ({
   // Inline editing states
   const [isEditingAmount, setIsEditingAmount] = useState(false);
   const [editingAmount, setEditingAmount] = useState(contract.amount.toString());
-  const [editingReason, setEditingReason] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(contract.name || '');
@@ -143,7 +142,6 @@ export const ContractCard = ({
     setEditingName(contract.name || '');
     setEditingCompany(contract.company || '');
     setEditingAmount(contract.amount.toString());
-    setEditingReason('');
   }, [contract]);
   
   const categoryColor = useMemo(() => getCategoryBadgeColor(contract.category), [contract.category]);
@@ -169,24 +167,8 @@ export const ContractCard = ({
 
     try {
       setIsSaving(true);
-      
-      const newPriceChange: PriceChange = {
-        date: new Date().toISOString(),
-        previousAmount: contract.amount,
-        newAmount: newAmount,
-        reason: editingReason.trim() || 'Amount updated via inline editing',
-        effectiveDate: new Date().toISOString()
-      };
 
-      const updatedPriceChanges = [
-        ...(contract.priceChanges || []),
-        newPriceChange
-      ];
-
-      await onUpdate(contract.id, { 
-        amount: newAmount,
-        priceChanges: updatedPriceChanges
-      });
+      await onUpdate(contract.id, { amount: newAmount });
       setIsEditingAmount(false);
     } catch (error) {
       console.error('Failed to update amount:', error);
@@ -199,7 +181,6 @@ export const ContractCard = ({
 
   const handleAmountCancel = () => {
     setEditingAmount(contract.amount.toString());
-    setEditingReason('');
     setIsEditingAmount(false);
   };
 

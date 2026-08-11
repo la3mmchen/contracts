@@ -22,22 +22,6 @@
   "familyMember": "Alex",
   "tags": ["streaming", "entertainment", "4K"],
   "pinned": true,
-  "priceChanges": [
-    {
-      "date": "2024-07-01",
-      "previousAmount": 19.99,
-      "newAmount": 22.99,
-      "reason": "Annual price increase",
-      "effectiveDate": "2024-07-01"
-    },
-    {
-      "date": "2024-01-01",
-      "previousAmount": 17.99,
-      "newAmount": 19.99,
-      "reason": "Plan upgrade to Premium",
-      "effectiveDate": "2024-01-01"
-    }
-  ],
   "customFields": {
     "Account Email": "family@example.com",
     "Plan Type": "Premium",

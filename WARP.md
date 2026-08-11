@@ -92,7 +92,7 @@ npm start            # Run compiled version
 ### Data Model
 The core `Contract` interface (api/src/types/contract.ts) includes:
 - Basic contract info (name, company, amount, dates)
-- Complex fields: price change history, notes history, custom fields
+- Complex fields: notes history, custom fields
 - Metadata: flags for drafts, optimization hints, family member assignments
 - Relationship tracking: connected contracts via contractId references
 

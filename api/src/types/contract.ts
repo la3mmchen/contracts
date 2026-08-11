@@ -1,11 +1,3 @@
-export interface PriceChange {
-  date: string;
-  previousAmount: number;
-  newAmount: number;
-  reason: string;
-  effectiveDate: string;
-}
-
 export interface NotesHistoryEntry {
   timestamp: string;
   notes: string;
@@ -41,8 +33,7 @@ export interface Contract {
   draft?: boolean; // Flag to indicate contract is in draft state
   optimizable?: boolean; // Flag to indicate contract could be optimized
   familyMember?: string; // Which family member the contract is for
-  priceChanges?: PriceChange[]; // Array of amount changes over time
-  customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
+   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
   documentLink?: string;
   paperlessTag?: string; // Custom Paperless tag (falls back to c:<short-uuid> if not set)
@@ -83,7 +74,6 @@ export interface CreateContractRequest {
   optimizable?: boolean; // Flag to indicate contract could be optimized
   familyMember?: string; // Which family member the contract is for
   notesHistory?: NotesHistoryEntry[];
-  priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
   documentLink?: string;
   paperlessTag?: string; // Custom Paperless tag (falls back to c:<short-uuid> if not set)

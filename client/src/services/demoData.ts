@@ -45,15 +45,6 @@ export const demoContracts: Contract[] = [
     ],
     tags: ['streaming', 'entertainment', '4K'],
     pinned: true,
-    priceChanges: [
-      {
-        date: '2024-07-01',
-        previousAmount: 19.99,
-        newAmount: 22.99,
-        reason: 'Annual price increase',
-        effectiveDate: '2024-07-01'
-      }
-    ],
     customFields: {
       'Account Email': 'family@example.com',
       'Plan Type': 'Premium',

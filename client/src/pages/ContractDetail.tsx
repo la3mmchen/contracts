@@ -7,9 +7,7 @@ import { ContractForm } from '@/components/ContractForm';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ContractNavigation } from '@/components/ContractNavigation';
 import { NotesSection } from '@/components/NotesSection';
-import { PriceOverTimeChart } from '@/components/PriceOverTimeChart';
 import { PaperlessDocuments } from '@/components/PaperlessDocuments';
-import { PriceChangesSection } from '@/components/PriceChangesSection';
 import { useContractNavigation } from '@/hooks/useContractNavigation';
 import { usePaperlessDocuments } from '@/hooks/usePaperlessDocuments';
 import { Button } from '@/components/ui/button';
@@ -476,7 +474,6 @@ const ContractDetail = () => {
               onUpdate={updateContract}
               onFilter={handleFilter}
               defaultExpandCustomFields={true}
-              defaultExpandPriceChanges={false}
               defaultExpandPayments={true}
               isDetailPage={true}
               onInlineEditingChange={setIsInlineEditing}
@@ -484,9 +481,6 @@ const ContractDetail = () => {
             
             {/* Paperless Documents */}
             <PaperlessDocuments contractId={contract.id} paperlessTag={contract.paperlessTag} />
-            
-            {/* Price Changes Section */}
-            <PriceChangesSection contract={contract} />
           </div>
 
           {/* Sidebar */}
@@ -870,9 +864,6 @@ const ContractDetail = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Payment Over Time Chart */}
-            <PriceOverTimeChart contract={contract} />
 
             {/* Notes Section */}
             <NotesSection

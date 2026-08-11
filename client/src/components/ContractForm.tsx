@@ -19,7 +19,7 @@ interface ContractFormProps {
   contract?: Contract;
   isCopying?: boolean; // New prop to indicate if we're copying a contract
   existingContracts?: Contract[]; // Existing contracts for autocomplete suggestions
-  onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => void;
+  onSubmit: (contract: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   onDirtyStateChange?: (isDirty: boolean) => void;
 }
@@ -69,7 +69,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     optimizable: contract?.optimizable || false,
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
-    priceChangeReason: '',
     // New: connections by contractId
     connections: contract?.connections || [],
   });
@@ -104,7 +103,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     customFields: contract?.customFields || {},
     documentLink: contract?.documentLink || '',
     paperlessTag: contract?.paperlessTag || '',
-    priceChangeReason: '',
     // New
     connections: contract?.connections || [],
   });
@@ -151,7 +149,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
         customFields: contract.customFields || {},
         documentLink: contract.documentLink || '',
         paperlessTag: contract.paperlessTag || '',
-        priceChangeReason: '',
         // New: connections
         connections: contract.connections || [],
       };
@@ -243,7 +240,7 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
     setIsDirty(false);
     onDirtyStateChange?.(false);
     
-    onSubmit(contractData, formData.priceChangeReason);
+    onSubmit(contractData);
   };
 
   // Get available options from config
@@ -472,23 +469,6 @@ export const ContractForm = ({ contract, isCopying = false, existingContracts, o
               </Select>
             </div>
           </div>
-
-          {/* Price Change Reason - Only show when amount has changed */}
-          {contract && formData.amount !== contract.amount.toString() && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="priceChangeReason">Reason for Price Change</Label>
-                <Input
-                  id="priceChangeReason"
-                  type="text"
-                  value={formData.priceChangeReason}
-                  onChange={(e) => updateFormData({ priceChangeReason: e.target.value })}
-                  placeholder="e.g., Annual price increase, Plan upgrade, etc."
-                  maxLength={100}
-                />
-              </div>
-            </div>
-          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

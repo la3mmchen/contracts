@@ -40,7 +40,6 @@ Each exported markdown file includes:
 ### **Additional Data**
 - Tags and categories
 - Document links
-- Price change history (if available)
 - Creation and update timestamps
 
 ### **Export Metadata**

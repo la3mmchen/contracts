@@ -27,11 +27,21 @@ class ContractService {
     return path.join(this.contractsDir, `${id}.json`);
   }
 
+  // Strip fields from removed features so stale data in existing files is not
+  // surfaced in responses/exports and is not re-persisted on save. Currently
+  // drops the discontinued `priceChanges` field.
+  private stripLegacyFields(contract: any): Contract {
+    if (contract && typeof contract === 'object' && 'priceChanges' in contract) {
+      delete contract.priceChanges;
+    }
+    return contract as Contract;
+  }
+
   private async loadContractFromFile(id: string): Promise<Contract | null> {
     try {
       const filePath = this.getContractFilePath(id);
       const data = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(data);
+      return this.stripLegacyFields(JSON.parse(data));
     } catch (error) {
       return null;
     }
@@ -41,7 +51,7 @@ class ContractService {
     await this.ensureDataDirectory();
     const filePath = this.getContractFilePath(contract.id);
     
-    const jsonData = JSON.stringify(contract, null, 2);
+    const jsonData = JSON.stringify(this.stripLegacyFields(contract), null, 2);
     
     await fs.writeFile(filePath, jsonData);
   }
@@ -74,7 +84,7 @@ class ContractService {
         try {
           const filePath = path.join(this.contractsDir, file);
           const data = await fs.readFile(filePath, 'utf-8');
-          const contract = JSON.parse(data);
+          const contract = this.stripLegacyFields(JSON.parse(data));
           contracts.push(contract);
         } catch (error) {
           // Contract file could not be loaded, skipping
@@ -149,7 +159,6 @@ class ContractService {
       pinned: data.pinned,
       draft: data.draft,
       optimizable: data.optimizable,
-      priceChanges: data.priceChanges,
       customFields: data.customFields,
       attachments: [],
       documentLink: data.documentLink,
@@ -374,18 +383,6 @@ class ContractService {
 
     if (contract.documentLink) {
       markdown += `**Document Link:** ${contract.documentLink}\n\n`;
-    }
-
-    // Add price changes if they exist
-    if (contract.priceChanges && contract.priceChanges.length > 0) {
-      markdown += `**Price Changes:**\n\n`;
-      for (const change of contract.priceChanges) {
-        markdown += `- **${change.effectiveDate}**: ${contract.currency} ${change.previousAmount.toFixed(2)} → ${contract.currency} ${change.newAmount.toFixed(2)}\n`;
-        if (change.reason) {
-          markdown += `  - Reason: ${change.reason}\n`;
-        }
-        markdown += `\n`;
-      }
     }
 
     markdown += `**Created:** ${contract.createdAt}\n\n`;

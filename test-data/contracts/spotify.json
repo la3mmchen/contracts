@@ -19,15 +19,6 @@
   },
   "notes": "Family plan with 6 accounts. Shared payment method.",
   "tags": ["music", "streaming", "family"],
-  "priceChanges": [
-    {
-      "date": "2024-09-01",
-      "previousAmount": 14.99,
-      "newAmount": 16.99,
-      "reason": "Annual price adjustment",
-      "effectiveDate": "2024-09-01"
-    }
-  ],
   "customFields": {
     "Account Email": "family@example.com",
     "Login URL": "https://open.spotify.com/account",

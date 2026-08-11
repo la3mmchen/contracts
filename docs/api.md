@@ -224,15 +224,6 @@ curl http://localhost:3001/api/contracts/info/stats
   "customFields": {
     "customKey": "customValue"
   },
-  "priceChanges": [
-    {
-      "date": "2024-01-01T00:00:00.000Z",
-      "previousAmount": 99.99,
-      "newAmount": 109.99,
-      "reason": "Price increase",
-      "effectiveDate": "2024-01-01T00:00:00.000Z"
-    }
-  ],
   "createdAt": "2024-01-01T00:00:00.000Z",
   "updatedAt": "2024-01-01T00:00:00.000Z"
 }

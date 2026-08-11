@@ -119,10 +119,6 @@ export const calculateDataQualityScore = (
   }
 
   // Bonus Points (2 points each) - Recognition for extra effort
-  if (contract.priceChanges && contract.priceChanges.length > 0) {
-    score += 2;
-  }
-
   if (contract.notesHistory && contract.notesHistory.length > 0) {
     score += 2;
   }

@@ -35,10 +35,9 @@ These fields enhance contract details:
 - **Custom Fields** - Additional custom data
 
 ### Bonus Points (Recognition - 2 points each)
-- **Price Changes History** - Track of amount changes over time
 - **Notes History** - Audit trail of notes modifications
 
-**Maximum Score: 67 points**
+**Maximum Score: 65 points**
 
 ## Grade System
 

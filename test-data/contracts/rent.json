@@ -22,15 +22,6 @@
   "familyMember": "Mike",
   "tags": ["rent", "housing", "apartment"],
   "connections": ["ELEC-2024-001", "SERV-2024-008"],
-  "priceChanges": [
-    {
-      "date": "2024-01-01",
-      "previousAmount": 2400.00,
-      "newAmount": 2500.00,
-      "reason": "Annual lease renewal",
-      "effectiveDate": "2024-01-01"
-    }
-  ],
   "customFields": {
     "Parking Space": "#12",
     "Pet Deposit": "Paid",

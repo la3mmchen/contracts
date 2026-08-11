@@ -33,7 +33,6 @@ interface Contract {
   needsMoreInfo?: boolean;       // Flag indicating incomplete information
   pinned?: boolean;              // Flag to pin contract to top of list
   draft?: boolean;               // Flag indicating contract is in draft state
-  priceChanges?: PriceChange[];  // History of price changes
   attachments?: ContractAttachment[]; // Associated files
   documentLink?: string;         // Link to contract document
   createdAt: string;             // Creation timestamp
@@ -90,18 +89,6 @@ interface ContactInfo {
 }
 ```
 
-### PriceChange
-
-```typescript
-interface PriceChange {
-  date: string;          // Date of price change
-  previousAmount: number; // Previous contract amount
-  newAmount: number;     // New contract amount
-  reason: string;        // Reason for price change
-  effectiveDate: string; // When the change takes effect
-}
-```
-
 ### ContractAttachment
 
 ```typescript
@@ -137,7 +124,6 @@ interface CreateContractRequest {
   needsMoreInfo?: boolean;
   pinned?: boolean;
   draft?: boolean;               // Flag to indicate contract is in draft state
-  priceChanges?: PriceChange[];
 }
 ```
 

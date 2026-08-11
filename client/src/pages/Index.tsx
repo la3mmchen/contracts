@@ -554,34 +554,9 @@ const Index = () => {
     }
   };
 
-  const handleEditContract = (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>, priceChangeReason?: string) => {
+  const handleEditContract = (contractData: Omit<Contract, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingContract) {
-      // Check if amount changed and create price change entry
-      let updatedData = { ...contractData };
-      
-      if (contractData.amount !== editingContract.amount) {
-        // Create new price change entry
-        const newPriceChange = {
-          date: new Date().toISOString(),
-          previousAmount: editingContract.amount,
-          newAmount: contractData.amount,
-          reason: priceChangeReason?.trim() || 'Amount updated via edit form',
-          effectiveDate: new Date().toISOString()
-        };
-        
-        // Add to existing price changes or create new array
-        const updatedPriceChanges = [
-          ...(editingContract.priceChanges || []),
-          newPriceChange
-        ];
-        
-        updatedData = {
-          ...contractData,
-          priceChanges: updatedPriceChanges
-        };
-      }
-      
-      updateContract(editingContract.id, updatedData);
+      updateContract(editingContract.id, contractData);
       setEditingContract(undefined);
       setIsFormOpen(false);
     }
@@ -603,11 +578,10 @@ const Index = () => {
       id: undefined,
       createdAt: undefined,
       updatedAt: undefined,
-      priceChanges: [], // Start fresh with no price changes
     };
     
     // Remove the fields we don't want to copy
-    const { id, createdAt, updatedAt, priceChanges, ...copyData } = contractCopy;
+    const { id, createdAt, updatedAt, ...copyData } = contractCopy;
     
     // Open the form with the copied data
     setEditingContract(undefined); // Clear any existing edit

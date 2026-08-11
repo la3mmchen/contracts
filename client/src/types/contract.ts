@@ -1,13 +1,5 @@
 import { Category } from '@/config/categories';
 
-export interface PriceChange {
-  date: string;
-  previousAmount: number;
-  newAmount: number;
-  reason: string;
-  effectiveDate: string;
-}
-
 export interface NotesHistoryEntry {
   timestamp: string;
   notes: string;
@@ -42,7 +34,6 @@ export interface Contract {
   pinned?: boolean; // Flag to pin contract to the top of the list
   draft?: boolean; // Flag to indicate contract is in draft state
   optimizable?: boolean; // Flag to indicate contract could be optimized
-  priceChanges?: PriceChange[]; // Array of amount changes over time
   familyMember?: string; // Which family member the contract is for
   customFields?: Record<string, string>; // Dynamic key-value pairs for additional info
   attachments?: ContractAttachment[];
@@ -126,7 +117,6 @@ export interface CreateContractRequest {
   draft?: boolean; // Flag to indicate contract is in draft state
   optimizable?: boolean; // Flag to indicate contract could be optimized
   familyMember?: string; // Which family member the contract is for
-  priceChanges?: PriceChange[];
   customFields?: Record<string, string>;
   // New: connections by user-managed contractId
   connections?: string[];

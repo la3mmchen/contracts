@@ -123,15 +123,6 @@ curl -s "http://localhost:3001/api/contracts/export/markdown/individual" | jq .
         "Account Email": "family@example.com",
         "Login URL": "https://netflix.com/account"
       },
-      "priceChanges": [
-        {
-          "date": "2024-09-01T00:00:00.000Z",
-          "previousAmount": 14.99,
-          "newAmount": 15.99,
-          "reason": "Annual price adjustment",
-          "effectiveDate": "2024-09-01T00:00:00.000Z"
-        }
-      ],
       "attachments": [],
       "documentLink": "https://drive.google.com/file/d/123/view",
       "createdAt": "2024-01-01T10:00:00.000Z",
