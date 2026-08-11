@@ -16,7 +16,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   ArrowLeft, 
   Edit, 
@@ -483,58 +482,15 @@ const ContractDetail = () => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="w-full" 
-                      size="sm"
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Contract
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem 
-                      onClick={() => setIsEditFormOpen(true)}
-                      className="cursor-pointer"
-                    >
-                                          <Edit className="h-4 w-4 mr-2" />
-                    Full Form Edit
-                      <span className="ml-auto text-xs text-muted-foreground">All fields</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="cursor-pointer"
-                      onClick={() => {
-                        // Scroll to first editable field and show hint
-                        const firstEditableField = document.querySelector('[data-editable="true"]');
-                        if (firstEditableField) {
-                          firstEditableField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                          // Add a temporary highlight effect
-                          firstEditableField.classList.add('ring-2', 'ring-primary', 'ring-opacity-50');
-                          setTimeout(() => {
-                            firstEditableField.classList.remove('ring-2', 'ring-primary', 'ring-opacity-50');
-                          }, 2000);
-                        }
-                      }}
-                    >
-                      <PenTool className="h-4 w-4 mr-2" />
-                      Quick Inline Edit
-                      <span className="ml-auto text-xs text-muted-foreground">Single fields</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="cursor-pointer"
-                      onClick={() => {
-                        // Show a helpful tooltip about editing modes
-                        alert('💡 Editing Tips:\n\n• Click any field to edit it inline\n• Use "Full Form Edit" button above for changing many fields at once\n• Inline editing is perfect for quick updates\n• Form editing is better for major changes');
-                      }}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Editing Help
-                    </DropdownMenuItem>
-                    
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  size="sm"
+                  onClick={() => setIsEditFormOpen(true)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Contract
+                </Button>
                 <Button 
                   variant="outline" 
                   className="w-full" 
