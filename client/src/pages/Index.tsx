@@ -23,7 +23,9 @@ import {
   Info,
   X,
   PanelLeft,
-  ChevronDown
+  ChevronDown,
+  ChevronsDownUp,
+  ChevronsUpDown
 } from 'lucide-react';
 import { appConfig } from '@/config/app';
 import { isValidCategory } from '@/lib/utils';
@@ -143,6 +145,16 @@ const Index = () => {
       }
       return next;
     });
+  };
+
+  const setCollapsedCategoriesPersisted = (keys: string[]) => {
+    const next = new Set(keys);
+    setCollapsedCategories(next);
+    try {
+      localStorage.setItem(COLLAPSED_CATEGORIES_STORAGE_KEY, JSON.stringify([...next]));
+    } catch {
+      // Ignore storage failures (e.g. private mode).
+    }
   };
 
   const handleLayoutChange = (next: ContractLayout) => {
@@ -1156,6 +1168,33 @@ const Index = () => {
                 <span className="text-sm text-muted-foreground">
                   {filteredContracts.length} contract{filteredContracts.length === 1 ? '' : 's'}
                 </span>
+                {layout === 'list' && groupedContracts.length > 0 && (() => {
+                  const allCollapsed = groupedContracts.every(group => collapsedCategories.has(group.key));
+                  return (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs text-muted-foreground"
+                      onClick={() =>
+                        allCollapsed
+                          ? setCollapsedCategoriesPersisted([])
+                          : setCollapsedCategoriesPersisted(groupedContracts.map(group => group.key))
+                      }
+                    >
+                      {allCollapsed ? (
+                        <>
+                          <ChevronsUpDown className="h-4 w-4 mr-1.5" />
+                          Expand all
+                        </>
+                      ) : (
+                        <>
+                          <ChevronsDownUp className="h-4 w-4 mr-1.5" />
+                          Collapse all
+                        </>
+                      )}
+                    </Button>
+                  );
+                })()}
               </div>
 
               {layout === 'list' ? (

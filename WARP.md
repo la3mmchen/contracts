@@ -4,7 +4,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-This is a **contracts management system** with a React frontend and Node.js/Express backend. The system helps users organize contracts, track spending, and maintain visibility of contract statuses. It stores data as individual JSON files on disk and supports export/backup functionality.
+This is a **contracts management system** with a React frontend and Node.js/Express backend. The system helps users organize contracts and maintain visibility of contract statuses. It stores data as individual JSON files on disk and supports export/backup functionality.
 
 ## Architecture
 

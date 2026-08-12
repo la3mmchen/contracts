@@ -1,6 +1,6 @@
 # contracts
 
-Organize contracts, maintain visibility, and track your spendings.
+Organize your contracts and keep visibility over them in one place.
 
 ## 🚀 Live Demo
 
@@ -12,13 +12,13 @@ The demo showcases all the features below with sample data. **No installation or
 
 - 📝 **Easy Contract Management** - Add, edit, and organize all your contracts in one place
 - 🏷️ **Reference Number Tracking** - Store and search important contract identifiers like purchase orders, invoice numbers, and account references
-- 💰 **Track Any Currency** - Works with euros (default), dollars, pounds, and 7 other major currencies
-- 📊 **Smart Spending Insights** - See where your money goes with beautiful charts and summaries
+- 💰 **Track Any Currency** - Optionally record an amount in euros (default), dollars, pounds, and 7 other major currencies
+- 🗂️ **Grouped List View** - Group contracts by category, person, or last-updated time, with collapsible sections
 - 🔍 **Find Anything Fast** - Search contracts by name, company, reference number, or filter by type and status
+- 📄 **Paperless Integration** - Link documents from Paperless-ngx by tag or correspondent
 - 📱 **Works Everywhere** - Use on your phone, tablet, or computer - always looks great
 - 📤 **Export Your Data** - Download contracts as markdown files or backup everything at once
 - 🔒 **Keep Your Data Safe** - Automatic backups and protection against losing your work
-- ⚡ **Always Up to Date** - See your spending totals and upcoming payments in real-time
 
 ![contracts](./docs/images/sneak-peek.png)
 
@@ -104,10 +104,11 @@ CONTRACTS_FREQUENCIES="daily,weekly,monthly,quarterly,annually"
 CONTRACTS_CURRENCIES="EUR,USD,GBP,JPY,CNY,INR,BRL"
 ```
 
-**New Features:**
-- **Reference Field**: Each contract now includes an optional reference field for storing important identifiers like purchase order numbers, invoice references, account numbers, etc.
+**Notes:**
+- **Reference Field**: Each contract includes an optional reference field for storing important identifiers like purchase order numbers, invoice references, account numbers, etc.
+- **Optional Amount**: Recording an amount is optional — you can track a contract without one.
 - **EUR Default Currency**: New contracts default to EUR instead of USD
-- **Enhanced Search**: Search now includes reference numbers for better contract discovery
+- **Enhanced Search**: Search includes reference numbers for better contract discovery
 
 ## 🔐 Authentication
 
@@ -255,6 +256,9 @@ The API provides endpoints for:
 | `API_TOKEN` | *(unset)* | Token for machine clients via `Authorization: Bearer` / `X-API-Key`. Only enforced when `APP_PASSWORD` is set |
 | `NODE_ENV` | *(unset)* | Set to `production` (HTTPS) to add the `Secure` flag to session cookies |
 | `APP_ORIGIN` | *(unset — reflects origin)* | Comma-separated allowed browser origins for CORS with credentials |
+| `PAPERLESS_URL` | *(unset)* | Internal Paperless-ngx base URL used server-side to fetch documents. Enables the Paperless integration when set together with `PAPERLESS_API_TOKEN` |
+| `PAPERLESS_PUBLIC_URL` | *(falls back to `PAPERLESS_URL`)* | Public/external Paperless base URL used only for user-facing document links opened in the browser |
+| `PAPERLESS_API_TOKEN` | *(unset)* | API token used to authenticate against Paperless-ngx |
 
 **Example custom configuration:**
 ```yaml
