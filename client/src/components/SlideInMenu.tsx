@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, PanelLeftClose, CheckCircle, LayoutGrid, List, Clock } from 'lucide-react';
+import { X, Search, Download, Upload, Plus, Tag, Building2, User, TrendingUp, Coins, LogOut, PanelLeftClose, CheckCircle, LayoutGrid, List, Clock, Grid3x3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { appConfig } from '@/config/app';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Separator } from '@/components/ui/separator';
@@ -920,6 +921,19 @@ export const SlideInMenu = ({
                 Import
               </Button>
             </div>
+          </div>
+
+          <Separator />
+
+          {/* Dashboards */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold">Dashboards</h3>
+            <Button asChild variant="outline" size="sm" className="w-full justify-start">
+              <Link to={`${window.location.pathname.includes('/contracts/') ? '/contracts' : ''}/coverage-matrix`}>
+                <Grid3x3 className="h-4 w-4 mr-2" />
+                Coverage Matrix
+              </Link>
+            </Button>
           </div>
 
           <Separator />

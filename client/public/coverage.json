@@ -1,0 +1,37 @@
+{
+  "categories": [
+    {
+      "id": "housing",
+      "label": "Housing",
+      "baselines": [
+        { "id": "rent-mortgage", "label": "Rent/Mortgage", "keywords": ["rent", "mortgage", "lease", "miete"] },
+        { "id": "home-insurance", "label": "Home Insurance", "keywords": ["home insurance", "household", "contents", "hausrat", "building insurance"] },
+        { "id": "electricity", "label": "Electricity", "keywords": ["electric", "power", "strom", "energy"] },
+        { "id": "internet", "label": "Internet", "keywords": ["internet", "broadband", "fiber", "fibre", "dsl", "wifi"] }
+      ]
+    },
+    {
+      "id": "mobility",
+      "label": "Mobility",
+      "baselines": [
+        { "id": "car-insurance", "label": "Car Insurance", "keywords": ["car insurance", "auto insurance", "vehicle", "kfz", "motor insurance"] },
+        { "id": "public-transit", "label": "Public Transit", "keywords": ["transit", "transport", "metro", "bus", "train", "bahn", "ticket"] }
+      ]
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "baselines": [
+        { "id": "health-insurance", "label": "Health Insurance", "keywords": ["health", "medical", "krankenversicherung", "dental"] },
+        { "id": "liability-insurance", "label": "Liability Insurance", "keywords": ["liability", "haftpflicht"] }
+      ]
+    },
+    {
+      "id": "connectivity",
+      "label": "Connectivity",
+      "baselines": [
+        { "id": "mobile-phone", "label": "Mobile Phone", "keywords": ["mobile", "phone", "cell", "handy", "sim"] }
+      ]
+    }
+  ]
+}

@@ -14,6 +14,8 @@ The demo showcases all the features below with sample data. **No installation or
 - 🏷️ **Reference Number Tracking** - Store and search important contract identifiers like purchase orders, invoice numbers, and account references
 - 💰 **Track Any Currency** - Optionally record an amount in euros (default), dollars, pounds, and 7 other major currencies
 - 🗂️ **Grouped List View** - Group contracts by category, person, or last-updated time, with collapsible sections
+- 🩺 **Coverage Matrix** - Visual health-check dashboard grouping contracts by life category (Housing, Mobility, Insurance…) that highlights covered baselines and nudges you about missing necessities
+- 🔗 **Dependency Warnings** - Get alerted on a contract when a connected contract is cancelled or expiring within 30 days, so you don't forget to cancel dependents
 - 🔍 **Find Anything Fast** - Search contracts by name, company, reference number, or filter by type and status
 - 📄 **Paperless Integration** - Link documents from Paperless-ngx by tag or correspondent
 - 📱 **Works Everywhere** - Use on your phone, tablet, or computer - always looks great
@@ -109,6 +111,37 @@ CONTRACTS_CURRENCIES="EUR,USD,GBP,JPY,CNY,INR,BRL"
 - **Optional Amount**: Recording an amount is optional — you can track a contract without one.
 - **EUR Default Currency**: New contracts default to EUR instead of USD
 - **Enhanced Search**: Search includes reference numbers for better contract discovery
+
+### Coverage Matrix Configuration
+
+The Coverage Matrix dashboard groups contracts into "life categories" (e.g. Housing, Mobility, Insurance) and checks whether you have a contract covering each baseline necessity. Its configuration lives in a JSON file (`coverage.json`) that is loaded at runtime, so you can customize it **without rebuilding** the app. If the file is missing or invalid, built-in defaults are used.
+
+Each baseline defines `keywords` that are matched (case-insensitively) against a contract's category, tags, name, and company to decide whether it's covered:
+
+```json
+{
+  "categories": [
+    {
+      "id": "housing",
+      "label": "Housing",
+      "baselines": [
+        { "id": "rent-mortgage", "label": "Rent/Mortgage", "keywords": ["rent", "mortgage", "lease"] },
+        { "id": "electricity", "label": "Electricity", "keywords": ["electric", "power", "energy"] }
+      ]
+    }
+  ]
+}
+```
+
+To override it in Docker, mount your own file over the served default:
+
+```yaml
+services:
+  frontend:
+    image: ghcr.io/la3mmchen/contracts-app:latest
+    volumes:
+      - "./coverage.json:/usr/share/nginx/html/coverage.json:ro"
+```
 
 ## 🔐 Authentication
 

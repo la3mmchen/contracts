@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -30,7 +31,8 @@ import {
   Star,
   X,
   TrendingUp,
-  CheckCircle2
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 import { smartApi } from '@/services/smartApi';
 import { useToast } from '@/hooks/use-toast';
@@ -75,6 +77,30 @@ const ContractDetail = () => {
     const ids = new Set(contract.connections);
     return contracts.filter(c => ids.has(c.contractId));
   }, [contract, contracts]);
+
+  // Derived: connected contracts that are terminating soon. A connected
+  // contract "A" is considered terminating if it is cancelled/terminated/closed
+  // or its endDate is within the next 30 days. When this contract depends on
+  // such a contract, we surface a warning.
+  const terminatingDependencies = React.useMemo(() => {
+    if (connectedContracts.length === 0) return [] as Contract[];
+    const now = Date.now();
+    const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+
+    return connectedContracts.filter(cc => {
+      const statusTerminating =
+        cc.status === 'cancelled' || cc.status === 'terminated' || cc.status === 'closed';
+      let endDateSoon = false;
+      if (cc.endDate) {
+        const end = new Date(cc.endDate).getTime();
+        if (!Number.isNaN(end)) {
+          endDateSoon = end - now <= THIRTY_DAYS && end - now >= -THIRTY_DAYS;
+        }
+      }
+      return statusTerminating || endDateSoon;
+    });
+  }, [connectedContracts]);
+
 
 
   // Handle unsaved changes confirmation
@@ -458,6 +484,28 @@ const ContractDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Contract Info */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Dependency warnings: connected contracts terminating soon */}
+            {terminatingDependencies.length > 0 && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Connected contract terminating soon</AlertTitle>
+                <AlertDescription>
+                  {terminatingDependencies.map(dep => (
+                    <div key={dep.id} className="mt-1">
+                      A connected contract (
+                      <Link
+                        to={`${getBasePath()}/contract/${dep.id}${location.search}`}
+                        className="font-medium underline hover:no-underline"
+                      >
+                        {dep.name}
+                      </Link>
+                      ) is terminating soon. Do you need to cancel this contract too?
+                    </div>
+                  ))}
+                </AlertDescription>
+              </Alert>
+            )}
+
             <ContractCard
               contract={contract}
               onEdit={() => setIsEditFormOpen(true)}
