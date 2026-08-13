@@ -14,7 +14,7 @@ The demo showcases all the features below with sample data. **No installation or
 - 🏷️ **Reference Number Tracking** - Store and search important contract identifiers like purchase orders, invoice numbers, and account references
 - 💰 **Track Any Currency** - Optionally record an amount in euros (default), dollars, pounds, and 7 other major currencies
 - 🗂️ **Grouped List View** - Group contracts by category, person, or last-updated time, with collapsible sections
-- 🩺 **Coverage Matrix** - Visual health-check dashboard grouping contracts by life category (Housing, Mobility, Insurance…) that highlights covered baselines and nudges you about missing necessities
+- 🩺 **Coverage Matrix** - Visual health-check dashboard grouping contracts by life category (Housing, Mobility, Insurance…) that highlights covered baselines and nudges you about missing necessities, with an optional per-person filter
 - 🔗 **Dependency Warnings** - Get alerted on a contract when a connected contract is cancelled or expiring within 30 days, so you don't forget to cancel dependents
 - 🔍 **Find Anything Fast** - Search contracts by name, company, reference number, or filter by type and status
 - 📄 **Paperless Integration** - Link documents from Paperless-ngx by tag or correspondent
@@ -115,6 +115,23 @@ CONTRACTS_CURRENCIES="EUR,USD,GBP,JPY,CNY,INR,BRL"
 ### Coverage Matrix Configuration
 
 The Coverage Matrix dashboard groups contracts into "life categories" (e.g. Housing, Mobility, Insurance) and checks whether you have a contract covering each baseline necessity. Its configuration lives in a JSON file (`coverage.json`) that is loaded at runtime, so you can customize it **without rebuilding** the app. If the file is missing or invalid, built-in defaults are used.
+
+Use the **Person** dropdown in the header to scope the matrix to a single family member. It is populated from the `familyMember` values on your contracts and defaults to "All persons"; selecting a person recalculates coverage using only that person's active contracts. The dropdown only appears when at least one contract has a person assigned.
+
+The person options are not configured in `coverage.json` — they are read from the `familyMember` field of each stored contract. For example, a contract assigned to "Alice" looks like:
+
+```json
+{
+  "contractId": "rent-2024-001",
+  "name": "Apartment Lease",
+  "company": "Skyline Properties",
+  "status": "active",
+  "category": "rent",
+  "familyMember": "Alice"
+}
+```
+
+With that field set, "Alice" becomes selectable in the Person dropdown.
 
 Each baseline defines `keywords` that are matched (case-insensitively) against a contract's category, tags, name, and company to decide whether it's covered:
 
