@@ -54,3 +54,20 @@ export interface ContractDocumentsResponse {
   tagName: string;
   correspondentName?: string | null;
 }
+
+// A discovered document is a normal ContractDocument plus a lightweight
+// relevance score indicating how many of the query terms matched its
+// title/correspondent. Used only for the read-only discovery suggestions.
+export interface DiscoverySuggestion extends ContractDocument {
+  score: number;
+}
+
+export interface ContractDocumentsDiscoveryResponse {
+  suggestions: DiscoverySuggestion[];
+  count: number;
+  // The full-text query that was sent to Paperless.
+  query: string;
+  // Number of full-text hits that were dropped because they were already
+  // linked to the contract via the exact tag/correspondent read.
+  excludedCount: number;
+}

@@ -1,7 +1,12 @@
 // client/src/hooks/usePaperlessDocuments.ts
 
-import { useQuery } from '@tanstack/react-query';
-import { paperlessApi, PaperlessDocumentsResponse, PaperlessStatusResponse } from '@/services/paperlessApi';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  paperlessApi,
+  PaperlessDocumentsResponse,
+  PaperlessStatusResponse,
+  PaperlessDiscoveryResponse,
+} from '@/services/paperlessApi';
 
 export const usePaperlessStatus = () => {
   return useQuery<PaperlessStatusResponse>({
@@ -34,5 +39,35 @@ export const usePaperlessDocuments = (contractId: string | undefined, customTag?
     refetch: documentsQuery.refetch,
     isConfigured: statusQuery.data?.configured ?? false,
     isAvailable: statusQuery.data?.available ?? false,
+  };
+};
+
+interface DiscoveryArgs {
+  contractId: string;
+  name?: string;
+  company?: string;
+  customTag?: string;
+  correspondent?: string;
+}
+
+/**
+ * On-demand discovery of likely-related Paperless documents. Triggered by a
+ * user action (button click) via `discover(...)`, so it uses a mutation rather
+ * than an auto-running query.
+ */
+export const usePaperlessDiscovery = () => {
+  const mutation = useMutation<PaperlessDiscoveryResponse, Error, DiscoveryArgs>({
+    mutationFn: ({ contractId, name, company, customTag, correspondent }) =>
+      paperlessApi.discoverDocuments(contractId, name, company, customTag, correspondent),
+  });
+
+  return {
+    discover: mutation.mutate,
+    reset: mutation.reset,
+    result: mutation.data,
+    suggestions: mutation.data?.suggestions || [],
+    isLoading: mutation.isPending,
+    error: mutation.error,
+    hasRun: mutation.isSuccess || mutation.isError,
   };
 };

@@ -9,6 +9,8 @@ import {
   PaperlessStatusResponse,
   ContractDocument,
   ContractDocumentsResponse,
+  DiscoverySuggestion,
+  ContractDocumentsDiscoveryResponse,
 } from '../types/paperless';
 
 interface CacheEntry<T> {
@@ -262,8 +264,24 @@ class PaperlessService {
     console.log(`[Paperless] Found ${mergedResults.length} documents (tag: ${tagResponse.count}, correspondent: ${correspondentResponse.count})`);
 
     // Fetch correspondent and document type names for each document
-    const documents: ContractDocument[] = await Promise.all(
-      mergedResults.map(async (doc) => {
+    const documents = await this.enrichDocuments(mergedResults);
+
+    return {
+      documents,
+      count: mergedResults.length,
+      tagName,
+      correspondentName: correspondent || null,
+    };
+  }
+
+  /**
+   * Enrich raw Paperless documents with human-readable correspondent and
+   * document-type names (via the cached metadata lookups) and build the
+   * user-facing / download URLs.
+   */
+  private async enrichDocuments(docs: PaperlessDocument[]): Promise<ContractDocument[]> {
+    return Promise.all(
+      docs.map(async (doc) => {
         let correspondentName: string | null = null;
         let documentTypeName: string | null = null;
 
@@ -288,12 +306,104 @@ class PaperlessService {
         };
       })
     );
+  }
+
+  /**
+   * Full-text search across Paperless (title + OCR content index) via the
+   * `query` parameter. Results are ordered by Paperless relevance.
+   */
+  async searchDocuments(query: string): Promise<PaperlessDocumentsResponse> {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      return { count: 0, next: null, previous: null, results: [] };
+    }
+    return this.fetchPaperless<PaperlessDocumentsResponse>(
+      `/documents/?query=${encodeURIComponent(trimmed)}`
+    );
+  }
+
+  /**
+   * Build a de-duplicated list of search terms from a contract's company and
+   * name. Short (<=2 char) tokens are dropped to reduce noise.
+   */
+  private buildDiscoveryTerms(name?: string, company?: string): string[] {
+    const raw = `${company || ''} ${name || ''}`.toLowerCase();
+    const seen = new Set<string>();
+    const terms: string[] = [];
+    for (const token of raw.split(/[^\p{L}\p{N}]+/u)) {
+      if (token.length > 2 && !seen.has(token)) {
+        seen.add(token);
+        terms.push(token);
+      }
+    }
+    return terms;
+  }
+
+  /**
+   * Discover Paperless documents that likely relate to a contract but are NOT
+   * already linked by the exact tag/correspondent read.
+   *
+   * Strategy (read-only, one search request):
+   *   1. Full-text search Paperless using the contract's company + name terms.
+   *   2. Determine which documents are already linked (exact tag/correspondent).
+   *   3. Exclude already-linked docs, score the rest by how many query terms
+   *      appear in the title/correspondent, sort by score then recency, cap N.
+   */
+  async discoverDocumentsForContract(
+    contractId: string,
+    name?: string,
+    company?: string,
+    customTag?: string,
+    correspondentName?: string,
+    limit: number = 10
+  ): Promise<ContractDocumentsDiscoveryResponse> {
+    const terms = this.buildDiscoveryTerms(name, company);
+    const query = terms.join(' ');
+    console.log(
+      `[Paperless] Discovering documents for contract ${contractId} (query: "${query}")`
+    );
+
+    if (!query) {
+      return { suggestions: [], count: 0, query: '', excludedCount: 0 };
+    }
+
+    // Run the full-text search and, in parallel, find the already-linked docs
+    // so we can exclude them from the suggestions.
+    const [searchResponse, linked] = await Promise.all([
+      this.searchDocuments(query),
+      this.getDocumentsForContract(contractId, customTag, correspondentName).catch(() => ({
+        documents: [] as ContractDocument[],
+      })),
+    ]);
+
+    const linkedIds = new Set(linked.documents.map((d) => d.id));
+    const candidates = searchResponse.results.filter((doc) => !linkedIds.has(doc.id));
+    const excludedCount = searchResponse.results.length - candidates.length;
+
+    // Enrich, then score by how many query terms appear in title/correspondent.
+    const enriched = await this.enrichDocuments(candidates);
+    const suggestions: DiscoverySuggestion[] = enriched
+      .map((doc) => {
+        const haystack = `${doc.title} ${doc.correspondent || ''}`.toLowerCase();
+        const score = terms.reduce((acc, term) => (haystack.includes(term) ? acc + 1 : acc), 0);
+        return { ...doc, score };
+      })
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      })
+      .slice(0, limit);
+
+    console.log(
+      `[Paperless] Discovery for ${contractId}: ${searchResponse.results.length} hits, ` +
+      `${excludedCount} already-linked, ${suggestions.length} suggestions`
+    );
 
     return {
-      documents,
-      count: mergedResults.length,
-      tagName,
-      correspondentName: correspondent || null,
+      suggestions,
+      count: suggestions.length,
+      query,
+      excludedCount,
     };
   }
 }

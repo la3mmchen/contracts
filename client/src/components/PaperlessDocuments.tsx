@@ -1,7 +1,7 @@
 // client/src/components/PaperlessDocuments.tsx
 
 import React from 'react';
-import { usePaperlessDocuments } from '@/hooks/usePaperlessDocuments';
+import { usePaperlessDocuments, usePaperlessDiscovery } from '@/hooks/usePaperlessDocuments';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,15 +14,18 @@ import {
   FolderOpen,
   RefreshCw,
   Copy,
+  Search,
 } from 'lucide-react';
 
 interface PaperlessDocumentsProps {
   contractId: string;
+  contractName?: string; // Used for discovery full-text search
+  company?: string; // Used for discovery full-text search
   paperlessTag?: string; // Custom tag, falls back to c:<short-uuid> if not set
   paperlessCorrespondent?: string; // Also match documents by this Paperless correspondent
 }
 
-export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contractId, paperlessTag: customTag, paperlessCorrespondent: correspondent }) => {
+export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contractId, contractName, company, paperlessTag: customTag, paperlessCorrespondent: correspondent }) => {
   const { toast } = useToast();
   const {
     documents,
@@ -35,6 +38,24 @@ export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contract
     isAvailable,
     statusLoading,
   } = usePaperlessDocuments(contractId, customTag, correspondent);
+
+  const {
+    discover,
+    suggestions,
+    isLoading: discoveryLoading,
+    error: discoveryError,
+    hasRun: discoveryHasRun,
+  } = usePaperlessDiscovery();
+
+  const runDiscovery = () => {
+    discover({
+      contractId,
+      name: contractName,
+      company,
+      customTag,
+      correspondent,
+    });
+  };
 
   const paperlessTag = tagName || customTag?.trim() || `c:${contractId.substring(0, 8)}`;
   const paperlessCorrespondent = correspondentName ?? correspondent?.trim() ?? null;
@@ -200,6 +221,83 @@ export const PaperlessDocuments: React.FC<PaperlessDocumentsProps> = ({ contract
                 <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground flex-shrink-0" />
               </a>
             ))}
+          </div>
+        )}
+
+        {/* Discovery: find likely-related documents via full-text search */}
+        {!documentsLoading && !documentsError && (
+          <div className="mt-4 border-t pt-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                Search Paperless for other documents that may relate to this contract.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={runDiscovery}
+                disabled={discoveryLoading}
+              >
+                {discoveryLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4 mr-2" />
+                )}
+                Find related documents
+              </Button>
+            </div>
+
+            {/* Discovery error */}
+            {discoveryError && !discoveryLoading && (
+              <div className="flex items-center gap-2 mt-3 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span>Discovery failed: {discoveryError.message}</span>
+              </div>
+            )}
+
+            {/* Discovery empty */}
+            {discoveryHasRun && !discoveryLoading && !discoveryError && suggestions.length === 0 && (
+              <p className="text-sm text-muted-foreground mt-3 text-center py-2">
+                No additional related documents found.
+              </p>
+            )}
+
+            {/* Discovery suggestions */}
+            {!discoveryLoading && suggestions.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Suggested documents ({suggestions.length})
+                </p>
+                {suggestions.map((doc) => (
+                  <a
+                    key={doc.id}
+                    href={doc.paperlessUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-2 p-2 rounded-lg border border-dashed bg-card hover:bg-accent/50 transition-colors group"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate" title={doc.title}>
+                        {doc.title}
+                      </p>
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-0.5 text-xs text-muted-foreground">
+                        <span>{new Date(doc.created).toLocaleDateString()}</span>
+                        {doc.correspondent && <span>{doc.correspondent}</span>}
+                        {doc.documentType && (
+                          <Badge variant="outline" className="text-xs py-0">
+                            {doc.documentType}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground flex-shrink-0" />
+                  </a>
+                ))}
+                <p className="text-xs text-muted-foreground">
+                  Not linked yet — add the tag <code className="font-mono">{paperlessTag}</code> to a
+                  document in Paperless to link it here.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

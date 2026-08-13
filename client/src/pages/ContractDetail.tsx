@@ -517,7 +517,7 @@ const ContractDetail = () => {
             />
             
             {/* Paperless Documents */}
-            <PaperlessDocuments contractId={contract.id} paperlessTag={contract.paperlessTag} paperlessCorrespondent={contract.paperlessCorrespondent} />
+            <PaperlessDocuments contractId={contract.id} contractName={contract.name} company={contract.company} paperlessTag={contract.paperlessTag} paperlessCorrespondent={contract.paperlessCorrespondent} />
           </div>
 
           {/* Sidebar */}

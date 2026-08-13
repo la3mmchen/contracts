@@ -42,6 +42,17 @@ export interface PaperlessStatusResponse {
   error?: string;
 }
 
+export interface PaperlessDiscoverySuggestion extends PaperlessDocument {
+  score: number;
+}
+
+export interface PaperlessDiscoveryResponse {
+  suggestions: PaperlessDiscoverySuggestion[];
+  count: number;
+  query: string;
+  excludedCount: number;
+}
+
 // Demo documents for specific contracts
 const demoDocuments: Record<string, PaperlessDocument[]> = {
   'demo-netflix': [
@@ -165,6 +176,43 @@ export const paperlessApi = {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Failed to fetch documents' }));
       throw new Error(error.error || 'Failed to fetch documents');
+    }
+    return response.json();
+  },
+
+  async discoverDocuments(
+    contractId: string,
+    name?: string,
+    company?: string,
+    customTag?: string,
+    correspondent?: string
+  ): Promise<PaperlessDiscoveryResponse> {
+    // In demo mode, pretend there's nothing new to discover (the demo docs are
+    // already surfaced by getDocuments).
+    const isDemoMode = await smartApi.isDemoMode();
+    if (isDemoMode) {
+      const terms = `${company || ''} ${name || ''}`.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      return { suggestions: [], count: 0, query: terms.join(' '), excludedCount: 0 };
+    }
+
+    await ensureConfigLoaded();
+    const params = new URLSearchParams();
+    if (name?.trim()) params.set('name', name.trim());
+    if (company?.trim()) params.set('company', company.trim());
+    if (customTag?.trim()) params.set('tag', customTag.trim());
+    if (correspondent?.trim()) params.set('correspondent', correspondent.trim());
+    const query = params.toString();
+    const url = query
+      ? `${API_BASE}/paperless/discover/${contractId}?${query}`
+      : `${API_BASE}/paperless/discover/${contractId}`;
+    const response = await fetch(url, { credentials: 'include' });
+    if (response.status === 401) {
+      notifyUnauthorized();
+      throw new Error('Authentication required');
+    }
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to discover documents' }));
+      throw new Error(error.error || 'Failed to discover documents');
     }
     return response.json();
   },
