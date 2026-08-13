@@ -17,10 +17,12 @@ export const loadConfig = async (): Promise<AppConfig> => {
   try {
     // Try to load config from the root path, not relative to current location
     const basePath = window.location.pathname.includes('/contracts/') ? '/contracts' : '';
-    const configUrl = `${basePath}/config.json`;
-    
-    const response = await fetch(configUrl);
-    
+    const configUrl = `${basePath}/config.json?t=${Date.now()}`;
+
+    // Runtime config is volume-mounted/edited by admins; never use a cached
+    // copy or a stale value silently persists until a hard refresh.
+    const response = await fetch(configUrl, { cache: 'no-store' });
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }

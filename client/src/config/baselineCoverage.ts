@@ -114,7 +114,13 @@ export const loadCoverageConfig = async (): Promise<CoverageCategory[]> => {
 
   try {
     const basePath = window.location.pathname.includes('/contracts/') ? '/contracts' : '';
-    const response = await fetch(`${basePath}/coverage.json`);
+    // Always fetch a fresh copy: coverage.json is runtime config that admins
+    // edit/volume-mount, and a stale browser cache silently falls back to the
+    // built-in defaults. `no-store` prevents caching and the cache-busting
+    // query param defeats any intermediate/proxy caches.
+    const response = await fetch(`${basePath}/coverage.json?t=${Date.now()}`, {
+      cache: 'no-store',
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
