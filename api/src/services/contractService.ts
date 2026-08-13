@@ -164,6 +164,8 @@ class ContractService {
       customFields: data.customFields,
       attachments: [],
       documentLink: data.documentLink,
+      paperlessTag: data.paperlessTag,
+      paperlessCorrespondent: data.paperlessCorrespondent,
       connections: data.connections,
       createdAt: now,
       updatedAt: now,

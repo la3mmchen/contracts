@@ -5,7 +5,9 @@ import morgan from 'morgan';
 import { contractRoutes } from './routes/contracts';
 import { paperlessRoutes } from './routes/paperless';
 import { authRoutes } from './routes/auth';
+import { ingestRoutes } from './routes/ingest';
 import { requireAuth } from './middleware/requireAuth';
+import { requireIngestAuth } from './middleware/requireIngestAuth';
 import { isAuthEnabled } from './services/authService';
 
 const app = express();
@@ -44,6 +46,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/contracts', requireAuth, contractRoutes);
 app.use('/api/paperless', requireAuth, paperlessRoutes);
 
+// Document ingestion webhook for external DMS (Paperless-ngx, Papra, ...).
+// Uses its own middleware so it can additionally accept a dedicated INGEST_TOKEN.
+app.use('/api/ingest', requireIngestAuth, ingestRoutes);
+
 // Health check - intentionally public (used for demo-mode detection and
 // container healthchecks).
 app.get('/api/health', (req, res) => {
@@ -67,7 +73,8 @@ app.get('/', (req, res) => {
       dataInfo: '/api/contracts/info/data',
       paperless: '/api/paperless',
       paperlessStatus: '/api/paperless/status',
-      paperlessDocuments: '/api/paperless/documents/:contractId'
+      paperlessDocuments: '/api/paperless/documents/:contractId',
+      ingestDocument: '/api/ingest/document'
     }
   });
 });
