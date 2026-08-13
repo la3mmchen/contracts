@@ -5,8 +5,17 @@ import { useContractStorage } from '@/hooks/useContractStorage';
 import { DEFAULT_COVERAGE_CATEGORIES, loadCoverageConfig, CoverageBaseline, CoverageCategory } from '@/config/baselineCoverage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ArrowLeft, CheckCircle2, CircleDashed, Loader2 } from 'lucide-react';
+
+const ALL_PERSONS = 'all';
 
 const getBasePath = () => {
   return window.location.pathname.includes('/contracts/') ? '/contracts' : '';
@@ -51,9 +60,27 @@ const CoverageMatrix = () => {
     };
   }, []);
 
-  // For each category/baseline, find the matching active contracts.
+  // Person (familyMember) filter. Options are derived from the contracts
+  // themselves - there is no fixed config list of persons.
+  const [selectedPerson, setSelectedPerson] = useState<string>(ALL_PERSONS);
+
+  const persons = useMemo(() => {
+    const set = new Set<string>();
+    contracts.forEach((contract) => {
+      const member = contract.familyMember?.trim();
+      if (member) set.add(member);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [contracts]);
+
+  // For each category/baseline, find the matching active contracts, optionally
+  // scoped to a single person.
   const matrix = useMemo(() => {
-    const activeContracts = contracts.filter(isActive);
+    const activeContracts = contracts.filter(
+      (c) =>
+        isActive(c) &&
+        (selectedPerson === ALL_PERSONS || c.familyMember?.trim() === selectedPerson),
+    );
 
     return coverageCategories.map(category => {
       const baselines = category.baselines.map(baseline => {
@@ -70,7 +97,7 @@ const CoverageMatrix = () => {
         total: category.baselines.length,
       };
     });
-  }, [contracts, coverageCategories]);
+  }, [contracts, coverageCategories, selectedPerson]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -90,6 +117,25 @@ const CoverageMatrix = () => {
               <h1 className="text-xl sm:text-2xl font-bold">Coverage Matrix</h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
+              {persons.length > 0 && (
+                <Select value={selectedPerson} onValueChange={setSelectedPerson}>
+                  <SelectTrigger
+                    id="coverage-person-filter"
+                    className="w-[160px] bg-white/10 text-white border-white/20 hover:bg-white/20"
+                    aria-label="Filter coverage by person"
+                  >
+                    <SelectValue placeholder="All persons" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL_PERSONS}>All persons</SelectItem>
+                    {persons.map((person) => (
+                      <SelectItem key={person} value={person}>
+                        {person}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <ThemeToggle />
             </div>
           </div>
