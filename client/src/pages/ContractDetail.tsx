@@ -512,8 +512,6 @@ const ContractDetail = () => {
               onDelete={() => setDeleteConfirmOpen(true)}
               onUpdate={updateContract}
               onFilter={handleFilter}
-              defaultExpandCustomFields={true}
-              defaultExpandPayments={true}
               isDetailPage={true}
               onInlineEditingChange={setIsInlineEditing}
             />

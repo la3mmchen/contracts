@@ -40,6 +40,9 @@ const contractMatchesBaseline = (contract: Contract, baseline: CoverageBaseline)
 const isActive = (contract: Contract): boolean =>
   contract.status === 'active' && !contract.draft;
 
+// Normalize a familyMember value for case-insensitive, trimmed comparison.
+const normalizePerson = (value?: string): string => (value ?? '').trim().toLowerCase();
+
 const CoverageMatrix = () => {
   const navigate = useNavigate();
   const { contracts, loading } = useContractStorage();
@@ -75,28 +78,51 @@ const CoverageMatrix = () => {
 
   // For each category/baseline, find the matching active contracts, optionally
   // scoped to a single person.
+  //
+  // A category can declare its own `familyMember` scope (e.g. an "adults only"
+  // insurance category). The header Person dropdown narrows further on top of
+  // that (intersection):
+  //   - Categories whose `familyMember` conflicts with the selected person are
+  //     hidden entirely.
+  //   - The contract pool for a category is restricted to both the category's
+  //     familyMember (if any) and the selected person (if any).
   const matrix = useMemo(() => {
-    const activeContracts = contracts.filter(
-      (c) =>
-        isActive(c) &&
-        (selectedPerson === ALL_PERSONS || c.familyMember?.trim() === selectedPerson),
-    );
+    const selected = selectedPerson === ALL_PERSONS ? undefined : normalizePerson(selectedPerson);
 
-    return coverageCategories.map(category => {
-      const baselines = category.baselines.map(baseline => {
-        const matches = activeContracts.filter(c => contractMatchesBaseline(c, baseline));
-        return { baseline, matches };
+    return coverageCategories
+      .filter((category) => {
+        const categoryPerson = normalizePerson(category.familyMember);
+        // Hide a person-scoped category when a *different* person is selected.
+        if (selected && categoryPerson && categoryPerson !== selected) return false;
+        return true;
+      })
+      .map((category) => {
+        const categoryPerson = normalizePerson(category.familyMember);
+
+        const activeContracts = contracts.filter((c) => {
+          if (!isActive(c)) return false;
+          const contractPerson = normalizePerson(c.familyMember);
+          // Category-declared scope.
+          if (categoryPerson && contractPerson !== categoryPerson) return false;
+          // Dropdown scope (narrows further).
+          if (selected && contractPerson !== selected) return false;
+          return true;
+        });
+
+        const baselines = category.baselines.map((baseline) => {
+          const matches = activeContracts.filter((c) => contractMatchesBaseline(c, baseline));
+          return { baseline, matches };
+        });
+
+        const covered = baselines.filter((b) => b.matches.length > 0).length;
+
+        return {
+          category,
+          baselines,
+          covered,
+          total: category.baselines.length,
+        };
       });
-
-      const covered = baselines.filter(b => b.matches.length > 0).length;
-
-      return {
-        category,
-        baselines,
-        covered,
-        total: category.baselines.length,
-      };
-    });
   }, [contracts, coverageCategories, selectedPerson]);
 
   return (
@@ -161,7 +187,14 @@ const CoverageMatrix = () => {
               <Card key={category.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-lg">
-                    <span>{category.label}</span>
+                    <span className="flex items-center gap-2">
+                      {category.label}
+                      {category.familyMember && (
+                        <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                          {category.familyMember}
+                        </span>
+                      )}
+                    </span>
                     <span className="text-sm font-normal text-muted-foreground">
                       {covered}/{total}
                     </span>

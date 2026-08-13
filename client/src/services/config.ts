@@ -2,6 +2,9 @@ interface AppConfig {
   API_URL: string;
   APP_NAME: string;
   CATEGORIES: string;
+  STATUSES?: string;
+  CURRENCIES?: string;
+  FREQUENCIES?: string;
 }
 
 let config: AppConfig | null = null;

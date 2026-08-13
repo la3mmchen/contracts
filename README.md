@@ -150,6 +150,56 @@ Each baseline defines `keywords` that are matched (case-insensitively) against a
 }
 ```
 
+#### Per-person baseline needs (adults vs. kids)
+
+Different people often need different baselines — adults may need disability or
+life insurance, while kids need accident cover. A category can declare an
+optional `familyMember` to scope it to one person/group. When set:
+
+- Only contracts whose `familyMember` matches (case-insensitively, trimmed) are
+  counted for that category's baselines.
+- The category is shown only when the header Person filter is "All persons" or
+  that same person. Categories without `familyMember` apply to everyone.
+- Selecting a person in the dropdown narrows further (intersection) on top of
+  the category's own scope.
+
+```json
+{
+  "categories": [
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "baselines": [
+        { "id": "health-insurance", "label": "Health Insurance", "keywords": ["health", "krankenversicherung"] },
+        { "id": "liability-insurance", "label": "Liability Insurance", "keywords": ["liability", "haftpflicht"] }
+      ]
+    },
+    {
+      "id": "insurance-adults",
+      "label": "Insurance (Adults)",
+      "familyMember": "person1",
+      "baselines": [
+        { "id": "disability-insurance", "label": "Disability Insurance", "keywords": ["disability", "berufsunfaehigkeit", "bu"] },
+        { "id": "life-insurance", "label": "Life Insurance", "keywords": ["life insurance", "risikoleben"] }
+      ]
+    },
+    {
+      "id": "insurance-kids",
+      "label": "Insurance (Kids)",
+      "familyMember": "kid",
+      "baselines": [
+        { "id": "child-accident", "label": "Accident Insurance", "keywords": ["accident", "unfallversicherung"] }
+      ]
+    }
+  ]
+}
+```
+
+Here the base "Insurance" category applies to everyone, "Insurance (Adults)" only
+counts contracts belonging to `person1`, and "Insurance (Kids)" only counts
+contracts belonging to `kid`. The `familyMember` value must match the
+`familyMember` set on the relevant contracts.
+
 To override it in Docker, mount your own file over the served default:
 
 ```yaml

@@ -27,6 +27,23 @@
       ]
     },
     {
+      "id": "insurance-adults",
+      "label": "Insurance (Adults)",
+      "familyMember": "person1",
+      "baselines": [
+        { "id": "disability-insurance", "label": "Disability Insurance", "keywords": ["disability", "berufsunfaehigkeit", "bu"] },
+        { "id": "life-insurance", "label": "Life Insurance", "keywords": ["life insurance", "risikoleben", "term life"] }
+      ]
+    },
+    {
+      "id": "insurance-kids",
+      "label": "Insurance (Kids)",
+      "familyMember": "kid",
+      "baselines": [
+        { "id": "child-accident", "label": "Accident Insurance", "keywords": ["accident", "unfallversicherung"] }
+      ]
+    },
+    {
       "id": "connectivity",
       "label": "Connectivity",
       "baselines": [
