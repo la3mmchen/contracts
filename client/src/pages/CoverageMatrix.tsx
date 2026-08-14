@@ -22,12 +22,13 @@ const getBasePath = () => {
 };
 
 // Match a contract against a baseline's keywords (case-insensitive substring
-// match across category, tags, name and company).
+// match across category, tags, name, company and description).
 const contractMatchesBaseline = (contract: Contract, baseline: CoverageBaseline): boolean => {
   const haystack = [
     contract.category,
     contract.name,
     contract.company,
+    contract.description,
     ...(contract.tags || []),
   ]
     .filter(Boolean)
