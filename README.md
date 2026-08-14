@@ -163,6 +163,10 @@ optional `familyMember` to scope it to one person/group. When set:
 - Selecting a person in the dropdown narrows further (intersection) on top of
   the category's own scope.
 
+`familyMember` accepts either a single member (`"person1"`) or several
+(`["person1", "kid"]`). With an array, the category matches contracts belonging
+to **any** of the listed members and is shown for any of them.
+
 ```json
 {
   "categories": [
@@ -186,7 +190,7 @@ optional `familyMember` to scope it to one person/group. When set:
     {
       "id": "insurance-kids",
       "label": "Insurance (Kids)",
-      "familyMember": "kid",
+      "familyMember": ["kid1", "kid2"],
       "baselines": [
         { "id": "child-accident", "label": "Accident Insurance", "keywords": ["accident", "unfallversicherung"] }
       ]
@@ -196,8 +200,8 @@ optional `familyMember` to scope it to one person/group. When set:
 ```
 
 Here the base "Insurance" category applies to everyone, "Insurance (Adults)" only
-counts contracts belonging to `person1`, and "Insurance (Kids)" only counts
-contracts belonging to `kid`. The `familyMember` value must match the
+counts contracts belonging to `person1`, and "Insurance (Kids)" counts contracts
+belonging to `kid1` or `kid2`. The `familyMember` value(s) must match the
 `familyMember` set on the relevant contracts.
 
 To override it in Docker, mount your own file over the served default:

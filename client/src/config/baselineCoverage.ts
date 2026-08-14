@@ -27,12 +27,13 @@ export interface CoverageCategory {
   label: string;
   /**
    * Optional person scope. When set, only contracts whose `familyMember`
-   * matches (case-insensitively, trimmed) are considered for this category's
-   * baselines, and the category is only shown when the Person filter is
-   * "All persons" or this same person. Categories without `familyMember`
-   * apply to everyone.
+   * matches (case-insensitively, trimmed) one of the listed members are
+   * considered for this category's baselines, and the category is only shown
+   * when the Person filter is "All persons" or one of these members.
+   * Accepts a single member (string) or several (array). Categories without
+   * `familyMember` apply to everyone.
    */
-  familyMember?: string;
+  familyMember?: string | string[];
   baselines: CoverageBaseline[];
 }
 
@@ -85,8 +86,14 @@ const parseCoverageConfig = (data: unknown): CoverageCategory[] | null => {
     if (!cat || typeof cat !== 'object') return false;
     const c = cat as Record<string, unknown>;
     if (!isString(c.id) || !isString(c.label) || !Array.isArray(c.baselines)) return false;
-    // Optional person scope: if present it must be a string.
-    if (c.familyMember !== undefined && !isString(c.familyMember)) return false;
+    // Optional person scope: if present it must be a string or an array of strings.
+    if (
+      c.familyMember !== undefined &&
+      !isString(c.familyMember) &&
+      !(Array.isArray(c.familyMember) && c.familyMember.every(isString))
+    ) {
+      return false;
+    }
     return c.baselines.every((b) => {
       if (!b || typeof b !== 'object') return false;
       const base = b as Record<string, unknown>;

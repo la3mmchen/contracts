@@ -44,6 +44,18 @@ const isActive = (contract: Contract): boolean =>
 // Normalize a familyMember value for case-insensitive, trimmed comparison.
 const normalizePerson = (value?: string): string => (value ?? '').trim().toLowerCase();
 
+// Normalize a category's familyMember scope (string | string[] | undefined)
+// into a de-duplicated list of normalized members. Empty when unscoped.
+const normalizeCategoryMembers = (value?: string | string[]): string[] => {
+  const list = Array.isArray(value) ? value : value !== undefined ? [value] : [];
+  const seen = new Set<string>();
+  for (const member of list) {
+    const normalized = normalizePerson(member);
+    if (normalized) seen.add(normalized);
+  }
+  return Array.from(seen);
+};
+
 const CoverageMatrix = () => {
   const navigate = useNavigate();
   const { contracts, loading } = useContractStorage();
@@ -78,33 +90,33 @@ const CoverageMatrix = () => {
   }, [contracts]);
 
   // For each category/baseline, find the matching active contracts, optionally
-  // scoped to a single person.
+  // scoped to one or more persons.
   //
-  // A category can declare its own `familyMember` scope (e.g. an "adults only"
-  // insurance category). The header Person dropdown narrows further on top of
-  // that (intersection):
-  //   - Categories whose `familyMember` conflicts with the selected person are
-  //     hidden entirely.
-  //   - The contract pool for a category is restricted to both the category's
-  //     familyMember (if any) and the selected person (if any).
+  // A category can declare its own `familyMember` scope (one member or several,
+  // e.g. an "adults only" insurance category). The header Person dropdown
+  // narrows further on top of that (intersection):
+  //   - Categories whose members do NOT include the selected person are hidden.
+  //   - The contract pool for a category is restricted to contracts whose
+  //     familyMember is one of the category's members (OR), and to the selected
+  //     person (if any).
   const matrix = useMemo(() => {
     const selected = selectedPerson === ALL_PERSONS ? undefined : normalizePerson(selectedPerson);
 
     return coverageCategories
       .filter((category) => {
-        const categoryPerson = normalizePerson(category.familyMember);
-        // Hide a person-scoped category when a *different* person is selected.
-        if (selected && categoryPerson && categoryPerson !== selected) return false;
+        const members = normalizeCategoryMembers(category.familyMember);
+        // Hide a person-scoped category when the selected person isn't listed.
+        if (selected && members.length > 0 && !members.includes(selected)) return false;
         return true;
       })
       .map((category) => {
-        const categoryPerson = normalizePerson(category.familyMember);
+        const members = normalizeCategoryMembers(category.familyMember);
 
         const activeContracts = contracts.filter((c) => {
           if (!isActive(c)) return false;
           const contractPerson = normalizePerson(c.familyMember);
-          // Category-declared scope.
-          if (categoryPerson && contractPerson !== categoryPerson) return false;
+          // Category-declared scope: contract must belong to one of the members.
+          if (members.length > 0 && !members.includes(contractPerson)) return false;
           // Dropdown scope (narrows further).
           if (selected && contractPerson !== selected) return false;
           return true;
@@ -188,13 +200,21 @@ const CoverageMatrix = () => {
               <Card key={category.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-lg">
-                    <span className="flex items-center gap-2">
+                    <span className="flex flex-wrap items-center gap-2">
                       {category.label}
-                      {category.familyMember && (
-                        <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
-                          {category.familyMember}
+                      {(Array.isArray(category.familyMember)
+                        ? category.familyMember
+                        : category.familyMember
+                          ? [category.familyMember]
+                          : []
+                      ).map((member) => (
+                        <span
+                          key={member}
+                          className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                        >
+                          {member}
                         </span>
-                      )}
+                      ))}
                     </span>
                     <span className="text-sm font-normal text-muted-foreground">
                       {covered}/{total}
