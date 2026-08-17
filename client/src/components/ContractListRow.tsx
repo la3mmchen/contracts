@@ -8,7 +8,9 @@ import {
   FileText,
   AlertTriangle,
   Pin,
+  Users,
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Link } from 'react-router-dom';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { isValidCategory, getCategoryBadgeColor } from '@/lib/utils';
@@ -71,6 +73,23 @@ export const ContractListRow = ({
           </div>
         )}
       </div>
+
+      {/* Paperless correspondent indicator */}
+      {contract.paperlessCorrespondent && (
+        <div className="shrink-0">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Users
+                className="h-4 w-4 text-muted-foreground"
+                aria-label={`Paperless correspondent: ${contract.paperlessCorrespondent}`}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              Paperless correspondent: {contract.paperlessCorrespondent}
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
 
       {/* Status flags */}
       <div className="hidden md:flex items-center gap-1.5 shrink-0">
